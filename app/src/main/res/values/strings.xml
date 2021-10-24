@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">DoIt</string>
+    <string name="add">Add</string>
+    <string name="todo_hint">Todo</string>
+    <string name="deadline">Deadline</string>
+    <string name="time_interval">Interval</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="set_interval">Set</string>
+    <string name="create">Create</string>
+    <string name="start_time">Start Time</string>
+    <string name="start_time_button_text">Start Time</string>
+    <string name="create_todo">Create new Todo</string>
+    <string name="set_deadline">Set Deadline</string>
+    <string name="categories">Categories</string>
+    <string name="add_category">Add category</string>
+    <string name="create_category">create_category</string>
+</resources>
