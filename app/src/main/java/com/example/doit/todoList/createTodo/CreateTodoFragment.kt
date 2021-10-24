@@ -3,10 +3,10 @@ package com.example.doit.todoList.createTodo
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.EditText
 import android.widget.RadioButton
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -24,6 +24,7 @@ class CreateTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoCreateBinding
     private lateinit var viewModel: CreateTodoViewModel
+    private lateinit var actionbar: ActionBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -31,6 +32,8 @@ class CreateTodoFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_todo_create, container, false
         )
+
+        actionbar = (requireActivity() as AppCompatActivity).supportActionBar!!
 
         val categoryDb = CategoryDb.getInstance(requireContext())
         val viewModelFactory = CreateTodoViewModelFactory(categoryDb.dao)
@@ -95,10 +98,26 @@ class CreateTodoFragment : Fragment() {
         }
 
         binding.categorySelection.setOnCheckedChangeListener { _, id ->
-            with (viewModel) {
+            with(viewModel) {
                 getCategoryById(id)?.let {
                     todo.setCategory(it)
                 }
+            }
+        }
+
+        binding.addCategoryButton.setOnClickListener {
+            if (binding.categoryEditText.visibility == View.GONE) {
+                binding.headerTextCategory.visibility = View.GONE
+                binding.categoryEditText.visibility = View.VISIBLE
+                binding.addCategoryButton.setImageResource(R.drawable.ic_done)
+            } else {
+                val categoryString = binding.categoryEditText.text.toString()
+                if (categoryString.isNotEmpty()) {
+                    viewModel.addNewCategory(categoryString)
+                }
+                binding.headerTextCategory.visibility = View.VISIBLE
+                binding.categoryEditText.visibility = View.GONE
+                binding.addCategoryButton.setImageResource(R.drawable.ic_add)
             }
         }
 

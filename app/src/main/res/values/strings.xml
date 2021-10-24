@@ -15,4 +15,6 @@
     <string name="categories">Categories</string>
     <string name="add_category">Add category</string>
     <string name="create_category">create_category</string>
+    <string name="close_category">Close category</string>
+    <string name="category">Category</string>
 </resources>

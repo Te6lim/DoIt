@@ -36,7 +36,7 @@ class TodoInfo() : Parcelable {
 
 
     fun isValid(): Boolean {
-        return dateSet.isNotEmpty() || timeSet.isNotEmpty()
+        return dateSet.isNotEmpty() || timeSet.isNotEmpty() || description.isNotEmpty()
     }
 
     fun setDate(y: Int, m: Int, d: Int) {
