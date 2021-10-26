@@ -9,13 +9,7 @@
         android:id="@+id/todoListFragment"
         android:name="com.example.doit.todoList.TodoListFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_list_todo" >
-        <argument
-            android:name="todoInfo"
-            app:argType="com.example.doit.todoList.createTodo.TodoInfo"
-            app:nullable="true"
-            android:defaultValue="@null" />
-    </fragment>
+        tools:layout="@layout/fragment_list_todo" />
     <fragment
         android:id="@+id/createTodoFragment"
         android:name="com.example.doit.todoList.createTodo.CreateTodoFragment"
@@ -23,6 +17,8 @@
         tools:layout="@layout/fragment_todo_create">
         <action
             android:id="@+id/action_createTodoFragment_to_todoListFragment"
-            app:destination="@id/todoListFragment" />
+            app:destination="@id/todoListFragment"
+            app:popUpTo="@id/todoListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

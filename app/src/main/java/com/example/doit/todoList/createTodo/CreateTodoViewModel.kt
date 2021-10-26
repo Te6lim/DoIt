@@ -5,9 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
+import com.example.doit.database.Todo
+import com.example.doit.database.TodoDbDao
 import kotlinx.coroutines.*
 
-class CreateTodoViewModel(private val catDb: CategoryDao) : ViewModel() {
+class CreateTodoViewModel(
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao
+) : ViewModel() {
 
     companion object {
         const val DEFAULT_CATEGORY = "Work"
@@ -18,15 +22,39 @@ class CreateTodoViewModel(private val catDb: CategoryDao) : ViewModel() {
 
     private val _todoInfo = MutableLiveData<TodoInfo>()
     val todoInfo: LiveData<TodoInfo>
-    get() = _todoInfo
-    var todo = TodoInfo()
-    private set
+        get() = _todoInfo
 
-    private var _defaultCategory = MutableLiveData<Category>()
+    var todo = TodoInfo()
+        private set
+
+    private val _defaultCategory = MutableLiveData<Category>()
     val defaultCategory: LiveData<Category>
-    get() = _defaultCategory
+        get() = _defaultCategory
+
+    private val _categoryEditTextIsOpen = MutableLiveData<Boolean>()
+    val categoryEditTextIsOpen: LiveData<Boolean>
+        get() = _categoryEditTextIsOpen
 
     val categories = catDb.getAll()
+
+    fun add(todoInfo: TodoInfo) {
+        uiScope.launch {
+
+            val todo = Todo(
+                todoString = todoInfo.description,
+                category = todoInfo.category,
+                dateTodo = todoInfo.dateSet,
+                timeTodo = todoInfo.timeSet
+            )
+            addTodo(todo)
+        }
+    }
+
+    suspend fun addTodo(todo: Todo) {
+        withContext(Dispatchers.IO) {
+            todoDb.insert(todo)
+        }
+    }
 
     fun createTodoInfo() {
         _todoInfo.value = todo
@@ -104,6 +132,14 @@ class CreateTodoViewModel(private val catDb: CategoryDao) : ViewModel() {
     fun initializeCategories() {
         addNewCategory(DEFAULT_CATEGORY, true)
         addNewCategory("School")
+    }
+
+    fun makeCategoryEditTextVisible() {
+        _categoryEditTextIsOpen.value = true
+    }
+
+    fun makeCategoryEditTextNotVisible() {
+        _categoryEditTextIsOpen.value = false
     }
 
     override fun onCleared() {

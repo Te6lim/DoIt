@@ -21,10 +21,10 @@ data class Todo(
     var timeSet: LocalTime = LocalTime.now(),
 
     @ColumnInfo(name = "date_todo")
-    var dateTodo: LocalDate? = null,
+    var dateTodo: LocalDate,
 
     @ColumnInfo(name = "time_todo")
-    var timeTodo: LocalTime? = null,
+    var timeTodo: LocalTime,
 
     @ColumnInfo(name = "date_finished")
     var dateFinished: LocalDate? = null,

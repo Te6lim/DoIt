@@ -17,4 +17,9 @@
     <string name="create_category">create_category</string>
     <string name="close_category">Close category</string>
     <string name="category">Category</string>
+    <string name="todo_on">To-do on: %s</string>
+    <string name="day_month_year">%2d-%2d-%4d</string>
+    <string name="hour_min">%2d:%2d %s</string>
+    <string name="invalid_date">Invalid date!</string>
+    <string name="invalid_time">Invalid time!</string>
 </resources>

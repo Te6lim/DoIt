@@ -50,11 +50,6 @@ class TodoListFragment : Fragment() {
                     binding.emptyTodo.visibility = View.GONE
                 }
             }
-
-            TodoListFragmentArgs.fromBundle(requireArguments()).todoInfo?.let {
-                add(it)
-                requireArguments().clear()
-            }
         }
 
         return binding.root

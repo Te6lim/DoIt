@@ -1,89 +1,111 @@
 package com.example.doit.todoList.createTodo
 
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.doit.database.Category
-import com.example.doit.todoList.formatToString
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 
 
-class TodoInfo() : Parcelable {
+class TodoInfo {
     var description: String = ""
+        private set
 
-    var dateSet: String = ""
-    private set
+    var dateSet: LocalDate = LocalDate.now()
+        private set
 
-    var timeSet: String = ""
-    private set
+    var timeSet: LocalTime = LocalTime.now()
+        private set
 
-    var deadlineDate: String = ""
-    private set
+    var deadlineDate: LocalDate? = null
+        private set
 
-    var deadlineTime: String = ""
-    private set
+    var deadlineTime: LocalTime? = null
+        private set
 
     var deadlineEnabled: Boolean = false
-    private set
-    var category: String  = CreateTodoViewModel.DEFAULT_CATEGORY
-    private set
+        private set
+    var category: String = CreateTodoViewModel.DEFAULT_CATEGORY
+        private set
 
-    private val _valid = MutableLiveData<Boolean>()
-    val valid: LiveData<Boolean>
-    get() =_valid
+    private val _dateUIString = MutableLiveData("DATE")
+    val dateUIString: LiveData<String>
+        get() = _dateUIString
 
+    private val _timeUIString = MutableLiveData("TIME")
+    val timeUIString: LiveData<String>
+        get() = _timeUIString
 
-    fun isValid(): Boolean {
-        return dateSet.isNotEmpty() || timeSet.isNotEmpty() || description.isNotEmpty()
+    private val _isDateValid = MutableLiveData(true)
+    val isDateValid: LiveData<Boolean>
+        get() = _isDateValid
+
+    private val _isTimeValid = MutableLiveData(true)
+    val isTimeValid: LiveData<Boolean>
+        get() = _isTimeValid
+
+    private val _isTodoValid = MutableLiveData<Boolean>()
+    val isTodoValid: LiveData<Boolean>
+        get() = _isTodoValid
+
+    fun todoValid(): Boolean {
+        return description.isNotEmpty()
     }
 
-    fun setDate(y: Int, m: Int, d: Int) {
-        dateSet = LocalDate.of(y, m, d).formatToString()
-        if (timeSet.isNotEmpty()) _valid.value = true
+    fun setDescription(d: String) {
+        description = d
+        _isTodoValid.value = todoValid()
     }
 
-    fun setTime(h: Int, m: Int) {
-        timeSet = LocalTime.of(h, m).formatToString()
-        if (dateSet.isNotEmpty()) _valid.value = true
+    fun setDate(year: Int, month: Int, day: Int) {
+        if (dateIsInvalid(year, month, day)) {
+            _isDateValid.value = false
+            _dateUIString.value = "INVALID DATE!"
+        } else {
+            _dateUIString.value = "$year-$month-$day"
+            dateSet = LocalDate.of(year, month, day)
+            _isTodoValid.value = todoValid()
+            _isDateValid.value = true
+        }
+    }
+
+    fun setTime(hour: Int, minute: Int) {
+        if (timeIsInvalid(hour, minute)) {
+            _isTimeValid.value = false
+            _timeUIString.value = "INVALID TIME!"
+        } else {
+            timeSet = LocalTime.of(hour, minute)
+            val meridian = if (hour < 12) "AM" else "PM"
+            _timeUIString.value = "${hour % 12}:$minute $meridian"
+            _isTodoValid.value = todoValid()
+            _isTimeValid.value = true
+        }
+    }
+
+    private fun dateIsInvalid(year: Int, month: Int, day: Int): Boolean {
+        val calendar = Calendar.getInstance()
+        val presentYear = calendar.get(Calendar.YEAR)
+        val presentMonth = calendar.get(Calendar.MONTH) + 1
+        val presentDay = calendar.get(Calendar.DAY_OF_MONTH)
+        if (year < presentYear)
+            return true
+        if (year == presentYear && month < presentMonth)
+            return true
+        if (year == presentYear && month == presentMonth && day < presentDay)
+            return true
+        return false
+    }
+
+    private fun timeIsInvalid(hour: Int, minute: Int): Boolean {
+        val presentHour = LocalTime.now().hour
+        val presentMinute = LocalTime.now().minute
+        return if (dateSet == LocalDate.now()) {
+            ((hour < presentHour) || (hour == presentHour && minute < presentMinute))
+        } else false
     }
 
     fun setCategory(cat: Category) {
         category = cat.name
-    }
-
-    private constructor(parcel: Parcel) : this() {
-        description = parcel.readString()!!
-        dateSet = parcel.readString()!!
-        timeSet = parcel.readString()!!
-        deadlineDate = parcel.readString()!!
-        deadlineTime = parcel.readString()!!
-        deadlineEnabled = parcel.readByte() != 0.toByte()
-        category = parcel.readString()!!
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(description)
-        parcel.writeString(dateSet)
-        parcel.writeString(timeSet)
-        parcel.writeString(deadlineDate)
-        parcel.writeString(deadlineTime)
-        parcel.writeByte(if (deadlineEnabled) 1 else 0)
-        parcel.writeString(category)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<TodoInfo> {
-        override fun createFromParcel(parcel: Parcel): TodoInfo {
-            return TodoInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TodoInfo?> {
-            return arrayOfNulls(size)
-        }
     }
 }
