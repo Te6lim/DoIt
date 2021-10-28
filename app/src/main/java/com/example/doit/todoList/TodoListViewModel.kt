@@ -32,7 +32,11 @@ class TodoListViewModel(private val database: TodoDbDao) : ViewModel() {
     }
 
     fun delete(id: Long) {
-
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                database.delete(id)
+            }
+        }
     }
 
     override fun onCleared() {

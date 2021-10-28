@@ -61,11 +61,11 @@ class CreateTodoFragment : Fragment() {
 
             todoInfo.observe(viewLifecycleOwner) {
                 if (it.todoValid()) {
-                    viewModel.add(it)
+                    add(it)
                     findNavController().navigate(
-                        CreateTodoFragmentDirections
-                            .actionCreateTodoFragmentToTodoListFragment()
+                        CreateTodoFragmentDirections.actionCreateTodoFragmentToTodoListFragment()
                     )
+                    clearTodoInfo()
                 }
             }
 

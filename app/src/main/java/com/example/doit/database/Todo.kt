@@ -35,6 +35,9 @@ data class Todo(
     @ColumnInfo(name = "is_completed")
     var isCompleted: Boolean = false,
 
+    @ColumnInfo(name = "has_deadline")
+    val hasDeadline: Boolean = false,
+
     @ColumnInfo(name = "deadline_date")
     var deadlineDate: LocalDate? = null,
 

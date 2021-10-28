@@ -33,7 +33,10 @@ class TodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = TodoListAdapter()
+        val adapter = TodoListAdapter(CheckedTodoListener {
+            todoListViewModel.delete(it)
+        })
+
         binding.todoList.adapter = adapter
 
         with(todoListViewModel) {

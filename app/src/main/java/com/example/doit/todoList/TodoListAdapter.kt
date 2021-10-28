@@ -10,7 +10,8 @@ import com.example.doit.R
 import com.example.doit.database.Todo
 import com.example.doit.databinding.ItemTodoBinding
 
-class TodoListAdapter : ListAdapter<Todo, TodoListAdapter.TodoViewHolder>(TodoDiffCallback()) {
+class TodoListAdapter(private val listener: CheckedTodoListener) :
+    ListAdapter<Todo, TodoListAdapter.TodoViewHolder>(TodoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         return TodoViewHolder.create(parent)
@@ -18,7 +19,7 @@ class TodoListAdapter : ListAdapter<Todo, TodoListAdapter.TodoViewHolder>(TodoDi
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
         val todoItem = getItem(position)
-        holder.bind(todoItem)
+        holder.bind(todoItem, listener)
     }
 
     class TodoViewHolder(
@@ -35,8 +36,12 @@ class TodoListAdapter : ListAdapter<Todo, TodoListAdapter.TodoViewHolder>(TodoDi
             }
         }
 
-        fun bind(todo: Todo) {
-            itemViewBinding.todoItem = todo
+        fun bind(todo: Todo, checkListener: CheckedTodoListener) {
+            with(itemViewBinding) {
+                todoItem = todo
+                itemListener = checkListener
+                executePendingBindings()
+            }
         }
     }
 }
@@ -50,4 +55,10 @@ class TodoDiffCallback : DiffUtil.ItemCallback<Todo>() {
         return oldItem == newItem
     }
 
+}
+
+class CheckedTodoListener(private val x: (Long) -> Unit) {
+    fun onChecked(itemId: Long) {
+        x(itemId)
+    }
 }

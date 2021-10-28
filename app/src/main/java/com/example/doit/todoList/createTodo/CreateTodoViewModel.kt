@@ -39,16 +39,20 @@ class CreateTodoViewModel(
 
     fun add(todoInfo: TodoInfo) {
         uiScope.launch {
-
             val todo = Todo(
                 todoString = todoInfo.description,
                 category = todoInfo.category,
                 dateTodo = todoInfo.dateSet,
-                timeTodo = todoInfo.timeSet
-            )
+                timeTodo = todoInfo.timeSet,
+                hasDeadline = todoInfo.deadlineEnabled,
+            ).apply {
+                if (hasDeadline) {
+                    deadlineDate = todoInfo.deadlineDate
+                    deadlineTime = todoInfo.deadlineTime
+                }
+            }
             addTodo(todo)
         }
-        clearTodoInfo()
     }
 
     private suspend fun addTodo(todo: Todo) {
@@ -61,7 +65,7 @@ class CreateTodoViewModel(
         _todoInfo.value = todo
     }
 
-    private fun clearTodoInfo() {
+    fun clearTodoInfo() {
         todo = TodoInfo()
         _todoInfo.value = todo
     }

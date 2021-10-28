@@ -8,6 +8,10 @@
         <variable
             name="todoItem"
             type="com.example.doit.database.Todo" />
+
+        <variable
+            name="itemListener"
+            type="com.example.doit.todoList.CheckedTodoListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,6 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:onCheckedChanged="@{() -> itemListener.onChecked(todoItem.todoId)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
