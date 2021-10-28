@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import com.example.doit.database.Category
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 
 
 class TodoInfo {
@@ -26,6 +25,7 @@ class TodoInfo {
 
     var deadlineEnabled: Boolean = false
         private set
+
     var category: String = CreateTodoViewModel.DEFAULT_CATEGORY
         private set
 
@@ -37,6 +37,12 @@ class TodoInfo {
     val timeUIString: LiveData<String>
         get() = _timeUIString
 
+    private var deadlineDateUIString = ""
+
+    private val _deadlineUIString = MutableLiveData("SET DEADLINE")
+    val deadlineUIString: LiveData<String>
+        get() = _deadlineUIString
+
     private val _isDateValid = MutableLiveData(true)
     val isDateValid: LiveData<Boolean>
         get() = _isDateValid
@@ -45,12 +51,20 @@ class TodoInfo {
     val isTimeValid: LiveData<Boolean>
         get() = _isTimeValid
 
+    private val _isDeadlineValid = MutableLiveData(true)
+    val isDeadLineValid: LiveData<Boolean>
+        get() = _isDeadlineValid
+
     private val _isTodoValid = MutableLiveData<Boolean>()
     val isTodoValid: LiveData<Boolean>
         get() = _isTodoValid
 
     fun todoValid(): Boolean {
-        return description.isNotEmpty()
+        return (description.isNotEmpty() &&
+                (!deadlineEnabled || (deadlineEnabled && deadlineDate != null &&
+                        deadlineTime != null)) &&
+                _isDateValid.value!! && _isTimeValid.value!!
+                )
     }
 
     fun setDescription(d: String) {
@@ -58,49 +72,132 @@ class TodoInfo {
         _isTodoValid.value = todoValid()
     }
 
+    fun setIsDeadlineEnabled(value: Boolean) {
+        deadlineEnabled = value
+        _isTodoValid.value = todoValid()
+    }
+
     fun setDate(year: Int, month: Int, day: Int) {
-        if (dateIsInvalid(year, month, day)) {
+        if (dateIsInvalid(year, month, day, LocalDate.now())) {
             _isDateValid.value = false
             _dateUIString.value = "INVALID DATE!"
+            dateSet = LocalDate.now()
+            _isTodoValid.value = todoValid()
         } else {
             _dateUIString.value = "$year-$month-$day"
             dateSet = LocalDate.of(year, month, day)
-            _isTodoValid.value = todoValid()
             _isDateValid.value = true
+            _isTodoValid.value = todoValid()
+
+            if (deadlineDate != null) {
+                if (dateIsInvalid(
+                        deadlineDate!!.year, deadlineDate!!.monthValue,
+                        deadlineDate!!.dayOfMonth, dateSet
+                    )
+                ) {
+                    _isDateValid.value = false
+                    _dateUIString.value = "INVALID DATE!"
+                    dateSet = LocalDate.now()
+                    _isTodoValid.value = todoValid()
+                }
+            }
         }
     }
 
     fun setTime(hour: Int, minute: Int) {
-        if (timeIsInvalid(hour, minute)) {
+        if (timeIsInvalid(hour, minute, dateSet, LocalDate.now(), LocalTime.now())) {
             _isTimeValid.value = false
             _timeUIString.value = "INVALID TIME!"
+            timeSet = LocalTime.now()
+            _isTodoValid.value = todoValid()
         } else {
             timeSet = LocalTime.of(hour, minute)
             val meridian = if (hour < 12) "AM" else "PM"
             _timeUIString.value = "${hour % 12}:$minute $meridian"
-            _isTodoValid.value = todoValid()
             _isTimeValid.value = true
+            _isTodoValid.value = todoValid()
+
+            if (deadlineTime != null) {
+                if (timeIsInvalid(
+                        deadlineTime!!.hour, deadlineTime!!.minute,
+                        deadlineDate, dateSet, timeSet
+                    )
+                ) {
+
+                    _isTimeValid.value = false
+                    _timeUIString.value = "INVALID TIME!"
+                    timeSet = LocalTime.now()
+                    _isTodoValid.value = todoValid()
+                }
+            }
         }
     }
 
-    private fun dateIsInvalid(year: Int, month: Int, day: Int): Boolean {
-        val calendar = Calendar.getInstance()
-        val presentYear = calendar.get(Calendar.YEAR)
-        val presentMonth = calendar.get(Calendar.MONTH) + 1
-        val presentDay = calendar.get(Calendar.DAY_OF_MONTH)
-        if (year < presentYear)
-            return true
-        if (year == presentYear && month < presentMonth)
-            return true
-        if (year == presentYear && month == presentMonth && day < presentDay)
-            return true
+    fun setDeadlineDate(year: Int, month: Int, day: Int) {
+        if (!_isDateValid.value!! || !isTimeValid.value!! ||
+            dateIsInvalid(year, month, day, dateSet)
+        ) {
+            _deadlineUIString.value = "INVALID DATE!"
+            _isDeadlineValid.value = false
+            deadlineDate = null
+            _isTodoValid.value = todoValid()
+        } else {
+            deadlineDateUIString = "$year-$month-$day"
+            deadlineDate = LocalDate.of(year, month, day)
+            _isDeadlineValid.value = true
+
+            val hour = 23;
+            val minute = 59
+            deadlineTime = LocalTime.of(hour, minute)
+            val meridian = if (hour < 12) "AM" else "PM"
+            _deadlineUIString.value = deadlineDateUIString.plus(
+                " by ${hour % 12}:$minute $meridian"
+            )
+            _isTodoValid.value = todoValid()
+        }
+    }
+
+    fun setDeadlineTime(hour: Int, minute: Int) {
+        if (_isDeadlineValid.value!!) {
+            if (!_isDateValid.value!! || !isTimeValid.value!! ||
+                timeIsInvalid(hour, minute, deadlineDate, dateSet, timeSet)
+            ) {
+                _isDeadlineValid.value = false
+                _deadlineUIString.value = "INVALID TIME!"
+                deadlineTime = null
+                _isTodoValid.value = todoValid()
+            } else {
+                deadlineTime = LocalTime.of(hour, minute)
+                val meridian = if (hour < 12) "AM" else "PM"
+                _deadlineUIString.value = deadlineDateUIString.plus(
+                    " by ${hour % 12}:$minute $meridian"
+                )
+                _isDeadlineValid.value = true
+                _isTodoValid.value = todoValid()
+            }
+        }
+    }
+
+    private fun dateIsInvalid(
+        year: Int, month: Int, day: Int,
+        referenceDate: LocalDate
+    ): Boolean {
+        val y = referenceDate.year
+        val m = referenceDate.monthValue
+        val d = referenceDate.dayOfMonth
+        if (year < y) return true
+        if (year == y && month < m) return true
+        if (year == y && month == m && day < d) return true
         return false
     }
 
-    private fun timeIsInvalid(hour: Int, minute: Int): Boolean {
-        val presentHour = LocalTime.now().hour
-        val presentMinute = LocalTime.now().minute
-        return if (dateSet == LocalDate.now()) {
+    private fun timeIsInvalid(
+        hour: Int, minute: Int, date: LocalDate?,
+        referenceDate: LocalDate, referenceTime: LocalTime
+    ): Boolean {
+        val presentHour = referenceTime.hour
+        val presentMinute = referenceTime.minute
+        return if (date == referenceDate) {
             ((hour < presentHour) || (hour == presentHour && minute < presentMinute))
         } else false
     }

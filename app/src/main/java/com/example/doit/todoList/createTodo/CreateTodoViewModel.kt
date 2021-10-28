@@ -48,9 +48,10 @@ class CreateTodoViewModel(
             )
             addTodo(todo)
         }
+        clearTodoInfo()
     }
 
-    suspend fun addTodo(todo: Todo) {
+    private suspend fun addTodo(todo: Todo) {
         withContext(Dispatchers.IO) {
             todoDb.insert(todo)
         }
@@ -60,7 +61,7 @@ class CreateTodoViewModel(
         _todoInfo.value = todo
     }
 
-    fun clearTodoInfo() {
+    private fun clearTodoInfo() {
         todo = TodoInfo()
         _todoInfo.value = todo
     }
