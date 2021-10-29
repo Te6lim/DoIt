@@ -5,7 +5,6 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.RadioButton
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -25,7 +24,6 @@ class CreateTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoCreateBinding
     private lateinit var viewModel: CreateTodoViewModel
-    private lateinit var actionbar: ActionBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -33,8 +31,6 @@ class CreateTodoFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_todo_create, container, false
         )
-
-        actionbar = (requireActivity() as AppCompatActivity).supportActionBar!!
 
         val categoryDb = CategoryDb.getInstance(requireContext())
         val todoDb = TodoDatabase.getInstance(requireContext())
@@ -50,13 +46,20 @@ class CreateTodoFragment : Fragment() {
 
         with(viewModel) {
             categories.observe(viewLifecycleOwner) {
-                if (it.isNullOrEmpty()) initializeCategories()
-                initializeDefault()
-            }
+                when {
+                    it.isNullOrEmpty() -> initializeCategories()
+                    binding.categorySelection.childCount == 0 ->
+                        addCategoryViews(categories.value!!)
 
-            defaultCategory.observe(viewLifecycleOwner) { category ->
-                setTitleToDefaultCategoryName(category)
-                addCategoryViews(categories.value!!)
+                    else -> binding.categorySelection.addView(
+                        RadioButton(requireContext()).apply {
+                            id = it[0].id
+                            text = it[0].name
+                            this@CreateTodoFragment.viewModel.emitCategory(id)
+                        }, 0
+                    )
+                }
+                initializeDefault()
             }
 
             todoInfo.observe(viewLifecycleOwner) {
@@ -66,6 +69,15 @@ class CreateTodoFragment : Fragment() {
                         CreateTodoFragmentDirections.actionCreateTodoFragmentToTodoListFragment()
                     )
                     clearTodoInfo()
+                }
+            }
+
+            defaultCategory.observe(viewLifecycleOwner) {
+                if (category.value == null) {
+                    todo.setCategory(it)
+
+                    setTitleToDefaultCategoryName(it)
+                    binding.categorySelection.findViewById<RadioButton>(it.id).isChecked = true
                 }
             }
 
@@ -91,6 +103,15 @@ class CreateTodoFragment : Fragment() {
                         categoryEditText.visibility = View.GONE
                         addCategoryButton.setImageResource(R.drawable.ic_add)
                     }
+                }
+            }
+
+            category.observe(viewLifecycleOwner) {
+                it?.let {
+                    todo.setCategory(it)
+
+                    setTitleToDefaultCategoryName(it)
+                    binding.categorySelection.findViewById<RadioButton>(it.id).isChecked = true
                 }
             }
         }
@@ -150,11 +171,7 @@ class CreateTodoFragment : Fragment() {
         }
 
         binding.categorySelection.setOnCheckedChangeListener { _, id ->
-            with(viewModel) {
-                getCategoryById(id)?.let {
-                    todo.setCategory(it)
-                }
-            }
+            viewModel.emitCategory(id)
         }
 
         with(binding) {
@@ -173,13 +190,11 @@ class CreateTodoFragment : Fragment() {
     }
 
     private fun addCategoryViews(categories: List<Category>) {
-        binding.categorySelection.removeAllViews()
         for (cat in categories) {
             binding.categorySelection.addView(
                 RadioButton(requireContext()).apply {
                     id = cat.id
                     text = cat.name
-                    if (viewModel.isDefault(id)) isChecked = true
                 }
             )
         }

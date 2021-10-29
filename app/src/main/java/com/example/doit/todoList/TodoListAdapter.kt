@@ -2,6 +2,7 @@ package com.example.doit.todoList
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.marginBottom
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter

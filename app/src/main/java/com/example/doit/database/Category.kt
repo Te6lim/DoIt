@@ -18,7 +18,7 @@ data class Category(
 
 @Dao
 interface CategoryDao {
-    @Query("SELECT * FROM category_table")
+    @Query("SELECT * FROM category_table ORDER BY id DESC")
     fun getAll(): LiveData<List<Category>>
 
     @Insert
@@ -27,8 +27,8 @@ interface CategoryDao {
     @Query("DELETE FROM category_table WHERE name = :name")
     fun delete(name: String)
 
-    @Query("SELECT * FROM category_table WHERE id = :key")
-    fun get(key: Long): Category?
+    @Query("SELECT * FROM category_table WHERE id = :key LIMIT 1")
+    fun get(key: Int): Category?
 
     @Query("SELECT * FROM category_table WHERE is_default = :value LIMIT 1")
     fun getDefault(value: Boolean): Category

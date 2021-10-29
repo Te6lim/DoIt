@@ -37,6 +37,10 @@ class CreateTodoViewModel(
 
     val categories = catDb.getAll()
 
+    private val _category = MutableLiveData<Category>()
+    val category: LiveData<Category>
+        get() = _category
+
     fun add(todoInfo: TodoInfo) {
         uiScope.launch {
             val todo = Todo(
@@ -91,17 +95,15 @@ class CreateTodoViewModel(
         }
     }
 
-    fun getCategoryById(id: Int): Category? {
-        var cat: Category? = null
+    fun emitCategory(id: Int) {
         uiScope.launch {
-            cat = getCat(id)
+            _category.value = getCat(id)
         }
-        return cat
     }
 
     private suspend fun getCat(id: Int): Category? {
         return withContext(Dispatchers.IO) {
-            catDb.get(id.toLong())
+            catDb.get(id)
         }
     }
 
@@ -113,7 +115,7 @@ class CreateTodoViewModel(
         }
     }
 
-    fun changeDefault(categoryId: Long) {
+    fun changeDefault(categoryId: Int) {
         _defaultCategory.value?.let {
             it.isDefault = false
             var newDefault: Category?
