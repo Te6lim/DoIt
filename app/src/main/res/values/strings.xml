@@ -22,4 +22,7 @@
     <string name="hour_min">%2d:%2d %s</string>
     <string name="invalid_date">Invalid date!</string>
     <string name="invalid_time">Invalid time!</string>
+    <string name="finished_todos">Finished todos</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
 </resources>

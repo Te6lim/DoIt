@@ -23,9 +23,7 @@ abstract class TodoDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext, TodoDatabase::class.java, "todo_history"
-                    )
-                        .addTypeConverter(DateConverters())
-                        .addTypeConverter(TimeConverters())
+                    ).addTypeConverter(DateConverters()).addTypeConverter(TimeConverters())
                         .fallbackToDestructiveMigration().build()
                     INSTANCE = instance
                 }
