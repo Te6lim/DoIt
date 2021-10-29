@@ -39,6 +39,9 @@ class TodoListAdapter(private val listener: CheckedTodoListener) :
         fun bind(todo: Todo, checkListener: CheckedTodoListener) {
             with(itemViewBinding) {
                 todoItem = todo
+                itemViewBinding.todoItemView.setOnLongClickListener {
+                    true
+                }
                 itemListener = checkListener
                 executePendingBindings()
             }

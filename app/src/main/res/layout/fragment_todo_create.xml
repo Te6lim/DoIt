@@ -21,9 +21,12 @@
             android:layout_marginStart="@dimen/margin_large"
             android:layout_marginTop="@dimen/margin_large"
             android:layout_marginEnd="@dimen/margin_large"
+            android:background="@drawable/todo_background"
             android:hint="@string/todo_hint"
             android:inputType="text"
             android:minHeight="48dp"
+            android:paddingStart="@dimen/padding_small"
+            android:paddingEnd="@dimen/padding_small"
             app:layout_constraintBottom_toTopOf="@+id/date_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -90,10 +93,11 @@
             android:layout_marginEnd="16dp"
             android:enabled="false"
             android:text="@{viewModel.todo.deadlineUIString}"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/deadline_switch"
-            app:setColor="@{viewModel.todo.isDeadLineValid}" />
+            app:setColor="@{viewModel.todo.isDeadLineValid}"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/categories_header"

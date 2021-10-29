@@ -8,5 +8,8 @@
     <color name="secondaryDarkColor">#9c64a6</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
+
     <color name="colorRed">#FF0000</color>
+    <color name="listBackground">#ffffff</color>
+    <color name="outline">#8F8F8F</color>
 </resources>

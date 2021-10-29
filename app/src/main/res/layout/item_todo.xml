@@ -18,12 +18,11 @@
         android:id="@+id/todo_item_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_large"
-        android:layout_marginEnd="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_large"
         android:background="@drawable/todo_background"
-        android:elevation="@dimen/small_elevation"
+        android:longClickable="true"
         tools:elevation="@dimen/small_elevation">
 
         <TextView
