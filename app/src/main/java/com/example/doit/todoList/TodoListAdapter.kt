@@ -2,7 +2,6 @@ package com.example.doit.todoList
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.marginBottom
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -39,6 +38,7 @@ class TodoListAdapter(private val listener: CheckedTodoListener) :
 
         fun bind(todo: Todo, checkListener: CheckedTodoListener) {
             with(itemViewBinding) {
+                if (todoCheckBox.isChecked) todoCheckBox.isChecked = false
                 todoItem = todo
                 itemViewBinding.todoItemView.setOnLongClickListener {
                     true

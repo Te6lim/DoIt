@@ -33,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            tools:ignore="Autofill" />
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/date_button"
@@ -116,10 +116,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/margin_large"
+                android:background="@drawable/rounded_background"
                 android:ems="10"
                 android:hint="@string/category"
                 android:inputType="textPersonName"
                 android:minHeight="48dp"
+                android:paddingStart="@dimen/padding_small"
+                android:paddingEnd="@dimen/padding_small"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/addCategory_button"

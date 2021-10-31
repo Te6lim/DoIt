@@ -2,6 +2,7 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -64,8 +65,17 @@ class TodoListFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return NavigationUI.onNavDestinationSelected(item, findNavController()) ||
-                super.onOptionsItemSelected(item)
-
+        return when (item.itemId) {
+            R.id.createTodoFragment -> {
+                findNavController().navigate(
+                    TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment()
+                )
+                true
+            }
+            else -> {
+                NavigationUI.onNavDestinationSelected(item, findNavController()) ||
+                        super.onOptionsItemSelected(item)
+            }
+        }
     }
 }

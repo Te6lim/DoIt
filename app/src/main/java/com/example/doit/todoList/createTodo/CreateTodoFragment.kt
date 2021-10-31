@@ -65,10 +65,8 @@ class CreateTodoFragment : Fragment() {
             todoInfo.observe(viewLifecycleOwner) {
                 if (it.todoValid()) {
                     add(it)
-                    findNavController().navigate(
-                        CreateTodoFragmentDirections.actionCreateTodoFragmentToTodoListFragment()
-                    )
                     clearTodoInfo()
+                    findNavController().popBackStack()
                 }
             }
 
