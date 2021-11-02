@@ -35,7 +35,11 @@ class CreateTodoFragment : Fragment() {
         val categoryDb = CategoryDb.getInstance(requireContext())
         val todoDb = TodoDatabase.getInstance(requireContext())
 
-        val viewModelFactory = CreateTodoViewModelFactory(todoDb.databaseDao, categoryDb.dao)
+        val viewModelFactory = CreateTodoViewModelFactory(
+            todoDb.databaseDao, categoryDb.dao,
+            CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId
+        )
+
         viewModel = ViewModelProvider(
             this, viewModelFactory
         ).get(CreateTodoViewModel::class.java)
@@ -46,11 +50,9 @@ class CreateTodoFragment : Fragment() {
 
         with(viewModel) {
             categories.observe(viewLifecycleOwner) {
-                when {
-                    it.isNullOrEmpty() -> initializeCategories()
-                    binding.categorySelection.childCount == 0 ->
+                when (binding.categorySelection.childCount) {
+                    0 ->
                         addCategoryViews(categories.value!!)
-
                     else -> binding.categorySelection.addView(
                         RadioButton(requireContext()).apply {
                             id = it[0].id
@@ -59,7 +61,6 @@ class CreateTodoFragment : Fragment() {
                         }, 0
                     )
                 }
-                initializeDefault()
             }
 
             todoInfo.observe(viewLifecycleOwner) {
@@ -67,15 +68,6 @@ class CreateTodoFragment : Fragment() {
                     add(it)
                     clearTodoInfo()
                     findNavController().popBackStack()
-                }
-            }
-
-            defaultCategory.observe(viewLifecycleOwner) {
-                if (category.value == null) {
-                    todo.setCategory(it)
-
-                    setTitleToDefaultCategoryName(it)
-                    binding.categorySelection.findViewById<RadioButton>(it.id).isChecked = true
                 }
             }
 

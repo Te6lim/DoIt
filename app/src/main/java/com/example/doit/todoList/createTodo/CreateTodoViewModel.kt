@@ -10,7 +10,7 @@ import com.example.doit.database.TodoDbDao
 import kotlinx.coroutines.*
 
 class CreateTodoViewModel(
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao, defaultCategoryId: Int
 ) : ViewModel() {
 
     companion object {
@@ -20,6 +20,8 @@ class CreateTodoViewModel(
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
+    val categories = catDb.getAll()
+
     private val _todoInfo = MutableLiveData<TodoInfo>()
     val todoInfo: LiveData<TodoInfo>
         get() = _todoInfo
@@ -27,19 +29,17 @@ class CreateTodoViewModel(
     var todo = TodoInfo()
         private set
 
-    private val _defaultCategory = MutableLiveData<Category>()
-    val defaultCategory: LiveData<Category>
-        get() = _defaultCategory
-
     private val _categoryEditTextIsOpen = MutableLiveData<Boolean>()
     val categoryEditTextIsOpen: LiveData<Boolean>
         get() = _categoryEditTextIsOpen
 
-    val categories = catDb.getAll()
-
     private val _category = MutableLiveData<Category>()
     val category: LiveData<Category>
         get() = _category
+
+    init {
+        emitCategory(defaultCategoryId)
+    }
 
     fun add(todoInfo: TodoInfo) {
         uiScope.launch {
@@ -74,19 +74,6 @@ class CreateTodoViewModel(
         _todoInfo.value = todo
     }
 
-    fun initializeDefault() {
-        uiScope.launch {
-            _defaultCategory.value = defaultCategory()
-        }
-    }
-
-    private suspend fun defaultCategory(): Category {
-        return withContext(Dispatchers.IO) {
-            val default = catDb.getDefault(true)
-            default
-        }
-    }
-
     fun addNewCategory(newCategory: String, default: Boolean = false) {
         uiScope.launch {
             withContext(Dispatchers.IO) {
@@ -113,32 +100,6 @@ class CreateTodoViewModel(
                 catDb.delete(cat)
             }
         }
-    }
-
-    fun changeDefault(categoryId: Int) {
-        _defaultCategory.value?.let {
-            it.isDefault = false
-            var newDefault: Category?
-            uiScope.launch {
-                withContext(Dispatchers.IO) {
-                    newDefault = catDb.get(categoryId)
-                }
-                newDefault?.isDefault = true
-                _defaultCategory.value = newDefault ?: it.apply { isDefault = true }
-            }
-        }
-    }
-
-    fun isDefault(catId: Int): Boolean {
-        _defaultCategory.value?.let {
-            return it.id == catId
-        }
-        return false
-    }
-
-    fun initializeCategories() {
-        addNewCategory(DEFAULT_CATEGORY, true)
-        addNewCategory("School")
     }
 
     fun makeCategoryEditTextVisible() {

@@ -22,5 +22,9 @@
         android:id="@+id/createTodoFragment"
         android:name="com.example.doit.todoList.createTodo.CreateTodoFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_todo_create" />
+        tools:layout="@layout/fragment_todo_create">
+        <argument
+            android:name="defaultCategoryId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

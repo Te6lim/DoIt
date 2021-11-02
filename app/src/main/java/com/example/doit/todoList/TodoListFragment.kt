@@ -2,13 +2,13 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.R
+import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
 
@@ -16,6 +16,7 @@ class TodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
+    private var defaultCategoryId: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -26,9 +27,11 @@ class TodoListFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        val database = TodoDatabase.getInstance(requireContext())
+        val todoDatabase = TodoDatabase.getInstance(requireContext())
+        val categoryDatabase = CategoryDb.getInstance(requireContext())
 
-        val viewModelFactory = TodoListViewModelFactory(database.databaseDao)
+        val viewModelFactory =
+            TodoListViewModelFactory(categoryDatabase.dao, todoDatabase.databaseDao)
         todoListViewModel = ViewModelProvider(this, viewModelFactory)
             .get(TodoListViewModel::class.java)
 
@@ -54,6 +57,17 @@ class TodoListFragment : Fragment() {
                     binding.emptyTodo.visibility = View.GONE
                 }
             }
+
+            categories.observe(viewLifecycleOwner) {
+                if (it.isNullOrEmpty()) {
+                    initializeCategories()
+                }
+                initializeDefault()
+            }
+
+            defaultCategory.observe(viewLifecycleOwner) {
+                defaultCategoryId = it.id
+            }
         }
 
         return binding.root
@@ -68,7 +82,9 @@ class TodoListFragment : Fragment() {
         return when (item.itemId) {
             R.id.createTodoFragment -> {
                 findNavController().navigate(
-                    TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment()
+                    TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
+                        defaultCategoryId
+                    )
                 )
                 true
             }
