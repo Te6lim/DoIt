@@ -64,11 +64,9 @@ class CreateTodoFragment : Fragment() {
             }
 
             todoInfo.observe(viewLifecycleOwner) {
-                if (it.todoValid()) {
-                    add(it)
-                    clearTodoInfo()
-                    findNavController().popBackStack()
-                }
+                add(it)
+                clearTodoInfo()
+                findNavController().popBackStack()
             }
 
             categoryEditTextIsOpen.observe(viewLifecycleOwner) { isOpen ->
@@ -99,7 +97,6 @@ class CreateTodoFragment : Fragment() {
             category.observe(viewLifecycleOwner) {
                 it?.let {
                     todo.setCategory(it)
-
                     setTitleToDefaultCategoryName(it)
                     binding.categorySelection.findViewById<RadioButton>(it.id).isChecked = true
                 }

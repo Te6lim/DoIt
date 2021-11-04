@@ -46,8 +46,8 @@ class TodoListFragment : Fragment() {
 
         with(todoListViewModel) {
             todoList.observe(viewLifecycleOwner) {}
-            catTrans.observe(viewLifecycleOwner) {}
-            defTrans.observe(viewLifecycleOwner) {}
+            categoriesTransform.observe(viewLifecycleOwner) {}
+            defaultTransform.observe(viewLifecycleOwner) {}
 
             defaultCategory.observe(viewLifecycleOwner) {
                 defaultCategoryId = it.id
@@ -74,6 +74,14 @@ class TodoListFragment : Fragment() {
                     .supportActionBar?.subtitle = resources
                     .getString(R.string.category_plus_count, it.first, it.second)
             }
+
+            isNavigating.observe(viewLifecycleOwner) { navigating ->
+                if (navigating) {
+                    (requireActivity() as AppCompatActivity)
+                        .supportActionBar?.subtitle = null
+                    todoListViewModel.isNavigating(false)
+                }
+            }
         }
 
         return binding.root
@@ -92,6 +100,7 @@ class TodoListFragment : Fragment() {
                         defaultCategoryId
                     )
                 )
+                todoListViewModel.isNavigating(true)
                 true
             }
             else -> {

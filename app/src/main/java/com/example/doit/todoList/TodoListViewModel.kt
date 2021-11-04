@@ -31,7 +31,7 @@ class TodoListViewModel(
     val defaultCategory: LiveData<Category>
         get() = _defaultCategory
 
-    val catTrans = Transformations.map(categories) { catList ->
+    val categoriesTransform = Transformations.map(categories) { catList ->
         if (catList.isNullOrEmpty()) {
             val cat = Category(
                 name = CreateTodoViewModel.DEFAULT_CATEGORY, isDefault = true
@@ -45,7 +45,7 @@ class TodoListViewModel(
         emitDefault()
     }
 
-    val defTrans = Transformations.map(defaultCategory) {
+    val defaultTransform = Transformations.map(defaultCategory) {
         _todoList.value = allList.value
     }
 
@@ -71,6 +71,10 @@ class TodoListViewModel(
             else (name to list.size)
         }
     }
+
+    private val _isNavigating = MutableLiveData<Boolean>()
+    val isNavigating: LiveData<Boolean>
+        get() = _isNavigating
 
     private fun emitDefault() {
         uiScope.launch {
@@ -104,6 +108,10 @@ class TodoListViewModel(
                 todoDb.delete(id)
             }
         }
+    }
+
+    fun isNavigating(value: Boolean) {
+        _isNavigating.value = value
     }
 
     override fun onCleared() {
