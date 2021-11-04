@@ -2,6 +2,7 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -44,29 +45,34 @@ class TodoListFragment : Fragment() {
         binding.todoList.adapter = adapter
 
         with(todoListViewModel) {
-            todoList.observe(viewLifecycleOwner) {
-                adapter.submitList(it)
-            }
-
-            isTodoListEmpty.observe(viewLifecycleOwner) {
-                if (it) {
-                    binding.todoList.visibility = View.GONE
-                    binding.emptyTodo.visibility = View.VISIBLE
-                } else {
-                    binding.todoList.visibility = View.VISIBLE
-                    binding.emptyTodo.visibility = View.GONE
-                }
-            }
-
-            categories.observe(viewLifecycleOwner) {
-                if (it.isNullOrEmpty()) {
-                    initializeCategories()
-                }
-                initializeDefault()
-            }
+            todoList.observe(viewLifecycleOwner) {}
+            catTrans.observe(viewLifecycleOwner) {}
+            defTrans.observe(viewLifecycleOwner) {}
 
             defaultCategory.observe(viewLifecycleOwner) {
                 defaultCategoryId = it.id
+            }
+
+            todoListByCategory.observe(viewLifecycleOwner) { list ->
+                adapter.submitList(list)
+            }
+
+            isTodoListEmpty.observe(viewLifecycleOwner) {
+                with(binding) {
+                    if (it) {
+                        todoList.visibility = View.GONE
+                        emptyTodo.visibility = View.VISIBLE
+                    } else {
+                        todoList.visibility = View.VISIBLE
+                        emptyTodo.visibility = View.GONE
+                    }
+                }
+            }
+
+            itemCountInCategory.observe(viewLifecycleOwner) {
+                (requireActivity() as AppCompatActivity)
+                    .supportActionBar?.subtitle = resources
+                    .getString(R.string.category_plus_count, it.first, it.second)
             }
         }
 

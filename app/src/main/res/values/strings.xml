@@ -25,4 +25,5 @@
     <string name="finished_todos">Finished todos</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="category_plus_count">%s (%d)</string>
 </resources>

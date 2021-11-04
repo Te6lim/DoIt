@@ -92,6 +92,11 @@ class TodoInfo {
                         deadlineDate!!.dayOfMonth, dateSet
                     )
                 ) invalidateDate()
+                else if (timeIsInvalid(
+                        deadlineTime!!.hour, deadlineTime!!.minute,
+                        dateSet, deadlineDate!!, timeSet
+                    )
+                ) invalidateTime()
             }
         }
     }
@@ -109,7 +114,7 @@ class TodoInfo {
             if (deadlineTime != null) {
                 if (timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
-                        deadlineDate, dateSet, timeSet
+                        deadlineDate!!, dateSet, timeSet
                     )
                 ) invalidateTime()
             }

@@ -31,7 +31,7 @@ interface CategoryDao {
     fun get(key: Int): Category?
 
     @Query("SELECT * FROM category_table WHERE is_default = :value LIMIT 1")
-    fun getDefault(value: Boolean): Category
+    fun getDefault(value: Boolean = true): Category
 }
 
 @Database(entities = [Category::class], version = 1, exportSchema = false)

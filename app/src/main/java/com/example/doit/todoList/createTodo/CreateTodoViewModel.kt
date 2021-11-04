@@ -94,13 +94,13 @@ class CreateTodoViewModel(
         }
     }
 
-    fun delete(cat: String) {
+    /*fun delete(cat: String) {
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 catDb.delete(cat)
             }
         }
-    }
+    }*/
 
     fun makeCategoryEditTextVisible() {
         _categoryEditTextIsOpen.value = true
