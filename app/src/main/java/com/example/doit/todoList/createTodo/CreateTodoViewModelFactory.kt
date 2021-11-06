@@ -11,7 +11,7 @@ class CreateTodoViewModelFactory(
 ) :
     ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
             return CreateTodoViewModel(todoDb, catDb, defaultCategoryId) as T
         }

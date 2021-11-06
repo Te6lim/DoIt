@@ -66,7 +66,7 @@ class CreateTodoViewModel(
     }
 
     fun createTodoInfo() {
-        if (todo.todoValid()) _todoInfo.value = todo
+        _todoInfo.value = todo
     }
 
     fun clearTodoInfo() {

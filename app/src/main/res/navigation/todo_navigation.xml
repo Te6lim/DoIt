@@ -13,7 +13,7 @@
         <action
             android:id="@+id/action_todoListFragment_to_createTodoFragment"
             app:destination="@id/createTodoFragment"
-            app:enterAnim="@anim/fall_in"
+            app:enterAnim="@anim/jump_in"
             app:exitAnim="@anim/slide_left_from_center"
             app:popEnterAnim="@anim/slide_right_from_left"
             app:popExitAnim="@anim/fall_out" />

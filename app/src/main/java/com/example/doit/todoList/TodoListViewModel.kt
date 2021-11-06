@@ -1,9 +1,6 @@
 package com.example.doit.todoList
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
@@ -14,10 +11,6 @@ import kotlinx.coroutines.*
 class TodoListViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao
 ) : ViewModel() {
-
-    private val viewModelJob = Job()
-
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     private val allList = todoDb.getAll()
 
@@ -36,7 +29,7 @@ class TodoListViewModel(
             val cat = Category(
                 name = CreateTodoViewModel.DEFAULT_CATEGORY, isDefault = true
             )
-            uiScope.launch {
+            viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     catDb.insert(cat)
                 }
@@ -77,7 +70,7 @@ class TodoListViewModel(
         get() = _isNavigating
 
     private fun emitDefault() {
-        uiScope.launch {
+        viewModelScope.launch {
             _defaultCategory.value = getDefault()
         }
     }
@@ -103,7 +96,7 @@ class TodoListViewModel(
     }*/
 
     fun delete(id: Long) {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
             }
@@ -112,10 +105,5 @@ class TodoListViewModel(
 
     fun isNavigating(value: Boolean) {
         _isNavigating.value = value
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }

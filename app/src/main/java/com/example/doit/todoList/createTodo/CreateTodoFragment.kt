@@ -64,9 +64,11 @@ class CreateTodoFragment : Fragment() {
             }
 
             todoInfo.observe(viewLifecycleOwner) {
-                add(it)
-                clearTodoInfo()
-                findNavController().popBackStack()
+                if (it.todoValid()) {
+                    add(it)
+                    clearTodoInfo()
+                    findNavController().popBackStack()
+                }
             }
 
             categoryEditTextIsOpen.observe(viewLifecycleOwner) { isOpen ->

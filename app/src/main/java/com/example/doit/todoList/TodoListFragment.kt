@@ -7,7 +7,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import com.example.doit.R
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
@@ -43,6 +42,15 @@ class TodoListFragment : Fragment() {
         })
 
         binding.todoList.adapter = adapter
+
+        binding.addNew.setOnClickListener {
+            findNavController().navigate(
+                TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
+                    defaultCategoryId
+                )
+            )
+            todoListViewModel.isNavigating(true)
+        }
 
         with(todoListViewModel) {
             todoList.observe(viewLifecycleOwner) {}
@@ -89,24 +97,6 @@ class TodoListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        return inflater.inflate(R.menu.add_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.createTodoFragment -> {
-                findNavController().navigate(
-                    TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                        defaultCategoryId
-                    )
-                )
-                todoListViewModel.isNavigating(true)
-                true
-            }
-            else -> {
-                NavigationUI.onNavDestinationSelected(item, findNavController()) ||
-                        super.onOptionsItemSelected(item)
-            }
-        }
+        return inflater.inflate(R.menu.todo_list_menu, menu)
     }
 }
