@@ -18,10 +18,10 @@ class TodoListViewModel(
     val todoList: LiveData<List<Todo>>
         get() = _todoList
 
-    private val categories = catDb.getAll()
+    val categories = catDb.getAll()
 
-    private val _defaultCategory = MutableLiveData<Category>()
-    val defaultCategory: LiveData<Category>
+    private val _defaultCategory = MutableLiveData<Category?>()
+    val defaultCategory: LiveData<Category?>
         get() = _defaultCategory
 
     val categoriesTransform = Transformations.map(categories) { catList ->
@@ -35,15 +35,18 @@ class TodoListViewModel(
                 }
             }
         }
-        emitDefault()
+        if (_defaultCategory.value == null) emitDefault()
     }
 
     val defaultTransform = Transformations.map(defaultCategory) {
         _todoList.value = allList.value
+
     }
 
     val isTodoListEmpty = Transformations.map(allList) {
-        if (_todoList.value != null) _todoList.value = allList.value
+        if (_todoList.value != null) {
+            _todoList.value = allList.value
+        }
         it?.isEmpty() ?: false
     }
 
@@ -52,16 +55,19 @@ class TodoListViewModel(
             list.filter { todo ->
                 todo.category == defaultCategory.value?.name
             }.let { newList ->
-                if (newList.isEmpty()) list
-                else newList
+                if (newList.isEmpty()) {
+                    list
+                } else newList
             }
         }
     }
 
     val itemCountInCategory = Transformations.map(todoListByCategory) { list ->
         with(defaultCategory.value) {
-            if (this == null) ("All" to todoList.value!!.size)
-            else (name to list.size)
+            if (list.isEmpty() || this == null) ("All" to todoList.value!!.size)
+            else if (list[0].category != this.name) {
+                ("All" to todoList.value!!.size)
+            } else (name to list.size)
         }
     }
 
@@ -69,9 +75,27 @@ class TodoListViewModel(
     val isNavigating: LiveData<Boolean>
         get() = _isNavigating
 
+    private val _contextActionBarEnabled = MutableLiveData<Boolean>()
+    val contextActionBarEnabled: LiveData<Boolean>
+        get() = _contextActionBarEnabled
+
     private fun emitDefault() {
         viewModelScope.launch {
             _defaultCategory.value = getDefault()
+        }
+    }
+
+    fun emitDisplayCategoryAsDefault(id: Int) {
+        if (defaultCategory.value != null) {
+            viewModelScope.launch {
+                _defaultCategory.value = getCategoryById(id)
+            }
+        }
+    }
+
+    private suspend fun getCategoryById(id: Int): Category? {
+        return withContext(Dispatchers.IO) {
+            catDb.get(id)
         }
     }
 
@@ -105,5 +129,9 @@ class TodoListViewModel(
 
     fun isNavigating(value: Boolean) {
         _isNavigating.value = value
+    }
+
+    fun contextActionBarEnabled(value: Boolean) {
+        _contextActionBarEnabled.value = value
     }
 }

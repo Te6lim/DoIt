@@ -27,4 +27,5 @@
     <string name="about">About</string>
     <string name="category_plus_count">%s (%d)</string>
     <string name="all">All</string>
+    <string name="categories_selection">categories selection</string>
 </resources>

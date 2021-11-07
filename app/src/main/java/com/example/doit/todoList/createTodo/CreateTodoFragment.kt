@@ -66,8 +66,11 @@ class CreateTodoFragment : Fragment() {
             todoInfo.observe(viewLifecycleOwner) {
                 if (it.todoValid()) {
                     add(it)
+                    findNavController().apply {
+                        val id = binding.categorySelection.checkedRadioButtonId
+                        previousBackStackEntry?.savedStateHandle?.set("KEY", id)
+                    }.popBackStack()
                     clearTodoInfo()
-                    findNavController().popBackStack()
                 }
             }
 
