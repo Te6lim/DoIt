@@ -8,6 +8,7 @@ import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
 import kotlinx.coroutines.*
+import java.time.LocalDateTime
 
 class CreateTodoViewModel(
     private val todoDb: TodoDbDao, private val catDb: CategoryDao, defaultCategoryId: Int
@@ -46,13 +47,11 @@ class CreateTodoViewModel(
             val todo = Todo(
                 todoString = todoInfo.description,
                 category = todoInfo.category,
-                dateTodo = todoInfo.dateSet,
-                timeTodo = todoInfo.timeSet,
+                dateTodo = LocalDateTime.of(todoInfo.dateSet, todoInfo.timeSet),
                 hasDeadline = todoInfo.deadlineEnabled,
             ).apply {
                 if (hasDeadline) {
-                    deadlineDate = todoInfo.deadlineDate
-                    deadlineTime = todoInfo.deadlineTime
+                    deadlineDate = LocalDateTime.of(todoInfo.deadlineDate, todoInfo.deadlineTime)
                 }
             }
             addTodo(todo)

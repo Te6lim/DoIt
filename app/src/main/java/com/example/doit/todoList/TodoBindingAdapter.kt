@@ -7,6 +7,6 @@ import com.example.doit.database.Todo
 @BindingAdapter("setDate")
 fun TextView.setDate(item: Todo?) {
     item?.let {
-        text = it.dateTodo.formatToString()
+        text = it.dateTodo.toLocalDate().formatToString()
     }
 }

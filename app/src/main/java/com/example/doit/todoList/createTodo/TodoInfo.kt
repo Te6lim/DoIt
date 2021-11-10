@@ -6,7 +6,6 @@ import com.example.doit.database.Category
 import java.time.LocalDate
 import java.time.LocalTime
 
-
 class TodoInfo {
     var description: String = ""
         private set

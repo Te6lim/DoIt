@@ -36,6 +36,17 @@ class TodoListViewModel(
             }
         }
         if (_defaultCategory.value == null) emitDefault()
+        catList.toListOfString { it.name }
+    }
+
+    private fun List<Category>?.toListOfString(f: (Category) -> String): List<String> {
+        val list = mutableListOf<String>()
+        this?.let {
+            for (item in this) {
+                list.add(f(item))
+            }
+        }
+        return list
     }
 
     val defaultTransform = Transformations.map(defaultCategory) {

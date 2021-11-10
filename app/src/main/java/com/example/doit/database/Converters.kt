@@ -2,8 +2,7 @@ package com.example.doit.database
 
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
-import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -11,7 +10,7 @@ import java.time.format.FormatStyle
 class DateConverters {
 
     @TypeConverter
-    fun LocalDate?.toString(): String? {
+    fun LocalDateTime?.toString(): String? {
         return this?.let {
             var dateString: String?
             it.apply {
@@ -23,33 +22,10 @@ class DateConverters {
     }
 
     @TypeConverter
-    fun String?.toLocalDate(): LocalDate? {
+    fun String?.toLocalDateTime(): LocalDateTime? {
         return this?.let {
             val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
-            LocalDate.parse(this, formatter)
-        }
-    }
-}
-
-@ProvidedTypeConverter
-class TimeConverters {
-    @TypeConverter
-    fun LocalTime?.toString(): String? {
-        return this?.let {
-            var timeString: String?
-            it.apply {
-                val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
-                timeString = format(formatter)
-            }
-            timeString
-        }
-    }
-
-    @TypeConverter
-    fun String?.toLocalTime(): LocalTime? {
-        return this?.let {
-            val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
-            LocalTime.parse(this, formatter)
+            LocalDateTime.parse(this, formatter)
         }
     }
 }

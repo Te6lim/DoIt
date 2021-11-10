@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(entities = [Todo::class], version = 1, exportSchema = false)
-@TypeConverters(DateConverters::class, TimeConverters::class)
+@TypeConverters(DateConverters::class)
 abstract class TodoDatabase : RoomDatabase() {
 
     abstract val databaseDao: TodoDbDao
@@ -23,8 +23,7 @@ abstract class TodoDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext, TodoDatabase::class.java, "todo_history"
-                    ).addTypeConverter(DateConverters()).addTypeConverter(TimeConverters())
-                        .fallbackToDestructiveMigration().build()
+                    ).addTypeConverter(DateConverters()).fallbackToDestructiveMigration().build()
                     INSTANCE = instance
                 }
                 return instance

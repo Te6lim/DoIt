@@ -4,8 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
-import java.util.*
 
 @Entity(tableName = "todo_table")
 data class Todo(
@@ -16,22 +16,13 @@ data class Todo(
     var todoString: String = "",
 
     @ColumnInfo(name = "date_set")
-    var dateSet: LocalDate = LocalDate.now(),
-
-    @ColumnInfo(name = "time_set")
-    var timeSet: LocalTime = LocalTime.now(),
+    var dateSet: LocalDateTime = LocalDateTime.now(),
 
     @ColumnInfo(name = "date_todo")
-    var dateTodo: LocalDate,
-
-    @ColumnInfo(name = "time_todo")
-    var timeTodo: LocalTime,
+    var dateTodo: LocalDateTime,
 
     @ColumnInfo(name = "date_finished")
-    var dateFinished: LocalDate? = null,
-
-    @ColumnInfo(name = "time_finished")
-    var timeFinished: LocalTime? = null,
+    var dateFinished: LocalDateTime? = null,
 
     @ColumnInfo(name = "is_completed")
     var isCompleted: Boolean = false,
@@ -40,10 +31,7 @@ data class Todo(
     val hasDeadline: Boolean = false,
 
     @ColumnInfo(name = "deadline_date")
-    var deadlineDate: LocalDate? = null,
-
-    @ColumnInfo(name = "deadline_time")
-    var deadlineTime: LocalTime? = null,
+    var deadlineDate: LocalDateTime? = null,
 
     @ColumnInfo(name = "category")
     var category: String

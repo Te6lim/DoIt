@@ -2,6 +2,8 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -36,6 +38,7 @@ class TodoListFragment : Fragment() {
 
         val callback = object : ActionMode.Callback {
             override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+
                 return true
             }
 
@@ -81,7 +84,15 @@ class TodoListFragment : Fragment() {
         with(todoListViewModel) {
             categories.observe(viewLifecycleOwner) {}
             todoList.observe(viewLifecycleOwner) {}
-            categoriesTransform.observe(viewLifecycleOwner) {}
+            categoriesTransform.observe(viewLifecycleOwner) { list ->
+                val spinner = customActionMode.findViewById<Spinner>(R.id.categorySelector)
+                ArrayAdapter(
+                    requireContext(), R.layout.category_item, list
+                ).also { adapter ->
+                    adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
+                    spinner.adapter = adapter
+                }
+            }
             defaultTransform.observe(viewLifecycleOwner) {}
 
             defaultCategory.observe(viewLifecycleOwner) { category ->

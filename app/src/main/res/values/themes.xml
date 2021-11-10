@@ -19,6 +19,6 @@
     </style>
 
     <style name="myActionModeStyle" parent="Widget.AppCompat.ActionMode">
-        <item name="background">@color/secondaryColor</item>
+        <item name="popupTheme">@style/Theme.MaterialComponents.Light</item>
     </style>
 </resources>
