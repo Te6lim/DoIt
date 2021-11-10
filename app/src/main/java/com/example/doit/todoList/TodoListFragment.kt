@@ -2,8 +2,6 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -36,33 +34,14 @@ class TodoListFragment : Fragment() {
         customActionMode = LayoutInflater.from(requireContext())
             .inflate(R.layout.contextual_actionbar, container, false)
 
-        val callback = object : ActionMode.Callback {
-            override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-
-                return true
-            }
-
-            override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-                return true
-            }
-
-            override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
-                return false
-            }
-
-            override fun onDestroyActionMode(aM: ActionMode?) {
-                todoListViewModel.contextActionBarEnabled(false)
-            }
-
-        }
-
         val todoDatabase = TodoDatabase.getInstance(requireContext())
         val categoryDatabase = CategoryDb.getInstance(requireContext())
 
         val viewModelFactory =
             TodoListViewModelFactory(categoryDatabase.dao, todoDatabase.databaseDao)
-        todoListViewModel = ViewModelProvider(this, viewModelFactory)
-            .get(TodoListViewModel::class.java)
+        todoListViewModel = ViewModelProvider(
+            this, viewModelFactory
+        )[TodoListViewModel::class.java]
 
         binding.lifecycleOwner = this
 
@@ -84,15 +63,7 @@ class TodoListFragment : Fragment() {
         with(todoListViewModel) {
             categories.observe(viewLifecycleOwner) {}
             todoList.observe(viewLifecycleOwner) {}
-            categoriesTransform.observe(viewLifecycleOwner) { list ->
-                val spinner = customActionMode.findViewById<Spinner>(R.id.categorySelector)
-                ArrayAdapter(
-                    requireContext(), R.layout.category_item, list
-                ).also { adapter ->
-                    adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
-                    spinner.adapter = adapter
-                }
-            }
+            categoriesTransform.observe(viewLifecycleOwner) {}
             defaultTransform.observe(viewLifecycleOwner) {}
 
             defaultCategory.observe(viewLifecycleOwner) { category ->
@@ -126,14 +97,6 @@ class TodoListFragment : Fragment() {
                     todoListViewModel.isNavigating(false)
                 }
             }
-            contextActionBarEnabled.observe(viewLifecycleOwner) { enabled ->
-                if (enabled) {
-                    mainActivity.startActionMode(callback)
-                        .apply {
-                            this?.customView = customActionMode
-                        }
-                }
-            }
         }
 
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
@@ -153,13 +116,13 @@ class TodoListFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.categories -> {
                 todoListViewModel.contextActionBarEnabled(true)
-                return true
+                true
             }
 
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

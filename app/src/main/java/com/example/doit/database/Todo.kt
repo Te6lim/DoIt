@@ -3,9 +3,7 @@ package com.example.doit.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 @Entity(tableName = "todo_table")
 data class Todo(
