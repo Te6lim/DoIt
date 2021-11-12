@@ -22,8 +22,9 @@ class TodoInfo {
     var deadlineTime: LocalTime? = null
         private set
 
-    var deadlineEnabled: Boolean = false
-        private set
+    private val _deadlineEnabled = MutableLiveData<Boolean>(false)
+    val deadlineEnabled: LiveData<Boolean>
+        get() = _deadlineEnabled
 
     var category: String = CreateTodoViewModel.DEFAULT_CATEGORY
         private set
@@ -60,7 +61,7 @@ class TodoInfo {
 
     fun todoValid(): Boolean {
         return (description.isNotEmpty() &&
-                (!deadlineEnabled || (deadlineEnabled && deadlineDate != null &&
+                (!_deadlineEnabled.value!! || (_deadlineEnabled.value!! && deadlineDate != null &&
                         deadlineTime != null)) &&
                 _isDateValid.value!! && _isTimeValid.value!!
                 )
@@ -72,7 +73,7 @@ class TodoInfo {
     }
 
     fun setIsDeadlineEnabled(value: Boolean) {
-        deadlineEnabled = value
+        _deadlineEnabled.value = value
         _isTodoValid.value = todoValid()
     }
 

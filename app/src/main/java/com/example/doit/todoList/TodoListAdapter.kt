@@ -11,7 +11,7 @@ import com.example.doit.database.Todo
 import com.example.doit.databinding.ItemTodoBinding
 
 class TodoListAdapter(private val listener: CheckedTodoListener) :
-    ListAdapter<Todo, TodoListAdapter.TodoViewHolder>(TodoDiffCallback()) {
+    ListAdapter<Todo, TodoViewHolder>(TodoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         return TodoViewHolder.create(parent)
@@ -21,31 +21,31 @@ class TodoListAdapter(private val listener: CheckedTodoListener) :
         val todoItem = getItem(position)
         holder.bind(todoItem, listener)
     }
+}
 
-    class TodoViewHolder(
-        private val itemViewBinding: ItemTodoBinding
-    ) : RecyclerView.ViewHolder(itemViewBinding.root) {
-
-        companion object {
-            fun create(parent: ViewGroup): TodoViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val itemViewBinding: ItemTodoBinding = DataBindingUtil.inflate(
-                    layoutInflater, R.layout.item_todo, parent, false
-                )
-                return TodoViewHolder(itemViewBinding)
-            }
+class TodoViewHolder(
+    private val itemViewBinding: ItemTodoBinding
+) : RecyclerView.ViewHolder(itemViewBinding.root) {
+    companion object {
+        fun create(parent: ViewGroup): TodoViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val itemViewBinding: ItemTodoBinding = DataBindingUtil.inflate(
+                layoutInflater, R.layout.item_todo, parent, false
+            )
+            return TodoViewHolder(itemViewBinding)
         }
+    }
 
-        fun bind(todo: Todo, checkListener: CheckedTodoListener) {
-            with(itemViewBinding) {
-                if (todoCheckBox.isChecked) todoCheckBox.isChecked = false
-                todoItem = todo
-                itemViewBinding.todoItemView.setOnLongClickListener {
-                    true
-                }
-                itemListener = checkListener
-                executePendingBindings()
+    fun bind(todo: Todo, checkListener: CheckedTodoListener) {
+        with(itemViewBinding) {
+            if (todoCheckBox.isChecked) todoCheckBox.isChecked = false
+            todoItem = todo
+            itemViewBinding.todoItemView.setOnLongClickListener {
+                true
             }
+            itemListener = checkListener
+            executePendingBindings()
+
         }
     }
 }

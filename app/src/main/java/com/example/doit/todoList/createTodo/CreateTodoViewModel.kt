@@ -48,7 +48,7 @@ class CreateTodoViewModel(
                 todoString = todoInfo.description,
                 category = todoInfo.category,
                 dateTodo = LocalDateTime.of(todoInfo.dateSet, todoInfo.timeSet),
-                hasDeadline = todoInfo.deadlineEnabled,
+                hasDeadline = todoInfo.deadlineEnabled.value!!,
             ).apply {
                 if (hasDeadline) {
                     deadlineDate = LocalDateTime.of(todoInfo.deadlineDate, todoInfo.deadlineTime)

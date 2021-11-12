@@ -1,6 +1,7 @@
 package com.example.doit.todoList.createTodo
 
 import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import com.example.doit.R
@@ -9,9 +10,9 @@ import com.example.doit.R
 fun Button.setColor(item: LiveData<Boolean>?) {
     item?.let {
         if (!it.value!!) {
-            setBackgroundColor(context.getColor(R.color.colorRed))
+            if (isEnabled) setBackgroundColor(ContextCompat.getColor(context, R.color.colorRed))
         } else {
-            setBackgroundColor(context.getColor(R.color.primaryColor))
+            if (isEnabled) setBackgroundColor(ContextCompat.getColor(context, R.color.primaryColor))
         }
     }
 }

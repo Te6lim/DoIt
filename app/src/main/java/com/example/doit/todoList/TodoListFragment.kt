@@ -6,18 +6,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
 
-class TodoListFragment : Fragment() {
+open class TodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
     private var defaultCategoryId: Int = 0
-    private lateinit var customActionMode: View
 
     private lateinit var mainActivity: MainActivity
 
@@ -31,9 +31,6 @@ class TodoListFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        customActionMode = LayoutInflater.from(requireContext())
-            .inflate(R.layout.contextual_actionbar, container, false)
-
         val todoDatabase = TodoDatabase.getInstance(requireContext())
         val categoryDatabase = CategoryDb.getInstance(requireContext())
 
@@ -46,10 +43,18 @@ class TodoListFragment : Fragment() {
         binding.lifecycleOwner = this
 
         val adapter = TodoListAdapter(CheckedTodoListener {
-            todoListViewModel.delete(it)
+            todoListViewModel.markAsDone(it)
         })
 
-        binding.todoList.adapter = adapter
+        binding.todoList.adapter = adapter.also {
+            it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    binding.todoList.scrollToPosition(0)
+                }
+
+            })
+        }
 
         binding.addNew.setOnClickListener {
             findNavController().navigate(

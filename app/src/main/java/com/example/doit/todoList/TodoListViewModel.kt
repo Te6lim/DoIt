@@ -116,6 +116,27 @@ class TodoListViewModel(
         }
     }
 
+    fun markAsDone(id: Long) {
+        viewModelScope.launch {
+            getTodo(id)?.also { todo ->
+                todo.isCompleted = true
+                updateTodo(todo)
+            }
+        }
+    }
+
+    private suspend fun getTodo(id: Long): Todo? {
+        return withContext(Dispatchers.IO) {
+            todoDb.get(id)
+        }
+    }
+
+    private suspend fun updateTodo(todo: Todo) {
+        withContext(Dispatchers.IO) {
+            todoDb.update(todo)
+        }
+    }
+
     /*fun changeDefault(categoryId: Int) {
         _defaultCategory.value?.let {
             it.isDefault = false
