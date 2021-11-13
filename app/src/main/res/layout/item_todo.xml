@@ -10,6 +10,10 @@
             type="com.example.doit.database.Todo" />
 
         <variable
+            name="todoListViewModel"
+            type="com.example.doit.todoList.TodoListViewModel" />
+
+        <variable
             name="itemListener"
             type="com.example.doit.todoList.CheckedTodoListener" />
     </data>
@@ -48,8 +52,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:checked="@{todoItem.completed}"
-            android:onCheckedChanged="@{() -> itemListener.onChecked(todoItem.todoId)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/date_text"

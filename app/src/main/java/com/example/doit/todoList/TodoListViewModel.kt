@@ -116,12 +116,9 @@ class TodoListViewModel(
         }
     }
 
-    fun markAsDone(id: Long) {
+    fun mark(todo: Todo) {
         viewModelScope.launch {
-            getTodo(id)?.also { todo ->
-                todo.isCompleted = true
-                updateTodo(todo)
-            }
+            updateTodo(todo)
         }
     }
 

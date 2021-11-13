@@ -42,8 +42,8 @@ open class TodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = TodoListAdapter(CheckedTodoListener {
-            todoListViewModel.markAsDone(it)
+        val adapter = TodoListAdapter(CheckedTodoListener { todo ->
+            todoListViewModel.mark(todo)
         })
 
         binding.todoList.adapter = adapter.also {
