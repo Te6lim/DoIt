@@ -5,6 +5,8 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.MainActivity
@@ -43,7 +45,7 @@ open class TodoListFragment : Fragment() {
         binding.lifecycleOwner = this
 
         val adapter = TodoListAdapter(CheckedTodoListener { todo ->
-            todoListViewModel.mark(todo)
+            todoListViewModel.updateTodo(todo)
         })
 
         binding.todoList.adapter = adapter.also {
@@ -66,8 +68,6 @@ open class TodoListFragment : Fragment() {
         }
 
         with(todoListViewModel) {
-            categories.observe(viewLifecycleOwner) {}
-            todoList.observe(viewLifecycleOwner) {}
             categoriesTransform.observe(viewLifecycleOwner) {}
             defaultTransform.observe(viewLifecycleOwner) {}
 
@@ -123,10 +123,8 @@ open class TodoListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.categories -> {
-                todoListViewModel.contextActionBarEnabled(true)
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }

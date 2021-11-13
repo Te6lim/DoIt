@@ -13,7 +13,7 @@ interface TodoDbDao {
     fun update(todo: Todo)
 
     @Query("SELECT * FROM todo_table WHERE :key = todoId")
-    suspend fun get(key: Long): Todo?
+    fun get(key: Long): Todo?
 
     @Query("SELECT * FROM todo_table ORDER BY todoId DESC")
     fun getAll(): LiveData<List<Todo>?>

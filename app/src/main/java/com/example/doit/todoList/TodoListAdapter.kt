@@ -23,7 +23,7 @@ class TodoListAdapter(private val listener: CheckedTodoListener) :
     }
 }
 
-class TodoViewHolder(
+open class TodoViewHolder(
     private val itemViewBinding: ItemTodoBinding
 ) : RecyclerView.ViewHolder(itemViewBinding.root) {
 
@@ -40,18 +40,12 @@ class TodoViewHolder(
     fun bind(todo: Todo, checkListener: CheckedTodoListener) {
         with(itemViewBinding) {
             todoItem = todo
-            itemListener = checkListener
             todoCheckBox.isChecked = todo.isCompleted
 
-
             todoCheckBox.setOnClickListener {
-                checkListener.onChecked(todo.apply { isCompleted = todoCheckBox.isChecked })
+                checkListener.onCheck(todo.apply { isCompleted = todoCheckBox.isChecked })
             }
 
-            /*todoCheckBox.setOnCheckedChangeListener { _, isTrue ->
-                todoCheckBox.setOnCheckedChangeListener(null)
-                checkListener.onChecked(todo.apply { isCompleted = isTrue })
-            }*/
             executePendingBindings()
         }
     }
@@ -69,7 +63,8 @@ class TodoDiffCallback : DiffUtil.ItemCallback<Todo>() {
 }
 
 class CheckedTodoListener(private val x: (Todo) -> Unit) {
-    fun onChecked(todo: Todo) {
-        x(todo)
+
+    fun onCheck(item: Any) {
+        x(item as Todo)
     }
 }

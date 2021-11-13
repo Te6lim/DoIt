@@ -6,6 +6,7 @@
         android:title="@string/categories" />
 
     <item
+        android:id="@+id/completedTodoListFragment"
         android:icon="@drawable/ic_finished_todos"
         android:title="@string/finished_todos" />
 

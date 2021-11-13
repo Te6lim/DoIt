@@ -64,7 +64,7 @@ class TodoListViewModel(
     val todoListByCategory = Transformations.map(todoList) {
         it?.let { list ->
             list.filter { todo ->
-                todo.category == defaultCategory.value?.name
+                todo.category == defaultCategory.value?.name && !todo.isCompleted
             }.let { newList ->
                 if (newList.isEmpty()) {
                     list
@@ -116,21 +116,17 @@ class TodoListViewModel(
         }
     }
 
-    fun mark(todo: Todo) {
+    fun updateTodo(todo: Todo) {
         viewModelScope.launch {
-            updateTodo(todo)
+            withContext(Dispatchers.IO) {
+                todoDb.update(todo)
+            }
         }
     }
 
     private suspend fun getTodo(id: Long): Todo? {
         return withContext(Dispatchers.IO) {
             todoDb.get(id)
-        }
-    }
-
-    private suspend fun updateTodo(todo: Todo) {
-        withContext(Dispatchers.IO) {
-            todoDb.update(todo)
         }
     }
 

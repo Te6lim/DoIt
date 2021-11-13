@@ -17,6 +17,9 @@
             app:exitAnim="@anim/slide_left_from_center"
             app:popEnterAnim="@anim/slide_right_from_left"
             app:popExitAnim="@anim/fall_out" />
+        <action
+            android:id="@+id/action_todoListFragment_to_completedTodoListFragment"
+            app:destination="@id/completedTodoListFragment" />
     </fragment>
     <fragment
         android:id="@+id/createTodoFragment"
@@ -26,5 +29,14 @@
         <argument
             android:name="defaultCategoryId"
             app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/completedTodoListFragment"
+        android:name="com.example.doit.completedTodoList.CompletedTodoListFragment"
+        android:label="fragment_list_todo_completed"
+        tools:layout="@layout/fragment_list_todo_completed">
+        <action
+            android:id="@+id/action_completedTodoListFragment_to_todoListFragment"
+            app:destination="@id/todoListFragment" />
     </fragment>
 </navigation>
