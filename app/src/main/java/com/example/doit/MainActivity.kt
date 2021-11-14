@@ -49,15 +49,21 @@ class MainActivity : AppCompatActivity() {
             with(navController) {
                 when (menuItem.itemId) {
                     R.id.todos -> {
-                        graph = graph.apply {
-                            startDestination = R.id.todoListFragment
+                        if (currentDestination?.id != R.id.todoListFragment) {
+                            graph = graph.apply {
+                                startDestination = R.id.todoListFragment
+                            }
+                            toggle.syncState()
                         }
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
                     R.id.finishedTodo -> {
-                        graph = graph.apply {
-                            startDestination = R.id.completedTodoListFragment
+                        if (currentDestination?.id != R.id.completedTodoListFragment) {
+                            graph = graph.apply {
+                                startDestination = R.id.completedTodoListFragment
+                            }
+                            toggle.syncState()
                         }
                         drawer.closeDrawer(GravityCompat.START)
                         true

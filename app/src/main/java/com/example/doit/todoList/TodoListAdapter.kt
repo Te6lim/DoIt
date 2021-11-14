@@ -23,7 +23,7 @@ class TodoListAdapter(private val listener: CheckedTodoListener) :
     }
 }
 
-open class TodoViewHolder(
+class TodoViewHolder(
     private val itemViewBinding: ItemTodoBinding
 ) : RecyclerView.ViewHolder(itemViewBinding.root) {
 
