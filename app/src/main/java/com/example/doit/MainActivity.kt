@@ -2,7 +2,6 @@ package com.example.doit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
@@ -37,15 +36,16 @@ class MainActivity : AppCompatActivity() {
             this, drawer, R.string.drawer_open, R.string.drawer_close
         )
         drawer.addDrawerListener(toggle)
-        toggle.syncState()
 
         if (savedInstanceState != null) {
             with(navController) {
-                graph = graph.apply {
-                    val sd = savedInstanceState.getInt("KEY")
-                    if (sd != startDestination) startDestination = sd
+                val sd = savedInstanceState.getInt("KEY")
+                if (sd != graph.startDestination
+                    || currentDestination?.id == graph.startDestination
+                ) {
+                    graph = graph.apply { startDestination = sd }
+                    toggle.syncState()
                 }
-                toggle.syncState()
             }
         }
 
