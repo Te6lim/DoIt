@@ -2,14 +2,13 @@ package com.example.doit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.example.doit.completedTodoList.CompletedTodoListFragment
 import com.example.doit.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -19,16 +18,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         mainBinding = DataBindingUtil.setContentView(
             this, R.layout.activity_main
         )
 
         setSupportActionBar(mainBinding.myActionBar)
 
+        val navController = findNavController(R.id.myNavHost)
+
         drawer = mainBinding.drawer
         val navView = mainBinding.navView
-
-        val navController = findNavController(R.id.myNavHost)
 
         NavigationUI.setupActionBarWithNavController(this, navController, drawer)
         NavigationUI.setupWithNavController(navView, navController)
@@ -38,6 +38,16 @@ class MainActivity : AppCompatActivity() {
         )
         drawer.addDrawerListener(toggle)
         toggle.syncState()
+
+        if (savedInstanceState != null) {
+            with(navController) {
+                graph = graph.apply {
+                    val sd = savedInstanceState.getInt("KEY")
+                    if (sd != startDestination) startDestination = sd
+                }
+                toggle.syncState()
+            }
+        }
 
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             if (controller.graph.startDestination == destination.id)
@@ -79,5 +89,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(findNavController(R.id.myNavHost), drawer)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("KEY", findNavController(R.id.myNavHost).graph.startDestination)
+        super.onSaveInstanceState(outState)
     }
 }
