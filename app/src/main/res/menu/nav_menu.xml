@@ -2,11 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:icon="@drawable/ic_categories"
-        android:title="@string/categories" />
+        android:id="@+id/todos"
+        android:icon="@drawable/ic_todos"
+        android:title="@string/todos" />
 
     <item
-        android:id="@+id/completedTodoListFragment"
+        android:id="@+id/finishedTodo"
         android:icon="@drawable/ic_finished_todos"
         android:title="@string/finished_todos" />
 

@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.doit.R
 import com.example.doit.database.TodoDatabase
-import com.example.doit.databinding.FragmentListTodoBinding
 import com.example.doit.databinding.FragmentListTodoCompletedBinding
 import com.example.doit.todoList.CheckedTodoListener
 import com.example.doit.todoList.TodoListAdapter
@@ -27,14 +26,21 @@ class CompletedTodoListFragment : Fragment() {
 
         val todoDatabase = TodoDatabase.getInstance(requireContext())
         val viewModelFactory = CompletedTodoListViewModelFactory(todoDatabase.databaseDao)
-        val viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(CompletedTodoListViewModel::class.java)
+        val viewModel = ViewModelProvider(
+            this, viewModelFactory
+        )[CompletedTodoListViewModel::class.java]
 
         binding.lifecycleOwner = this
 
-        binding.completedTodoList.adapter = TodoListAdapter(CheckedTodoListener {
+        val adapter = TodoListAdapter(CheckedTodoListener {
             viewModel.updateTodo(it)
         })
+
+        binding.completedTodoList.adapter = adapter
+
+        viewModel.completedTodos.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
 
         return binding.root
     }

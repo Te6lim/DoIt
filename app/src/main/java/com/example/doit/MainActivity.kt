@@ -2,41 +2,72 @@ package com.example.doit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.get
 import androidx.navigation.ui.NavigationUI
+import com.example.doit.completedTodoList.CompletedTodoListFragment
 import com.example.doit.databinding.ActivityMainBinding
-import com.google.android.material.appbar.MaterialToolbar
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var mainBinding: ActivityMainBinding
     private lateinit var drawer: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(
+        mainBinding = DataBindingUtil.setContentView(
             this, R.layout.activity_main
         )
 
-        setSupportActionBar(binding.myActionBar)
+        setSupportActionBar(mainBinding.myActionBar)
 
-        drawer = binding.drawer
-        val navView = binding.navView
+        drawer = mainBinding.drawer
+        val navView = mainBinding.navView
 
         val navController = findNavController(R.id.myNavHost)
+
         NavigationUI.setupActionBarWithNavController(this, navController, drawer)
         NavigationUI.setupWithNavController(navView, navController)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawer, R.string.drawer_open, R.string.drawer_close
+        )
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
 
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             if (controller.graph.startDestination == destination.id)
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
             else drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        }
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            with(navController) {
+                when (menuItem.itemId) {
+                    R.id.todos -> {
+                        graph = graph.apply {
+                            startDestination = R.id.todoListFragment
+                        }
+                        drawer.closeDrawer(GravityCompat.START)
+                        true
+                    }
+                    R.id.finishedTodo -> {
+                        graph = graph.apply {
+                            startDestination = R.id.completedTodoListFragment
+                        }
+                        drawer.closeDrawer(GravityCompat.START)
+                        true
+                    }
+                    else -> {
+                        drawer.closeDrawer(GravityCompat.START)
+                        false
+                    }
+                }
+            }
         }
     }
 

@@ -28,4 +28,8 @@
     <string name="category_plus_count">%s (%d)</string>
     <string name="all">All</string>
     <string name="categories_selection">categories selection</string>
+    <string name="drawer_open">drawer open</string>
+    <string name="drawer_close">drawer close</string>
+    <string name="completed">Completed</string>
+    <string name="todos">Todos</string>
 </resources>

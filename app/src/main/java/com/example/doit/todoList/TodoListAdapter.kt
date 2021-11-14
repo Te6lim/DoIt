@@ -40,11 +40,16 @@ open class TodoViewHolder(
     fun bind(todo: Todo, checkListener: CheckedTodoListener) {
         with(itemViewBinding) {
             todoItem = todo
+
             todoCheckBox.isChecked = todo.isCompleted
 
             todoCheckBox.setOnClickListener {
                 checkListener.onCheck(todo.apply { isCompleted = todoCheckBox.isChecked })
             }
+
+            /*todoCheckBox.setOnCheckedChangeListener { _, isTrue ->
+                checkListener.onCheck(todo.apply { isCompleted = isTrue })
+            }*/
 
             executePendingBindings()
         }
