@@ -18,7 +18,7 @@ class TodoListViewModel(
     val todoList: LiveData<List<Todo>>
         get() = _todoList
 
-    val categories = catDb.getAll()
+    private val categories = catDb.getAll()
 
     private val _defaultCategory = MutableLiveData<Category?>()
     val defaultCategory: LiveData<Category?>
@@ -67,7 +67,9 @@ class TodoListViewModel(
                 todo.category == defaultCategory.value?.name && !todo.isCompleted
             }.let { newList ->
                 if (newList.isEmpty()) {
-                    list
+                    list.filter { todo ->
+                        !todo.isCompleted
+                    }
                 } else newList
             }
         }

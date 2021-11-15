@@ -1,9 +1,7 @@
 package com.example.doit.completedTodoList
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +14,7 @@ import com.example.doit.todoList.TodoListAdapter
 class CompletedTodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoCompletedBinding
+    private lateinit var viewModel: CompletedTodoListViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -24,9 +23,11 @@ class CompletedTodoListFragment : Fragment() {
             inflater, R.layout.fragment_list_todo_completed, container, false
         )
 
+        setHasOptionsMenu(true)
+
         val todoDatabase = TodoDatabase.getInstance(requireContext())
         val viewModelFactory = CompletedTodoListViewModelFactory(todoDatabase.databaseDao)
-        val viewModel = ViewModelProvider(
+        viewModel = ViewModelProvider(
             this, viewModelFactory
         )[CompletedTodoListViewModel::class.java]
 
@@ -43,5 +44,20 @@ class CompletedTodoListFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.completed_todo_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.clear -> {
+                viewModel.clearFinished()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

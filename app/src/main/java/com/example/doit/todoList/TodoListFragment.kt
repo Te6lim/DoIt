@@ -19,7 +19,6 @@ open class TodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
-    private var defaultCategoryId: Int = 0
 
     private lateinit var mainActivity: MainActivity
 
@@ -61,7 +60,7 @@ open class TodoListFragment : Fragment() {
         binding.addNew.setOnClickListener {
             findNavController().navigate(
                 TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                    defaultCategoryId
+                    todoListViewModel.defaultCategory.value!!.id
                 )
             )
             todoListViewModel.isNavigating(true)
@@ -70,10 +69,6 @@ open class TodoListFragment : Fragment() {
         with(todoListViewModel) {
             categoriesTransform.observe(viewLifecycleOwner) {}
             defaultTransform.observe(viewLifecycleOwner) {}
-
-            defaultCategory.observe(viewLifecycleOwner) { category ->
-                defaultCategoryId = category!!.id
-            }
 
             todoListByCategory.observe(viewLifecycleOwner) { list ->
                 adapter.submitList(list)
