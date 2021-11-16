@@ -24,9 +24,13 @@ class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewMode
     fun clearFinished() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                allTodos.value?.let { list ->
-                    for (item in list) {
-                        if (item.isCompleted) todoDatabase.delete(item.todoId)
+                allTodos.value?.let {
+                    it.filter { todo ->
+                        todo.isCompleted
+                    }.let { list ->
+                        list.forEach { todo ->
+                            todoDatabase.delete(todo.todoId)
+                        }
                     }
                 }
             }

@@ -33,4 +33,5 @@
     <string name="completed">Completed</string>
     <string name="todos">Todos</string>
     <string name="clear">clear</string>
+    <string name="deadline_string">Deadline: %s by %s</string>
 </resources>

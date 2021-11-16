@@ -6,8 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 
-fun LocalDate.formatToString(): String {
-    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+fun LocalDate.formatToString(formatter: DateTimeFormatter): String {
     return format(formatter)
 }
 

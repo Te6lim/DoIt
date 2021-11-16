@@ -40,6 +40,8 @@ class CompletedTodoListFragment : Fragment() {
         binding.completedTodoList.adapter = adapter
 
         viewModel.completedTodos.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) setHasOptionsMenu(false)
+            else setHasOptionsMenu(true)
             adapter.submitList(it)
         }
 
