@@ -41,14 +41,11 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             with(navController) {
                 val sd = savedInstanceState.getInt("KEY")
-                /*if (sd != graph.startDestination
-                    || currentDestination?.id == graph.startDestination
+                if (currentDestination?.id == graph.startDestination || sd != graph.startDestination
                 ) {
-                    graph = graph.apply { startDestination = sd }
+                    graph.startDestination = sd
                     toggle.syncState()
-                }*/
-                graph.startDestination = sd
-                toggle.syncState()
+                }
             }
         }
 
@@ -62,40 +59,34 @@ class MainActivity : AppCompatActivity() {
             with(navController) {
                 when (menuItem.itemId) {
                     R.id.todos -> {
-                        val navOptions = NavOptions.Builder().setPopUpTo(
-                            currentDestination!!.id, true
-                        ).build()
-                        navigate(
-                            R.id.action_completedTodoListFragment_to_todoListFragment,
-                            savedInstanceState, navOptions
-                        )
-                        toggle.syncState()
-                        graph.startDestination = R.id.todoListFragment
-                        /*if (currentDestination?.id != R.id.todoListFragment) {
-                            graph = graph.apply {
-                                startDestination = R.id.todoListFragment
-                            }
+                        if (graph.startDestination != R.id.todoListFragment) {
+                            val navOptions = NavOptions.Builder().setPopUpTo(
+                                currentDestination!!.id, true
+                            ).build()
+                            navigate(
+                                R.id.action_completedTodoListFragment_to_todoListFragment,
+                                savedInstanceState, navOptions
+                            )
                             toggle.syncState()
-                        }*/
+                            graph.startDestination = R.id.todoListFragment
+                        }
+
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
                     R.id.finishedTodo -> {
-                        val navOptions = NavOptions.Builder().setPopUpTo(
-                            currentDestination!!.id, true
-                        ).build()
-                        navigate(
-                            R.id.action_todoListFragment_to_completedTodoListFragment,
-                            savedInstanceState, navOptions
-                        )
-                        toggle.syncState()
-                        graph.startDestination = R.id.completedTodoListFragment
-                        /*if (currentDestination?.id != R.id.completedTodoListFragment) {
-                            graph = graph.apply {
-                                startDestination = R.id.completedTodoListFragment
-                            }
+                        if (graph.startDestination != R.id.completedTodoListFragment) {
+                            val navOptions = NavOptions.Builder().setPopUpTo(
+                                currentDestination!!.id, true
+                            ).build()
+                            navigate(
+                                R.id.action_todoListFragment_to_completedTodoListFragment,
+                                savedInstanceState, navOptions
+                            )
                             toggle.syncState()
-                        }*/
+                            graph.startDestination = R.id.completedTodoListFragment
+                        }
+
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
@@ -115,5 +106,10 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt("KEY", findNavController(R.id.myNavHost).graph.startDestination)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) drawer.closeDrawer(GravityCompat.START)
+        else super.onBackPressed()
     }
 }
