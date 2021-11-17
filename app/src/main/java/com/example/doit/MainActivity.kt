@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.databinding.ActivityMainBinding
@@ -40,12 +41,14 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             with(navController) {
                 val sd = savedInstanceState.getInt("KEY")
-                if (sd != graph.startDestination
+                /*if (sd != graph.startDestination
                     || currentDestination?.id == graph.startDestination
                 ) {
                     graph = graph.apply { startDestination = sd }
                     toggle.syncState()
-                }
+                }*/
+                graph.startDestination = sd
+                toggle.syncState()
             }
         }
 
@@ -59,22 +62,40 @@ class MainActivity : AppCompatActivity() {
             with(navController) {
                 when (menuItem.itemId) {
                     R.id.todos -> {
-                        if (currentDestination?.id != R.id.todoListFragment) {
+                        val navOptions = NavOptions.Builder().setPopUpTo(
+                            currentDestination!!.id, true
+                        ).build()
+                        navigate(
+                            R.id.action_completedTodoListFragment_to_todoListFragment,
+                            savedInstanceState, navOptions
+                        )
+                        toggle.syncState()
+                        graph.startDestination = R.id.todoListFragment
+                        /*if (currentDestination?.id != R.id.todoListFragment) {
                             graph = graph.apply {
                                 startDestination = R.id.todoListFragment
                             }
                             toggle.syncState()
-                        }
+                        }*/
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
                     R.id.finishedTodo -> {
-                        if (currentDestination?.id != R.id.completedTodoListFragment) {
+                        val navOptions = NavOptions.Builder().setPopUpTo(
+                            currentDestination!!.id, true
+                        ).build()
+                        navigate(
+                            R.id.action_todoListFragment_to_completedTodoListFragment,
+                            savedInstanceState, navOptions
+                        )
+                        toggle.syncState()
+                        graph.startDestination = R.id.completedTodoListFragment
+                        /*if (currentDestination?.id != R.id.completedTodoListFragment) {
                             graph = graph.apply {
                                 startDestination = R.id.completedTodoListFragment
                             }
                             toggle.syncState()
-                        }
+                        }*/
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }

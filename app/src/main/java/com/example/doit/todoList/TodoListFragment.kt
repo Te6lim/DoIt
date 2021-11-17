@@ -5,8 +5,6 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.MainActivity
@@ -117,9 +115,7 @@ open class TodoListFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.categories -> {
-                true
-            }
+            R.id.categories -> true
             else -> super.onOptionsItemSelected(item)
         }
     }
