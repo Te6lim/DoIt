@@ -1,8 +1,6 @@
 package com.example.doit.completedTodoList
 
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +17,10 @@ class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewMode
                 todo.isCompleted
             }
         }
+    }
+
+    val subtitleText = Transformations.map(completedTodos) {
+        it.size
     }
 
     fun clearFinished() {

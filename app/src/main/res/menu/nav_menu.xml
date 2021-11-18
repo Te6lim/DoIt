@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/todos"
-        android:icon="@drawable/ic_todos"
-        android:title="@string/todos" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/todos_navView"
+            android:icon="@drawable/ic_todos"
+            android:title="@string/todos" />
 
-    <item
-        android:id="@+id/finishedTodo"
-        android:icon="@drawable/ic_finished_todos"
-        android:title="@string/finished_todos" />
+        <item
+            android:id="@+id/finished_todos_navView"
+            android:icon="@drawable/ic_finished_todos"
+            android:title="@string/finished_todos" />
+    </group>
 
     <item
         android:icon="@drawable/ic_settings"

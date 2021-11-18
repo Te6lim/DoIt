@@ -6,15 +6,20 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.databinding.ActivityMainBinding
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var drawer: DrawerLayout
+    private lateinit var navView: NavigationView
+
+    private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +32,13 @@ class MainActivity : AppCompatActivity() {
 
         val navController = findNavController(R.id.myNavHost)
 
+        val viewModelFactory = MainViewModelFactory(navController.graph.startDestination)
+        mainViewModel = ViewModelProvider(
+            this, viewModelFactory
+        )[MainViewModel::class.java]
+
         drawer = mainBinding.drawer
-        val navView = mainBinding.navView
+        navView = mainBinding.navView
 
         NavigationUI.setupActionBarWithNavController(this, navController, drawer)
         NavigationUI.setupWithNavController(navView, navController)
@@ -36,7 +46,26 @@ class MainActivity : AppCompatActivity() {
         val toggle = ActionBarDrawerToggle(
             this, drawer, R.string.drawer_open, R.string.drawer_close
         )
+
         drawer.addDrawerListener(toggle)
+
+        mainViewModel.activeStartDestination.observe(this) {
+            when (it) {
+                R.id.todoListFragment -> {
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                    navView.setCheckedItem(R.id.todos_navView)
+                    toggle.syncState()
+                }
+                R.id.completedTodoListFragment -> {
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                    navView.setCheckedItem(R.id.finished_todos_navView)
+                    toggle.syncState()
+                }
+                else -> {
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                }
+            }
+        }
 
         if (savedInstanceState != null) {
             with(navController) {
@@ -44,21 +73,19 @@ class MainActivity : AppCompatActivity() {
                 if (currentDestination?.id == graph.startDestination || sd != graph.startDestination
                 ) {
                     graph.startDestination = sd
-                    toggle.syncState()
+                    mainViewModel.setActiveStartDestination(sd)
                 }
             }
         }
 
-        navController.addOnDestinationChangedListener { controller, destination, _ ->
-            if (controller.graph.startDestination == destination.id)
-                drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-            else drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            mainViewModel.setActiveStartDestination(destination.id)
         }
 
         navView.setNavigationItemSelectedListener { menuItem ->
             with(navController) {
                 when (menuItem.itemId) {
-                    R.id.todos -> {
+                    R.id.todos_navView -> {
                         if (graph.startDestination != R.id.todoListFragment) {
                             val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true
@@ -74,7 +101,8 @@ class MainActivity : AppCompatActivity() {
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
-                    R.id.finishedTodo -> {
+
+                    R.id.finished_todos_navView -> {
                         if (graph.startDestination != R.id.completedTodoListFragment) {
                             val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true

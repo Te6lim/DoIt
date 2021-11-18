@@ -5,6 +5,7 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoCompletedBinding
@@ -43,6 +44,10 @@ class CompletedTodoListFragment : Fragment() {
             if (it.isEmpty()) setHasOptionsMenu(false)
             else setHasOptionsMenu(true)
             adapter.submitList(it)
+        }
+
+        viewModel.subtitleText.observe(viewLifecycleOwner) {
+            (requireActivity() as MainActivity).supportActionBar?.subtitle = it.toString()
         }
 
         return binding.root
