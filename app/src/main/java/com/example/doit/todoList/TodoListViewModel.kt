@@ -39,16 +39,6 @@ class TodoListViewModel(
         catList.toListOfString { it.name }
     }
 
-    private fun List<Category>?.toListOfString(f: (Category) -> String): List<String> {
-        val list = mutableListOf<String>()
-        this?.let {
-            for (item in this) {
-                list.add(f(item))
-            }
-        }
-        return list
-    }
-
     val defaultTransform = Transformations.map(defaultCategory) {
         _todoList.value = allList.value
 
@@ -84,13 +74,25 @@ class TodoListViewModel(
         }
     }
 
+    val items = Transformations.map(allList) {
+        val list = mutableListOf<Boolean>()
+        it?.let {
+            it.forEach { _ -> list.add(false) }
+        }
+        list
+    }
+
     private val _isNavigating = MutableLiveData<Boolean>()
     val isNavigating: LiveData<Boolean>
         get() = _isNavigating
 
-    private val _contextActionBarEnabled = MutableLiveData<Boolean>()
+    private val _contextActionBarEnabled = MutableLiveData(false)
     val contextActionBarEnabled: LiveData<Boolean>
         get() = _contextActionBarEnabled
+
+    private val _itemSelected = MutableLiveData<Boolean>()
+    val itemSelected: LiveData<Boolean>
+        get() = _itemSelected
 
     private fun emitDefault() {
         viewModelScope.launch {
@@ -126,26 +128,6 @@ class TodoListViewModel(
         }
     }
 
-    private suspend fun getTodo(id: Long): Todo? {
-        return withContext(Dispatchers.IO) {
-            todoDb.get(id)
-        }
-    }
-
-    /*fun changeDefault(categoryId: Int) {
-        _defaultCategory.value?.let {
-            it.isDefault = false
-            var newDefault: Category?
-            uiScope.launch {
-                withContext(Dispatchers.IO) {
-                    newDefault = catDb.get(categoryId)
-                }
-                newDefault?.isDefault = true
-                _defaultCategory.value = newDefault ?: it.apply { isDefault = true }
-            }
-        }
-    }*/
-
     fun delete(id: Long) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -158,7 +140,23 @@ class TodoListViewModel(
         _isNavigating.value = value
     }
 
-    fun contextActionBarEnabled(value: Boolean) {
+    fun setContextActionBarEnabled(value: Boolean) {
         _contextActionBarEnabled.value = value
+    }
+
+    fun setItemSelected(position: Int) {
+        items.value?.let { list ->
+            list[position] = !list[position]
+            _itemSelected.value = list[position]
+        }
+    }
+
+    fun clickAction() {
+        items.value?.let { list ->
+            if (contextActionBarEnabled.value!!) {
+                (items as MutableLiveData).value = MutableList(list.size) { false }
+                _itemSelected.value = false
+            }
+        }
     }
 }

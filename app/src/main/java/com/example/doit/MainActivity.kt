@@ -19,7 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawer: DrawerLayout
     private lateinit var navView: NavigationView
 
-    private lateinit var mainViewModel: MainViewModel
+    lateinit var mainViewModel: MainViewModel
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

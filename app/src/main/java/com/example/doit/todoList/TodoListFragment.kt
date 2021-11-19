@@ -2,6 +2,7 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.CategoryDb
+import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
 
@@ -41,8 +43,39 @@ open class TodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = TodoListAdapter(CheckedTodoListener { todo ->
-            todoListViewModel.updateTodo(todo)
+        val actionModeCallback = object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                MenuInflater(requireContext()).inflate(R.menu.todo_action_mode_menu, menu)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                return false
+            }
+
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                return false
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode?) {
+                todoListViewModel.clickAction()
+                mode?.finish()
+            }
+
+        }
+
+        val adapter = TodoListAdapter(object : CheckedTodoListener {
+            override fun onCheck(todo: Todo) {
+                todoListViewModel.updateTodo(todo)
+            }
+
+            override fun onLongPress(position: Int) {
+                todoListViewModel.setItemSelected(position)
+            }
+
+            override fun onClick() {
+                todoListViewModel.clickAction()
+            }
         })
 
         binding.todoList.adapter = adapter.also {
@@ -67,6 +100,9 @@ open class TodoListFragment : Fragment() {
         with(todoListViewModel) {
             categoriesTransform.observe(viewLifecycleOwner) {}
             defaultTransform.observe(viewLifecycleOwner) {}
+            items.observe(viewLifecycleOwner) {
+
+            }
 
             todoListByCategory.observe(viewLifecycleOwner) { list ->
                 adapter.submitList(list)
@@ -85,8 +121,9 @@ open class TodoListFragment : Fragment() {
             }
 
             itemCountInCategory.observe(viewLifecycleOwner) {
-                mainActivity.supportActionBar?.subtitle = resources
-                    .getString(R.string.category_plus_count, it.first, it.second)
+                mainActivity.supportActionBar?.subtitle = resources.getString(
+                    R.string.category_plus_count, it.first, it.second
+                )
             }
 
             isNavigating.observe(viewLifecycleOwner) { navigating ->
@@ -94,6 +131,21 @@ open class TodoListFragment : Fragment() {
                     mainActivity.supportActionBar?.subtitle = null
                     todoListViewModel.isNavigating(false)
                 }
+            }
+
+            var actionMode: ActionMode? = null
+            contextActionBarEnabled.observe(viewLifecycleOwner) { isEnabled ->
+                if (isEnabled) {
+                    actionMode = mainActivity.startSupportActionMode(actionModeCallback)
+                } else {
+                    actionMode.let {
+                        actionModeCallback.onDestroyActionMode(it)
+                    }
+                }
+            }
+
+            itemSelected.observe(viewLifecycleOwner) {
+                todoListViewModel.setContextActionBarEnabled(it)
             }
         }
 

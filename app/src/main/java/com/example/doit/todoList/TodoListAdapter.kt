@@ -47,9 +47,14 @@ class TodoViewHolder(
                 checkListener.onCheck(todo.apply { isCompleted = todoCheckBox.isChecked })
             }
 
-            /*todoCheckBox.setOnCheckedChangeListener { _, isTrue ->
-                checkListener.onCheck(todo.apply { isCompleted = isTrue })
-            }*/
+            itemView.setOnLongClickListener {
+                checkListener.onLongPress(adapterPosition)
+                true
+            }
+
+            itemView.setOnClickListener {
+                checkListener.onClick()
+            }
 
             executePendingBindings()
         }
@@ -67,9 +72,13 @@ class TodoDiffCallback : DiffUtil.ItemCallback<Todo>() {
 
 }
 
-class CheckedTodoListener(private val x: (Todo) -> Unit) {
+interface CheckedTodoListener {
+    fun onCheck(todo: Todo)
+    fun onLongPress(position: Int) {
 
-    fun onCheck(item: Any) {
-        x(item as Todo)
+    }
+
+    fun onClick() {
+
     }
 }
