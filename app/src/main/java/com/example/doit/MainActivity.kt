@@ -50,21 +50,28 @@ class MainActivity : AppCompatActivity() {
 
         drawer.addDrawerListener(toggle)
 
-        mainViewModel.activeStartDestination.observe(this) {
-            when (it) {
-                R.id.todoListFragment -> {
-                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-                    navView.setCheckedItem(R.id.todos_navView)
-                    toggle.syncState()
+        with(mainViewModel) {
+            activeStartDestination.observe(this@MainActivity) {
+                when (it) {
+                    R.id.todoListFragment -> {
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                        navView.setCheckedItem(R.id.todos_navView)
+                        toggle.syncState()
+                    }
+                    R.id.completedTodoListFragment -> {
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                        navView.setCheckedItem(R.id.finished_todos_navView)
+                        toggle.syncState()
+                    }
+                    else -> {
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                    }
                 }
-                R.id.completedTodoListFragment -> {
-                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-                    navView.setCheckedItem(R.id.finished_todos_navView)
-                    toggle.syncState()
-                }
-                else -> {
-                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                }
+            }
+
+            contextActionbarActive.observe(this@MainActivity) { isActive ->
+                if (isActive) drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                else drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
             }
         }
 

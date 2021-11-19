@@ -11,12 +11,20 @@ class MainViewModel(startDest: Int) : ViewModel() {
     val activeStartDestination: LiveData<Int>
         get() = _activeStartDestination
 
+    private val _contextActionbarActive = MutableLiveData<Boolean>()
+    val contextActionbarActive: LiveData<Boolean>
+        get() = _contextActionbarActive
+
     init {
         _activeStartDestination.value = startDest
     }
 
     fun setActiveStartDestination(id: Int) {
         _activeStartDestination.value = id
+    }
+
+    fun setContextActionbarActive(value: Boolean) {
+        _contextActionbarActive.value = value
     }
 }
 

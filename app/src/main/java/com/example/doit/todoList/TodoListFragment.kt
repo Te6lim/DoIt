@@ -137,11 +137,14 @@ open class TodoListFragment : Fragment() {
             contextActionBarEnabled.observe(viewLifecycleOwner) { isEnabled ->
                 if (isEnabled) {
                     actionMode = mainActivity.startSupportActionMode(actionModeCallback)
+                    binding.addNew.visibility = View.GONE
                 } else {
                     actionMode.let {
                         actionModeCallback.onDestroyActionMode(it)
+                        binding.addNew.visibility = View.VISIBLE
                     }
                 }
+                mainActivity.mainViewModel.setContextActionbarActive(isEnabled)
             }
 
             itemSelected.observe(viewLifecycleOwner) {
