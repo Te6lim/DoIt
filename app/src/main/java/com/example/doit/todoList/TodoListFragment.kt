@@ -61,10 +61,9 @@ open class TodoListFragment : Fragment() {
                 todoListViewModel.clickAction()
                 mode?.finish()
             }
-
         }
 
-        val adapter = TodoListAdapter(object : CheckedTodoListener {
+        val adapter = TodoListAdapter(object : ActionCallback {
             override fun onCheck(todo: Todo) {
                 todoListViewModel.updateTodo(todo)
             }
@@ -98,10 +97,11 @@ open class TodoListFragment : Fragment() {
         }
 
         with(todoListViewModel) {
+
             categoriesTransform.observe(viewLifecycleOwner) {}
             defaultTransform.observe(viewLifecycleOwner) {}
             items.observe(viewLifecycleOwner) {
-
+                setContextActionBarEnabled(false)
             }
 
             todoListByCategory.observe(viewLifecycleOwner) { list ->

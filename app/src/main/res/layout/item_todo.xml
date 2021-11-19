@@ -15,7 +15,7 @@
 
         <variable
             name="itemListener"
-            type="com.example.doit.todoList.CheckedTodoListener" />
+            type="com.example.doit.todoList.ActionCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

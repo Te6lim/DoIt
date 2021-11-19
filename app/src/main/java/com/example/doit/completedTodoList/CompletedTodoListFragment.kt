@@ -5,13 +5,12 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.model.getAdapterName
 import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoCompletedBinding
-import com.example.doit.todoList.CheckedTodoListener
+import com.example.doit.todoList.ActionCallback
 import com.example.doit.todoList.TodoListAdapter
 
 class CompletedTodoListFragment : Fragment() {
@@ -36,7 +35,7 @@ class CompletedTodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = TodoListAdapter(object : CheckedTodoListener {
+        val adapter = TodoListAdapter(object : ActionCallback {
             override fun onCheck(todo: Todo) {
                 viewModel.updateTodo(todo)
             }

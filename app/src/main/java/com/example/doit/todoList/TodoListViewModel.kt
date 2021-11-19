@@ -86,7 +86,7 @@ class TodoListViewModel(
     val isNavigating: LiveData<Boolean>
         get() = _isNavigating
 
-    private val _contextActionBarEnabled = MutableLiveData(false)
+    private val _contextActionBarEnabled = MutableLiveData<Boolean>()
     val contextActionBarEnabled: LiveData<Boolean>
         get() = _contextActionBarEnabled
 

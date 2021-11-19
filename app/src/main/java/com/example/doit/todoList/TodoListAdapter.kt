@@ -10,7 +10,7 @@ import com.example.doit.R
 import com.example.doit.database.Todo
 import com.example.doit.databinding.ItemTodoBinding
 
-class TodoListAdapter(private val listener: CheckedTodoListener) :
+class TodoListAdapter(private val callback: ActionCallback) :
     ListAdapter<Todo, TodoViewHolder>(TodoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
@@ -19,7 +19,7 @@ class TodoListAdapter(private val listener: CheckedTodoListener) :
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
         val todoItem = getItem(position)
-        holder.bind(todoItem, listener)
+        holder.bind(todoItem, callback)
     }
 }
 
@@ -37,23 +37,23 @@ class TodoViewHolder(
         }
     }
 
-    fun bind(todo: Todo, checkListener: CheckedTodoListener) {
+    fun bind(todo: Todo, callback: ActionCallback) {
         with(itemViewBinding) {
             todoItem = todo
 
             todoCheckBox.isChecked = todo.isCompleted
 
             todoCheckBox.setOnClickListener {
-                checkListener.onCheck(todo.apply { isCompleted = todoCheckBox.isChecked })
+                callback.onCheck(todo.apply { isCompleted = todoCheckBox.isChecked })
             }
 
             itemView.setOnLongClickListener {
-                checkListener.onLongPress(adapterPosition)
+                callback.onLongPress(adapterPosition)
                 true
             }
 
             itemView.setOnClickListener {
-                checkListener.onClick()
+                callback.onClick()
             }
 
             executePendingBindings()
@@ -72,13 +72,11 @@ class TodoDiffCallback : DiffUtil.ItemCallback<Todo>() {
 
 }
 
-interface CheckedTodoListener {
+interface ActionCallback {
+
     fun onCheck(todo: Todo)
-    fun onLongPress(position: Int) {
 
-    }
+    fun onLongPress(position: Int) {}
 
-    fun onClick() {
-
-    }
+    fun onClick() {}
 }
