@@ -5,6 +5,8 @@ import android.view.*
 import android.widget.CheckBox
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
+import androidx.core.view.allViews
+import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -56,7 +58,22 @@ open class TodoListFragment : Fragment() {
             }
 
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-                return false
+                return when (item?.itemId) {
+                    R.id.edit -> {
+                        true
+                    }
+
+                    R.id.select_all -> {
+                        todoListViewModel.selectAll()
+                        true
+                    }
+
+                    R.id.delete -> {
+                        todoListViewModel.setToBeDeleted()
+                        true
+                    }
+                    else -> false
+                }
             }
 
             override fun onDestroyActionMode(mode: ActionMode?) {
@@ -79,8 +96,17 @@ open class TodoListFragment : Fragment() {
                 todoListViewModel.clickAction(position)
             }
 
-            override fun selectView(position: Int, holder: View) {
+            override fun selectedView(position: Int, holder: View) {
+
                 switchBackground(todoListViewModel.items.value!![position], holder)
+
+                todoListViewModel.contextActionBarEnabled.value!!.let { isActive ->
+                    view?.findViewById<CheckBox>(R.id.todo_check_box)?.isEnabled = !isActive
+                    binding.todoList.allViews.forEach {
+                        it.findViewById<CheckBox>(R.id.todo_check_box)?.isEnabled =
+                            !isActive
+                    }
+                }
             }
         })
 
@@ -152,8 +178,15 @@ open class TodoListFragment : Fragment() {
                     actionMode.let {
                         actionModeCallback.onDestroyActionMode(it)
                         binding.addNew.visibility = View.VISIBLE
+
                     }
                 }
+
+                binding.todoList.allViews.forEach {
+                    it.findViewById<CheckBox>(R.id.todo_check_box)?.isEnabled =
+                        !isEnabled
+                }
+
                 mainActivity.mainViewModel.setContextActionbarActive(isEnabled)
             }
 
@@ -164,6 +197,15 @@ open class TodoListFragment : Fragment() {
                         switchBackground(todoListViewModel.getItems()!![position], holder)
                     }
                 }
+            }
+
+            selectionCount.observe(viewLifecycleOwner) {
+                actionMode?.title = getString(R.string.selection_count, it)
+                actionMode?.menu?.get(0)?.isVisible = it == 1
+            }
+
+            toBeDeleted.observe(viewLifecycleOwner) {
+                deleteSelected(it)
             }
         }
 
@@ -180,14 +222,12 @@ open class TodoListFragment : Fragment() {
 
     private fun switchBackground(value: Boolean, holder: View) {
         with(holder) {
-            if (value) {
-                findViewById<CheckBox>(R.id.todo_check_box).isEnabled = false
-                background = AppCompatResources.getDrawable(
+            background = if (value) {
+                AppCompatResources.getDrawable(
                     context, R.drawable.item_selected_background
                 )
             } else {
-                findViewById<CheckBox>(R.id.todo_check_box).isEnabled = true
-                background = AppCompatResources.getDrawable(
+                AppCompatResources.getDrawable(
                     context, R.drawable.rounded_background
                 )
             }

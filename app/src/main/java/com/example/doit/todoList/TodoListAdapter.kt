@@ -55,7 +55,7 @@ class TodoViewHolder(
 
             itemView.setOnClickListener { callback.onClick(adapterPosition) }
 
-            callback.selectView(adapterPosition, itemView)
+            callback.selectedView(adapterPosition, itemView)
 
             executePendingBindings()
         }
@@ -81,5 +81,5 @@ interface ActionCallback {
 
     fun onClick(position: Int) {}
 
-    fun selectView(position: Int, holder: View)
+    fun selectedView(position: Int, holder: View)
 }

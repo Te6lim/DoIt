@@ -74,7 +74,7 @@ class TodoListViewModel(
         }
     }
 
-    val items = Transformations.map(allList) {
+    val items = Transformations.map(todoListByCategory) {
         val list = mutableListOf<Boolean>()
         it?.let {
             it.forEach { _ -> list.add(false) }
@@ -93,6 +93,14 @@ class TodoListViewModel(
     private val _viewHolderPosition = MutableLiveData<Int>()
     val viewHolderPosition: LiveData<Int>
         get() = _viewHolderPosition
+
+    private val _selectionCount = MutableLiveData(0)
+    val selectionCount: LiveData<Int>
+        get() = _selectionCount
+
+    private val _toBeDeleted = MutableLiveData<List<Todo>>()
+    val toBeDeleted: LiveData<List<Todo>>
+        get() = _toBeDeleted
 
     private fun emitDefault() {
         viewModelScope.launch {
@@ -149,8 +157,11 @@ class TodoListViewModel(
     fun setItemSelected(position: Int) {
         items.value?.let { list ->
             list[position] = !list[position]
-            if (list.any { it }) setContextActionBarEnabled(true)
-            else setContextActionBarEnabled(false)
+            if (list.any { it }) {
+                setContextActionBarEnabled(true)
+                if (list[position]) _selectionCount.value = _selectionCount.value!!.plus(1)
+                else _selectionCount.value = _selectionCount.value!!.minus(1)
+            } else setContextActionBarEnabled(false)
             _viewHolderPosition.value = position
         }
     }
@@ -162,14 +173,47 @@ class TodoListViewModel(
                     if (position >= 0) {
                         list[position] = false
                         _viewHolderPosition.value = position
+                        _selectionCount.value = _selectionCount.value!!.minus(1)
                         if (!list.any { it }) setContextActionBarEnabled(false)
                     } else {
-                        (items as MutableLiveData).value = MutableList(list.size) { false }
+                        for ((i, isTrue) in list.withIndex()) {
+                            if (isTrue) {
+                                list[i] = false
+                                _viewHolderPosition.value = i
+                            }
+                        }
+                        setContextActionBarEnabled(false)
+                        _selectionCount.value = 0
                     }
                 } else {
                     list[position] = true
                     _viewHolderPosition.value = position
+                    _selectionCount.value = _selectionCount.value!!.plus(1)
                 }
+            }
+        }
+    }
+
+    fun selectAll() {
+        for ((i, value) in items.value!!.withIndex()) {
+            if (!value) {
+                clickAction(i)
+            }
+        }
+    }
+
+    fun setToBeDeleted() {
+        val list = mutableListOf<Todo>()
+        for ((i, item) in items.value!!.withIndex()) {
+            if (item) list.add(todoListByCategory.value!![i])
+        }
+        _toBeDeleted.value = list
+    }
+
+    fun deleteSelected(list: List<Todo>) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                list.forEach { delete(it.todoId) }
             }
         }
     }

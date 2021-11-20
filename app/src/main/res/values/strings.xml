@@ -36,4 +36,6 @@
     <string name="deadline_string">Deadline: %s by %s</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="selection_count">%d Selected</string>
+    <string name="select_all">select all</string>
 </resources>

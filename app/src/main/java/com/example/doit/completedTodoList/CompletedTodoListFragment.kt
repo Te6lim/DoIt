@@ -40,7 +40,7 @@ class CompletedTodoListFragment : Fragment() {
                 viewModel.updateTodo(todo)
             }
 
-            override fun selectView(position: Int, holder: View) {}
+            override fun selectedView(position: Int, holder: View) {}
         })
 
         binding.completedTodoList.adapter = adapter
