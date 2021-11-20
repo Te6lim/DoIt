@@ -2,6 +2,8 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
+import android.widget.CheckBox
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -64,6 +66,7 @@ open class TodoListFragment : Fragment() {
         }
 
         val adapter = TodoListAdapter(object : ActionCallback {
+
             override fun onCheck(todo: Todo) {
                 todoListViewModel.updateTodo(todo)
             }
@@ -72,8 +75,12 @@ open class TodoListFragment : Fragment() {
                 todoListViewModel.setItemSelected(position)
             }
 
-            override fun onClick() {
-                todoListViewModel.clickAction()
+            override fun onClick(position: Int) {
+                todoListViewModel.clickAction(position)
+            }
+
+            override fun selectView(position: Int, holder: View) {
+                switchBackground(todoListViewModel.items.value!![position], holder)
             }
         })
 
@@ -99,9 +106,12 @@ open class TodoListFragment : Fragment() {
         with(todoListViewModel) {
 
             categoriesTransform.observe(viewLifecycleOwner) {}
+
             defaultTransform.observe(viewLifecycleOwner) {}
-            items.observe(viewLifecycleOwner) {
-                setContextActionBarEnabled(false)
+
+            items.observe(viewLifecycleOwner) { list ->
+                if (list.any { it }) setContextActionBarEnabled(true)
+                else setContextActionBarEnabled(false)
             }
 
             todoListByCategory.observe(viewLifecycleOwner) { list ->
@@ -147,8 +157,13 @@ open class TodoListFragment : Fragment() {
                 mainActivity.mainViewModel.setContextActionbarActive(isEnabled)
             }
 
-            itemSelected.observe(viewLifecycleOwner) {
-                todoListViewModel.setContextActionBarEnabled(it)
+            viewHolderPosition.observe(viewLifecycleOwner) { position ->
+                val holder = binding.todoList.findViewHolderForAdapterPosition(position)?.itemView
+                contextActionBarEnabled.value?.let { _ ->
+                    holder?.let {
+                        switchBackground(todoListViewModel.getItems()!![position], holder)
+                    }
+                }
             }
         }
 
@@ -161,6 +176,22 @@ open class TodoListFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun switchBackground(value: Boolean, holder: View) {
+        with(holder) {
+            if (value) {
+                findViewById<CheckBox>(R.id.todo_check_box).isEnabled = false
+                background = AppCompatResources.getDrawable(
+                    context, R.drawable.item_selected_background
+                )
+            } else {
+                findViewById<CheckBox>(R.id.todo_check_box).isEnabled = true
+                background = AppCompatResources.getDrawable(
+                    context, R.drawable.rounded_background
+                )
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

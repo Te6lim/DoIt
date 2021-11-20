@@ -7,6 +7,8 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_add.xml" value="0.22777777777777777" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_todo.xml" value="0.22777777777777777" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_todos.xml" value="0.2324074074074074" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/item_selected_background.xml" value="0.23692307692307693" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/item_selector.xml" value="0.23692307692307693" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/rounded_background.xml" value="0.240625" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/todo_background.xml" value="0.22870370370370371" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/activity_main.xml" value="0.1743659420289855" />

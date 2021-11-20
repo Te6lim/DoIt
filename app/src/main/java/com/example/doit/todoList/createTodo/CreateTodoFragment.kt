@@ -43,7 +43,7 @@ class CreateTodoFragment : Fragment() {
 
         viewModel = ViewModelProvider(
             this, viewModelFactory
-        ).get(CreateTodoViewModel::class.java)
+        )[CreateTodoViewModel::class.java]
 
         binding.lifecycleOwner = this
 

@@ -39,6 +39,8 @@ class CompletedTodoListFragment : Fragment() {
             override fun onCheck(todo: Todo) {
                 viewModel.updateTodo(todo)
             }
+
+            override fun selectView(position: Int, holder: View) {}
         })
 
         binding.completedTodoList.adapter = adapter

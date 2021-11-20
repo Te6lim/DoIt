@@ -1,6 +1,7 @@
 package com.example.doit.todoList
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -52,9 +53,9 @@ class TodoViewHolder(
                 true
             }
 
-            itemView.setOnClickListener {
-                callback.onClick()
-            }
+            itemView.setOnClickListener { callback.onClick(adapterPosition) }
+
+            callback.selectView(adapterPosition, itemView)
 
             executePendingBindings()
         }
@@ -78,5 +79,7 @@ interface ActionCallback {
 
     fun onLongPress(position: Int) {}
 
-    fun onClick() {}
+    fun onClick(position: Int) {}
+
+    fun selectView(position: Int, holder: View)
 }

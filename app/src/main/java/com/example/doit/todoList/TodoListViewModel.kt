@@ -86,13 +86,13 @@ class TodoListViewModel(
     val isNavigating: LiveData<Boolean>
         get() = _isNavigating
 
-    private val _contextActionBarEnabled = MutableLiveData<Boolean>()
+    private val _contextActionBarEnabled = MutableLiveData(false)
     val contextActionBarEnabled: LiveData<Boolean>
         get() = _contextActionBarEnabled
 
-    private val _itemSelected = MutableLiveData<Boolean>()
-    val itemSelected: LiveData<Boolean>
-        get() = _itemSelected
+    private val _viewHolderPosition = MutableLiveData<Int>()
+    val viewHolderPosition: LiveData<Int>
+        get() = _viewHolderPosition
 
     private fun emitDefault() {
         viewModelScope.launch {
@@ -141,21 +141,35 @@ class TodoListViewModel(
     }
 
     fun setContextActionBarEnabled(value: Boolean) {
-        _contextActionBarEnabled.value = value
+        if (_contextActionBarEnabled.value!! != value) _contextActionBarEnabled.value = value
     }
+
+    fun getItems() = items.value?.toList()
 
     fun setItemSelected(position: Int) {
         items.value?.let { list ->
             list[position] = !list[position]
-            _itemSelected.value = list[position]
+            if (list.any { it }) setContextActionBarEnabled(true)
+            else setContextActionBarEnabled(false)
+            _viewHolderPosition.value = position
         }
     }
 
-    fun clickAction() {
+    fun clickAction(position: Int = -1) {
         items.value?.let { list ->
-            if (contextActionBarEnabled.value!!) {
-                (items as MutableLiveData).value = MutableList(list.size) { false }
-                _itemSelected.value = false
+            if (_contextActionBarEnabled.value!!) {
+                if (position < 0 || items.value!![position]) {
+                    if (position >= 0) {
+                        list[position] = false
+                        _viewHolderPosition.value = position
+                        if (!list.any { it }) setContextActionBarEnabled(false)
+                    } else {
+                        (items as MutableLiveData).value = MutableList(list.size) { false }
+                    }
+                } else {
+                    list[position] = true
+                    _viewHolderPosition.value = position
+                }
             }
         }
     }
