@@ -38,4 +38,5 @@
     <string name="delete">Delete</string>
     <string name="selection_count">%d Selected</string>
     <string name="select_all">select all</string>
+    <string name="empty_todo">empty todo</string>
 </resources>

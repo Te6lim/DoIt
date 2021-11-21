@@ -17,7 +17,12 @@ import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
 
-open class TodoListFragment : Fragment() {
+class TodoListFragment : Fragment() {
+
+    companion object {
+        private const val SCROLL = "SCROLL"
+        private const val DEF_KEY = "KEY"
+    }
 
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
@@ -101,13 +106,15 @@ open class TodoListFragment : Fragment() {
             }
         })
 
+
         binding.todoList.adapter = adapter.also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    binding.todoList.scrollToPosition(0)
+                    if (savedInstanceState != null)
+                        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy
+                            .values()[savedInstanceState.getInt(SCROLL)]
+                    else binding.todoList.scrollToPosition(0)
                 }
-
             })
         }
 
@@ -195,10 +202,10 @@ open class TodoListFragment : Fragment() {
         }
 
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        savedStateHandle?.getLiveData<Int>("KEY")?.observe(viewLifecycleOwner) { value ->
+        savedStateHandle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
             if (value != null) {
                 todoListViewModel.emitDisplayCategoryAsDefault(value)
-                savedStateHandle.remove<Int>("KEY")
+                savedStateHandle.remove<Int>(DEF_KEY)
             }
         }
 
@@ -229,5 +236,13 @@ open class TodoListFragment : Fragment() {
             R.id.categories -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(
+            "SCROLL",
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY.ordinal
+        )
+        super.onSaveInstanceState(outState)
     }
 }

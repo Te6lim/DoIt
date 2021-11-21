@@ -49,13 +49,13 @@ class TodoViewHolder(
             }
 
             itemView.setOnLongClickListener {
-                callback.onLongPress(adapterPosition)
+                callback.onLongPress(absoluteAdapterPosition)
                 true
             }
 
-            itemView.setOnClickListener { callback.onClick(adapterPosition) }
+            itemView.setOnClickListener { callback.onClick(absoluteAdapterPosition) }
 
-            callback.selectedView(adapterPosition, itemView)
+            callback.selectedView(absoluteAdapterPosition, itemView)
 
             executePendingBindings()
         }
