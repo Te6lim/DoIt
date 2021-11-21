@@ -49,7 +49,9 @@ class TodoViewHolder(
             }
 
             itemView.setOnLongClickListener {
-                callback.onLongPress(absoluteAdapterPosition)
+                callback.onLongPress(
+                    absoluteAdapterPosition, itemView, bindingAdapter as TodoListAdapter
+                )
                 true
             }
 
@@ -77,7 +79,7 @@ interface ActionCallback {
 
     fun onCheck(todo: Todo)
 
-    fun onLongPress(position: Int) {}
+    fun onLongPress(position: Int, holder: View, adapter: TodoListAdapter) {}
 
     fun onClick(position: Int) {}
 

@@ -1,10 +1,11 @@
 package com.example.doit.todoList
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
+import android.widget.CheckBox
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
-import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -50,6 +51,31 @@ class TodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        val adapter = TodoListAdapter(object : ActionCallback {
+
+            override fun onCheck(todo: Todo) {
+                todoListViewModel.updateTodo(todo)
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onLongPress(position: Int, holder: View, adapter: TodoListAdapter) {
+                todoListViewModel.setItemSelected(position)
+                todoListViewModel.isLongPressed = true
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun onClick(position: Int) {
+                todoListViewModel.clickAction(position)
+            }
+
+            override fun selectedView(position: Int, holder: View) {
+                switchBackground(todoListViewModel.getItems()!![position], holder)
+                if (todoListViewModel.isLongPressed) {
+                    holder.findViewById<CheckBox>(R.id.todo_check_box).visibility = View.INVISIBLE
+                }
+            }
+        })
+
         var actionMode: ActionMode? = null
         val actionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -61,6 +87,7 @@ class TodoListFragment : Fragment() {
                 return false
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 return when (item?.itemId) {
                     R.id.edit -> {
@@ -70,6 +97,7 @@ class TodoListFragment : Fragment() {
                     R.id.select_all -> {
                         todoListViewModel.selectAll()
                         item.isVisible = false
+                        adapter.notifyDataSetChanged()
                         true
                     }
 
@@ -81,31 +109,14 @@ class TodoListFragment : Fragment() {
                 }
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onDestroyActionMode(mode: ActionMode?) {
                 todoListViewModel.clickAction()
+                todoListViewModel.isLongPressed = false
+                adapter.notifyDataSetChanged()
                 mode?.finish()
             }
         }
-
-        val adapter = TodoListAdapter(object : ActionCallback {
-
-            override fun onCheck(todo: Todo) {
-                todoListViewModel.updateTodo(todo)
-            }
-
-            override fun onLongPress(position: Int) {
-                todoListViewModel.setItemSelected(position)
-            }
-
-            override fun onClick(position: Int) {
-                todoListViewModel.clickAction(position)
-            }
-
-            override fun selectedView(position: Int, holder: View) {
-                switchBackground(todoListViewModel.items.value!![position], holder)
-            }
-        })
-
 
         binding.todoList.adapter = adapter.also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -193,7 +204,7 @@ class TodoListFragment : Fragment() {
 
             selectionCount.observe(viewLifecycleOwner) {
                 actionMode?.title = getString(R.string.selection_count, it)
-                actionMode?.menu?.get(0)?.isVisible = it == 1
+                actionMode?.menu?.findItem(R.id.edit)?.isVisible = it == 1
             }
 
             toBeDeleted.observe(viewLifecycleOwner) {
@@ -214,11 +225,14 @@ class TodoListFragment : Fragment() {
 
     private fun switchBackground(value: Boolean, holder: View) {
         with(holder) {
+            val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
             background = if (value) {
+                checkBox?.visibility = View.INVISIBLE
                 AppCompatResources.getDrawable(
                     context, R.drawable.item_selected_background
                 )
             } else {
+                checkBox?.visibility = View.VISIBLE
                 AppCompatResources.getDrawable(
                     context, R.drawable.rounded_background
                 )

@@ -89,6 +89,8 @@ class TodoListViewModel(
     val toBeDeleted: LiveData<List<Todo>>
         get() = _toBeDeleted
 
+    var isLongPressed = false
+
     private fun filter(allTodos: List<Todo>, defCat: Category): List<Todo> {
         return allTodos.let { list ->
             list.filter { todo ->
