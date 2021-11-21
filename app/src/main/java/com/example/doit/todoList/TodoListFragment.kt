@@ -2,10 +2,8 @@ package com.example.doit.todoList
 
 import android.os.Bundle
 import android.view.*
-import android.widget.CheckBox
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
-import androidx.core.view.allViews
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -47,6 +45,7 @@ open class TodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        var actionMode: ActionMode? = null
         val actionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
                 MenuInflater(requireContext()).inflate(R.menu.todo_action_mode_menu, menu)
@@ -65,6 +64,7 @@ open class TodoListFragment : Fragment() {
 
                     R.id.select_all -> {
                         todoListViewModel.selectAll()
+                        item.isVisible = false
                         true
                     }
 
@@ -97,16 +97,7 @@ open class TodoListFragment : Fragment() {
             }
 
             override fun selectedView(position: Int, holder: View) {
-
                 switchBackground(todoListViewModel.items.value!![position], holder)
-
-                todoListViewModel.contextActionBarEnabled.value!!.let { isActive ->
-                    view?.findViewById<CheckBox>(R.id.todo_check_box)?.isEnabled = !isActive
-                    binding.todoList.allViews.forEach {
-                        it.findViewById<CheckBox>(R.id.todo_check_box)?.isEnabled =
-                            !isActive
-                    }
-                }
             }
         })
 
@@ -135,12 +126,7 @@ open class TodoListFragment : Fragment() {
 
             defaultTransform.observe(viewLifecycleOwner) {}
 
-            items.observe(viewLifecycleOwner) { list ->
-                if (list.any { it }) setContextActionBarEnabled(true)
-                else setContextActionBarEnabled(false)
-            }
-
-            todoListByCategory.observe(viewLifecycleOwner) { list ->
+            todoList.observe(viewLifecycleOwner) { list ->
                 adapter.submitList(list)
             }
 
@@ -169,7 +155,11 @@ open class TodoListFragment : Fragment() {
                 }
             }
 
-            var actionMode: ActionMode? = null
+            items.observe(viewLifecycleOwner) { list ->
+                if (list.any { it }) setContextActionBarEnabled(true)
+                else setContextActionBarEnabled(false)
+            }
+
             contextActionBarEnabled.observe(viewLifecycleOwner) { isEnabled ->
                 if (isEnabled) {
                     actionMode = mainActivity.startSupportActionMode(actionModeCallback)
@@ -180,11 +170,6 @@ open class TodoListFragment : Fragment() {
                         binding.addNew.visibility = View.VISIBLE
 
                     }
-                }
-
-                binding.todoList.allViews.forEach {
-                    it.findViewById<CheckBox>(R.id.todo_check_box)?.isEnabled =
-                        !isEnabled
                 }
 
                 mainActivity.mainViewModel.setContextActionbarActive(isEnabled)

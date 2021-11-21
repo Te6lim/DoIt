@@ -12,13 +12,13 @@ class TodoListViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao
 ) : ViewModel() {
 
+    private val categories = catDb.getAll()
     private val allList = todoDb.getAll()
 
     private val _todoList = MutableLiveData<List<Todo>>()
     val todoList: LiveData<List<Todo>>
         get() = _todoList
 
-    private val categories = catDb.getAll()
 
     private val _defaultCategory = MutableLiveData<Category?>()
     val defaultCategory: LiveData<Category?>
@@ -36,36 +36,23 @@ class TodoListViewModel(
             }
         }
         if (_defaultCategory.value == null) emitDefault()
-        catList.toListOfString { it.name }
     }
 
-    val defaultTransform = Transformations.map(defaultCategory) {
-        _todoList.value = allList.value
-
-    }
-
-    val isTodoListEmpty = Transformations.map(allList) {
-        if (_todoList.value != null) {
-            _todoList.value = allList.value
-        }
-        it?.isEmpty() ?: false
-    }
-
-    val todoListByCategory = Transformations.map(todoList) {
-        it?.let { list ->
-            list.filter { todo ->
-                todo.category == defaultCategory.value?.name && !todo.isCompleted
-            }.let { newList ->
-                if (newList.isEmpty()) {
-                    list.filter { todo ->
-                        !todo.isCompleted
-                    }
-                } else newList
-            }
+    val defaultTransform = Transformations.map(defaultCategory) { cat ->
+        allList.value?.let { list ->
+            _todoList.value = filter(list, cat!!)
         }
     }
 
-    val itemCountInCategory = Transformations.map(todoListByCategory) { list ->
+    val isTodoListEmpty = Transformations.map(allList) { list ->
+        defaultCategory.value?.let { category ->
+            _todoList.value = filter(list!!, category)
+        }
+
+        list?.isEmpty() ?: false
+    }
+
+    val itemCountInCategory = Transformations.map(todoList) { list ->
         with(defaultCategory.value) {
             if (list.isEmpty() || this == null) ("All" to todoList.value!!.size)
             else if (list[0].category != this.name) {
@@ -74,7 +61,7 @@ class TodoListViewModel(
         }
     }
 
-    val items = Transformations.map(todoListByCategory) {
+    val items = Transformations.map(todoList) {
         val list = mutableListOf<Boolean>()
         it?.let {
             it.forEach { _ -> list.add(false) }
@@ -101,6 +88,20 @@ class TodoListViewModel(
     private val _toBeDeleted = MutableLiveData<List<Todo>>()
     val toBeDeleted: LiveData<List<Todo>>
         get() = _toBeDeleted
+
+    private fun filter(allTodos: List<Todo>, defCat: Category): List<Todo> {
+        return allTodos.let { list ->
+            list.filter { todo ->
+                todo.category == defCat.name && !todo.isCompleted
+            }.let { newList ->
+                if (newList.isEmpty()) {
+                    list.filter { todo ->
+                        !todo.isCompleted
+                    }
+                } else newList
+            }
+        }
+    }
 
     private fun emitDefault() {
         viewModelScope.launch {
@@ -205,7 +206,7 @@ class TodoListViewModel(
     fun setToBeDeleted() {
         val list = mutableListOf<Todo>()
         for ((i, item) in items.value!!.withIndex()) {
-            if (item) list.add(todoListByCategory.value!![i])
+            if (item) list.add(todoList.value!![i])
         }
         _toBeDeleted.value = list
     }
@@ -214,6 +215,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 list.forEach { delete(it.todoId) }
+                _selectionCount.postValue(0)
             }
         }
     }
