@@ -24,6 +24,26 @@ class TodoListViewModel(
     val defaultCategory: LiveData<Category?>
         get() = _defaultCategory
 
+    private val _itemsState = MutableLiveData<MutableList<Boolean>>()
+    val itemsState: LiveData<MutableList<Boolean>>
+        get() = _itemsState
+
+    private val _isNavigating = MutableLiveData<Boolean>()
+    val isNavigating: LiveData<Boolean>
+        get() = _isNavigating
+
+    private val _contextActionBarEnabled = MutableLiveData(false)
+    val contextActionBarEnabled: LiveData<Boolean>
+        get() = _contextActionBarEnabled
+
+    private val _viewHolderPosition = MutableLiveData<Int>()
+    val viewHolderPosition: LiveData<Int>
+        get() = _viewHolderPosition
+
+    private val _selectionCount = MutableLiveData(0)
+    val selectionCount: LiveData<Int>
+        get() = _selectionCount
+
     val categoriesTransform = Transformations.map(categories) { catList ->
         if (catList.isNullOrEmpty()) {
             val cat = Category(
@@ -62,28 +82,8 @@ class TodoListViewModel(
         }
     }
 
-    private val _itemsState = MutableLiveData<MutableList<Boolean>>()
-    val itemsState: LiveData<MutableList<Boolean>>
-        get() = _itemsState
-
-    private val _isNavigating = MutableLiveData<Boolean>()
-    val isNavigating: LiveData<Boolean>
-        get() = _isNavigating
-
-    private val _contextActionBarEnabled = MutableLiveData(false)
-    val contextActionBarEnabled: LiveData<Boolean>
-        get() = _contextActionBarEnabled
-
-    private val _viewHolderPosition = MutableLiveData<Int>()
-    val viewHolderPosition: LiveData<Int>
-        get() = _viewHolderPosition
-
-    private val _selectionCount = MutableLiveData(0)
-    val selectionCount: LiveData<Int>
-        get() = _selectionCount
-
     private fun resetItemsState() {
-        _itemsState.value = MutableList(todoList.value!!.size) { false }
+        _itemsState.postValue(MutableList(todoList.value!!.size) { false })
     }
 
     var isLongPressed = false

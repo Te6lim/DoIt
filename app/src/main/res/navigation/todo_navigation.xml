@@ -39,4 +39,9 @@
             android:id="@+id/action_completedTodoListFragment_to_todoListFragment"
             app:destination="@id/todoListFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.example.doit.todoList.categories.CategoriesFragment"
+        android:label="@string/categories"
+        tools:layout="@layout/fragment_categories" />
 </navigation>

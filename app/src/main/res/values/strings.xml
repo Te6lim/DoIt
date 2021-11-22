@@ -39,4 +39,5 @@
     <string name="select_all">select all</string>
     <string name="empty_todo">empty todo</string>
     <string name="done_all">Done all</string>
+    <string name="add_new_category">add new category</string>
 </resources>
