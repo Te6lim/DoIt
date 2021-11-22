@@ -6,7 +6,14 @@
         android:id="@+id/edit"
         android:title="@string/edit"
         android:icon="@drawable/ic_edit"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/done_all"
+        android:icon="@drawable/ic_done_all"
+        android:title="@string/done_all"
+        android:visible="false"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/select_all"

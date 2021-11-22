@@ -60,16 +60,29 @@ class TodoListFragment : Fragment() {
             @SuppressLint("NotifyDataSetChanged")
             override fun onLongPress(position: Int, holder: View, adapter: TodoListAdapter) {
                 todoListViewModel.setItemSelected(position)
-                todoListViewModel.isLongPressed = true
-                adapter.notifyDataSetChanged()
+                if (!todoListViewModel.isLongPressed) {
+                    todoListViewModel.isLongPressed = true
+                    adapter.notifyDataSetChanged()
+                } else {
+                    val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
+                    if (todoListViewModel.isLongPressed)
+                        checkBox?.visibility = View.INVISIBLE
+                    else checkBox?.visibility = View.VISIBLE
+                }
             }
 
-            override fun onClick(position: Int) {
+            override fun onClick(position: Int, holder: View) {
                 todoListViewModel.clickAction(position)
+                val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
+                if (todoListViewModel.isLongPressed)
+                    checkBox?.visibility = View.INVISIBLE
+                else checkBox?.visibility = View.VISIBLE
             }
 
             override fun selectedView(position: Int, holder: View) {
-                switchBackground(todoListViewModel.getItems()!![position], holder)
+                todoListViewModel.getItems()?.let {
+                    switchBackground(todoListViewModel.getItems()!![position], holder)
+                }
                 if (todoListViewModel.isLongPressed) {
                     holder.findViewById<CheckBox>(R.id.todo_check_box).visibility = View.INVISIBLE
                 }
@@ -94,6 +107,11 @@ class TodoListFragment : Fragment() {
                         true
                     }
 
+                    R.id.done_all -> {
+                        todoListViewModel.updatedSelected()
+                        true
+                    }
+
                     R.id.select_all -> {
                         todoListViewModel.selectAll()
                         item.isVisible = false
@@ -102,7 +120,7 @@ class TodoListFragment : Fragment() {
                     }
 
                     R.id.delete -> {
-                        todoListViewModel.setToBeDeleted()
+                        todoListViewModel.deleteSelected()
                         true
                     }
                     else -> false
@@ -173,7 +191,7 @@ class TodoListFragment : Fragment() {
                 }
             }
 
-            items.observe(viewLifecycleOwner) { list ->
+            itemsState.observe(viewLifecycleOwner) { list ->
                 if (list.any { it }) setContextActionBarEnabled(true)
                 else setContextActionBarEnabled(false)
             }
@@ -202,13 +220,15 @@ class TodoListFragment : Fragment() {
                 }
             }
 
-            selectionCount.observe(viewLifecycleOwner) {
-                actionMode?.title = getString(R.string.selection_count, it)
-                actionMode?.menu?.findItem(R.id.edit)?.isVisible = it == 1
-            }
-
-            toBeDeleted.observe(viewLifecycleOwner) {
-                deleteSelected(it)
+            selectionCount.observe(viewLifecycleOwner) { count ->
+                actionMode?.let {
+                    it.title = count.toString()
+                    with(it.menu) {
+                        findItem(R.id.select_all)?.isVisible = count != getItems()?.size
+                        findItem(R.id.edit)?.isVisible = count == 1
+                        findItem(R.id.done_all)?.isVisible = count > 1
+                    }
+                }
             }
         }
 

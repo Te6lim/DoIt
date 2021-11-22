@@ -6,4 +6,10 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="category_text_style">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/secondaryColor</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

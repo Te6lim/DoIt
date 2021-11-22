@@ -41,6 +41,7 @@ class TodoListViewModel(
     val defaultTransform = Transformations.map(defaultCategory) { cat ->
         allList.value?.let { list ->
             _todoList.value = filter(list, cat!!)
+            resetItemsState()
         }
     }
 
@@ -49,7 +50,7 @@ class TodoListViewModel(
             _todoList.value = filter(list!!, category)
         }
 
-        list?.isEmpty() ?: false
+        list?.none { !it.isCompleted } ?: false
     }
 
     val itemCountInCategory = Transformations.map(todoList) { list ->
@@ -61,13 +62,9 @@ class TodoListViewModel(
         }
     }
 
-    val items = Transformations.map(todoList) {
-        val list = mutableListOf<Boolean>()
-        it?.let {
-            it.forEach { _ -> list.add(false) }
-        }
-        list
-    }
+    private val _itemsState = MutableLiveData<MutableList<Boolean>>()
+    val itemsState: LiveData<MutableList<Boolean>>
+        get() = _itemsState
 
     private val _isNavigating = MutableLiveData<Boolean>()
     val isNavigating: LiveData<Boolean>
@@ -85,9 +82,9 @@ class TodoListViewModel(
     val selectionCount: LiveData<Int>
         get() = _selectionCount
 
-    private val _toBeDeleted = MutableLiveData<List<Todo>>()
-    val toBeDeleted: LiveData<List<Todo>>
-        get() = _toBeDeleted
+    private fun resetItemsState() {
+        _itemsState.value = MutableList(todoList.value!!.size) { false }
+    }
 
     var isLongPressed = false
 
@@ -135,6 +132,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo)
+                resetItemsState()
             }
         }
     }
@@ -143,6 +141,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
+                resetItemsState()
             }
         }
     }
@@ -155,10 +154,10 @@ class TodoListViewModel(
         if (_contextActionBarEnabled.value!! != value) _contextActionBarEnabled.value = value
     }
 
-    fun getItems() = items.value?.toList()
+    fun getItems() = itemsState.value?.toList()
 
     fun setItemSelected(position: Int) {
-        items.value?.let { list ->
+        itemsState.value?.let { list ->
             list[position] = !list[position]
             if (list.any { it }) {
                 setContextActionBarEnabled(true)
@@ -170,9 +169,9 @@ class TodoListViewModel(
     }
 
     fun clickAction(position: Int = -1) {
-        items.value?.let { list ->
+        itemsState.value?.let { list ->
             if (_contextActionBarEnabled.value!!) {
-                if (position < 0 || items.value!![position]) {
+                if (position < 0 || itemsState.value!![position]) {
                     if (position >= 0) {
                         list[position] = false
                         _viewHolderPosition.value = position
@@ -198,25 +197,32 @@ class TodoListViewModel(
     }
 
     fun selectAll() {
-        for ((i, value) in items.value!!.withIndex()) {
+        for ((i, value) in itemsState.value!!.withIndex()) {
             if (!value) {
                 clickAction(i)
             }
         }
     }
 
-    fun setToBeDeleted() {
-        val list = mutableListOf<Todo>()
-        for ((i, item) in items.value!!.withIndex()) {
-            if (item) list.add(todoList.value!![i])
-        }
-        _toBeDeleted.value = list
-    }
-
-    fun deleteSelected(list: List<Todo>) {
+    fun deleteSelected() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                list.forEach { delete(it.todoId) }
+                for ((i, v) in itemsState.value!!.withIndex()) {
+                    if (v) todoDb.delete(todoList.value!![i].todoId)
+                }
+                resetItemsState()
+                _selectionCount.postValue(0)
+            }
+        }
+    }
+
+    fun updatedSelected() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                for ((i, v) in itemsState.value!!.withIndex()) {
+                    if (v) todoDb.update(todoList.value!![i].apply { isCompleted = v })
+                }
+                resetItemsState()
                 _selectionCount.postValue(0)
             }
         }
