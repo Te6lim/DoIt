@@ -7,10 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.R
-import com.example.doit.database.Category
 import com.example.doit.databinding.ItemCategoryBinding
 
-class CategoriesAdapter : ListAdapter<Category, CategoryViewHolder>(CategoriesDiffCallBack()) {
+class CategoriesAdapter : ListAdapter<CategoryInfo, CategoryViewHolder>(CategoriesDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         return CategoryViewHolder.create(parent)
@@ -36,17 +35,17 @@ class CategoryViewHolder(
         }
     }
 
-    fun bind(category: Category) {
-
+    fun bind(category: CategoryInfo) {
+        itemHolder.categoryInfo = category
     }
 }
 
-class CategoriesDiffCallBack : DiffUtil.ItemCallback<Category>() {
-    override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
+class CategoriesDiffCallBack : DiffUtil.ItemCallback<CategoryInfo>() {
+    override fun areItemsTheSame(oldItem: CategoryInfo, newItem: CategoryInfo): Boolean {
         return false
     }
 
-    override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
+    override fun areContentsTheSame(oldItem: CategoryInfo, newItem: CategoryInfo): Boolean {
         return false
     }
 

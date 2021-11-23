@@ -40,4 +40,6 @@
     <string name="empty_todo">empty todo</string>
     <string name="done_all">Done all</string>
     <string name="add_new_category">add new category</string>
+    <string name="todo_count">Todos: %d</string>
+    <string name="finished_todo_count">Finished: %d</string>
 </resources>

@@ -68,6 +68,7 @@ class TodoListViewModel(
     val isTodoListEmpty = Transformations.map(allList) { list ->
         defaultCategory.value?.let { category ->
             _todoList.value = filter(list!!, category)
+            resetItemsState()
         }
 
         list?.none { !it.isCompleted } ?: false
@@ -206,10 +207,12 @@ class TodoListViewModel(
 
     fun deleteSelected() {
         viewModelScope.launch {
+            val selectedId = mutableListOf<Long>()
+            for ((i, v) in itemsState.value!!.withIndex())
+                if (v) selectedId.add(todoList.value!![i].todoId)
+
             withContext(Dispatchers.IO) {
-                for ((i, v) in itemsState.value!!.withIndex()) {
-                    if (v) todoDb.delete(todoList.value!![i].todoId)
-                }
+                selectedId.forEach { todoDb.delete(it) }
                 resetItemsState()
                 _selectionCount.postValue(0)
             }

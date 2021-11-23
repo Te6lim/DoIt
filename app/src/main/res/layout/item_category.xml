@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="categoryInfo"
+            type="com.example.doit.todoList.categories.CategoryInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,7 +17,7 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_medium"
-        android:background="@drawable/category_backgorund">
+        android:background="@drawable/category_background">
 
         <TextView
             android:id="@+id/category_title_text"
@@ -25,6 +28,7 @@
             android:layout_marginTop="8dp"
             android:textAllCaps="true"
             android:textSize="20sp"
+            app:setCatName="@{categoryInfo}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="WORK" />
@@ -36,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textStyle="bold"
+            app:setCatTodoCount="@{categoryInfo}"
             app:layout_constraintBaseline_toBaselineOf="@+id/category_finished_count"
             app:layout_constraintStart_toStartOf="parent"
             tools:text="Todos: 12" />
@@ -48,6 +53,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            app:setCatTodoCompletedCount="@{categoryInfo}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/category_title_text"
