@@ -39,7 +39,7 @@ class CategoriesFragment : Fragment() {
         binding.categoriesRecyclerView.adapter = adapter
 
         viewModel.categoriesTransform.observe(viewLifecycleOwner) {}
-        viewModel.todoListTranform.observe(viewLifecycleOwner) {}
+        viewModel.todoListTransform.observe(viewLifecycleOwner) {}
 
         viewModel.catListInfo.observe(viewLifecycleOwner) {
             adapter.submitList(it)

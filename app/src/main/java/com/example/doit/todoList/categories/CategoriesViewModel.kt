@@ -14,7 +14,7 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
         get() = _catListInfo
 
 
-    val todoListTranform = Transformations.map(todos) { todoList ->
+    val todoListTransform = Transformations.map(todos) { todoList ->
         val catInfoList = mutableListOf<CategoryInfo>()
         categories.value?.let { catList ->
             catList.forEach { cat ->
