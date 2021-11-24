@@ -32,7 +32,7 @@
     </fragment>
     <fragment
         android:id="@+id/completedTodoListFragment"
-        android:name="com.example.doit.completedTodoList.CompletedTodoListFragment"
+        android:name="com.example.doit.finishedTodoList.FinishedTodoListFragment"
         android:label="@string/completed"
         tools:layout="@layout/fragment_list_todo_completed">
         <action

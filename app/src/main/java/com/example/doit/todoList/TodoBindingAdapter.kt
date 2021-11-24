@@ -21,14 +21,23 @@ fun TextView.setDate(item: Todo?) {
 
 @BindingAdapter("setDeadline")
 fun TextView.setDeadlineDateString(item: Todo?) {
-    item?.let {
-        if (it.hasDeadline) {
+    item?.let { todo ->
+        if (todo.dateFinished != null) {
             visibility = View.VISIBLE
             text = context.getString(
-                R.string.deadline_string, it.deadlineDate?.toLocalDate()?.formatToString(
+                R.string.finished_date_string, todo.dateFinished?.toLocalDate()?.formatToString(
                     DateTimeFormatter.ISO_DATE
-                ), it.deadlineDate?.toLocalTime()?.formatToString()
+                ), todo.dateFinished?.toLocalTime()?.formatToString()
             )
-        } else visibility = View.GONE
+        } else {
+            if (todo.hasDeadline) {
+                visibility = View.VISIBLE
+                text = context.getString(
+                    R.string.deadline_string, todo.deadlineDate?.toLocalDate()?.formatToString(
+                        DateTimeFormatter.ISO_DATE
+                    ), todo.deadlineDate?.toLocalTime()?.formatToString()
+                )
+            } else visibility = View.GONE
+        }
     }
 }

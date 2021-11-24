@@ -15,7 +15,7 @@
 
         <variable
             name="itemListener"
-            type="com.example.doit.todoList.ActionCallback" />
+            type="com.example.doit.ActionCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -78,7 +78,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@string/deadline_string"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

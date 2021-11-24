@@ -71,7 +71,7 @@ class TodoListViewModel(
             resetItemsState()
         }
 
-        list?.none { !it.isCompleted } ?: false
+        list?.none { !it.isFinished } ?: false
     }
 
     val itemCountInCategory = Transformations.map(todoList) { list ->
@@ -92,11 +92,11 @@ class TodoListViewModel(
     private fun filter(allTodos: List<Todo>, defCat: Category): List<Todo> {
         return allTodos.let { list ->
             list.filter { todo ->
-                todo.category == defCat.name && !todo.isCompleted
+                todo.category == defCat.name && !todo.isFinished
             }.let { newList ->
                 if (newList.isEmpty()) {
                     list.filter { todo ->
-                        !todo.isCompleted
+                        !todo.isFinished
                     }
                 } else newList
             }
@@ -223,7 +223,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 for ((i, v) in itemsState.value!!.withIndex()) {
-                    if (v) todoDb.update(todoList.value!![i].apply { isCompleted = v })
+                    if (v) todoDb.update(todoList.value!![i].apply { isFinished = v })
                 }
                 resetItemsState()
                 _selectionCount.postValue(0)

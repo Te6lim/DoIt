@@ -23,7 +23,7 @@ data class Todo(
     var dateFinished: LocalDateTime? = null,
 
     @ColumnInfo(name = "is_completed")
-    var isCompleted: Boolean = false,
+    var isFinished: Boolean = false,
 
     @ColumnInfo(name = "has_deadline")
     val hasDeadline: Boolean = false,

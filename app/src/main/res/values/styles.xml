@@ -9,7 +9,6 @@
 
     <style name="category_text_style">
         <item name="android:fontFamily">@font/roboto</item>
-        <item name="android:textColor">@color/secondaryColor</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/secondaryDarkColor</item>
     </style>
 </resources>

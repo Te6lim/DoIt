@@ -104,7 +104,7 @@ class CreateTodoFragment : Fragment() {
                 it?.let {
                     todo.setCategory(it)
                     setTitleToDefaultCategoryName(it)
-                    binding.categorySelection.findViewById<RadioButton>(it.id).isChecked = true
+                    binding.categorySelection.findViewById<RadioButton>(it.id)?.isChecked = true
                 }
             }
         }

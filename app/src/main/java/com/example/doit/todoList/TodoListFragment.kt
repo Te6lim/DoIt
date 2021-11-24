@@ -12,18 +12,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
+import com.example.doit.ActionCallback
 import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
+import java.time.LocalDateTime
 
 class TodoListFragment : Fragment() {
 
     companion object {
-        private const val SCROLL = "SCROLL"
-        private const val DEF_KEY = "KEY"
+        const val SCROLL = "SCROLL"
+        const val DEF_KEY = "KEY"
     }
 
     private lateinit var binding: FragmentListTodoBinding
@@ -52,10 +54,16 @@ class TodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = TodoListAdapter(object : ActionCallback {
+        val adapter = TodoListAdapter(object : ActionCallback<Todo> {
 
-            override fun onCheck(todo: Todo) {
-                todoListViewModel.updateTodo(todo)
+            override fun onCheck(t: Todo, holder: View) {
+
+                todoListViewModel.updateTodo(
+                    t.apply {
+                        isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
+                        dateFinished = if (isFinished) LocalDateTime.now()
+                        else null
+                    })
             }
 
             @SuppressLint("NotifyDataSetChanged")
@@ -72,7 +80,7 @@ class TodoListFragment : Fragment() {
                 }
             }
 
-            override fun onClick(position: Int, holder: View) {
+            override fun onClick(position: Int, t: Todo, holder: View) {
                 todoListViewModel.clickAction(position)
                 val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
                 if (todoListViewModel.isLongPressed)

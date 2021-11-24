@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.doit.ActionCallback
 import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentCategoriesBinding
+import com.example.doit.todoList.TodoListFragment
 
 class CategoriesFragment : Fragment() {
 
@@ -35,7 +38,20 @@ class CategoriesFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        val adapter = CategoriesAdapter()
+        val adapter = CategoriesAdapter(object : ActionCallback<CategoryInfo> {
+
+            override fun onClick(position: Int, t: CategoryInfo, holder: View) {
+                with(findNavController()) {
+                    previousBackStackEntry?.savedStateHandle?.set(
+                        TodoListFragment.DEF_KEY, t.id
+                    )
+                    popBackStack()
+                }
+            }
+
+            override fun selectedView(position: Int, holder: View) {}
+
+        })
         binding.categoriesRecyclerView.adapter = adapter
 
         viewModel.categoriesTransform.observe(viewLifecycleOwner) {}

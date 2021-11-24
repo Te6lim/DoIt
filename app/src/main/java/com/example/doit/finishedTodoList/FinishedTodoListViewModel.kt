@@ -1,4 +1,4 @@
-package com.example.doit.completedTodoList
+package com.example.doit.finishedTodoList
 
 import androidx.lifecycle.*
 import com.example.doit.database.Todo
@@ -6,6 +6,7 @@ import com.example.doit.database.TodoDbDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IllegalArgumentException
 
 class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewModel() {
 
@@ -14,7 +15,7 @@ class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewMode
     val completedTodos = Transformations.map(allTodos) {
         it?.let { list ->
             list.filter { todo ->
-                todo.isCompleted
+                todo.isFinished
             }
         }
     }
@@ -28,7 +29,7 @@ class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewMode
             withContext(Dispatchers.IO) {
                 allTodos.value?.let {
                     it.filter { todo ->
-                        todo.isCompleted
+                        todo.isFinished
                     }.let { list ->
                         list.forEach { todo ->
                             todoDatabase.delete(todo.todoId)
@@ -45,5 +46,16 @@ class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewMode
                 todoDatabase.update(todo)
             }
         }
+    }
+}
+
+class FinishedTodoListViewModelFactory(private val todoDatabase: TodoDbDao) :
+    ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CompletedTodoListViewModel::class.java)) {
+            return CompletedTodoListViewModel(todoDatabase) as T
+        }
+        throw IllegalArgumentException("unknown view model class")
     }
 }

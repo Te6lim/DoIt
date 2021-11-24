@@ -21,9 +21,10 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
                 val listFilter = todoList!!.filter { it.category == cat.name }
                 catInfoList.add(
                     CategoryInfo(
+                        cat.id,
                         cat.name,
-                        listFilter.filter { !it.isCompleted }.size,
-                        listFilter.filter { it.isCompleted }.size
+                        listFilter.filter { !it.isFinished }.size,
+                        listFilter.filter { it.isFinished }.size
                     )
                 )
             }
@@ -39,9 +40,10 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
                 val listFilter = todoList.filter { it.category == cat.name }
                 catInfoList.add(
                     CategoryInfo(
+                        cat.id,
                         cat.name,
-                        listFilter.filter { !it.isCompleted }.size,
-                        listFilter.filter { it.isCompleted }.size
+                        listFilter.filter { !it.isFinished }.size,
+                        listFilter.filter { it.isFinished }.size
                     )
                 )
             }
@@ -51,6 +53,7 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
 }
 
 data class CategoryInfo(
+    val id: Int,
     val name: String,
     val todoCount: Int,
     val todoCompletedCount: Int,

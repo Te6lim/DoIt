@@ -8,6 +8,10 @@
         <variable
             name="categoryInfo"
             type="com.example.doit.todoList.categories.CategoryInfo" />
+
+        <variable
+            name="listener"
+            type="com.example.doit.ActionCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,10 +31,11 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:textAllCaps="true"
-            android:textSize="20sp"
-            app:setCatName="@{categoryInfo}"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:setCatName="@{categoryInfo}"
             tools:text="WORK" />
 
         <TextView
@@ -39,7 +44,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:textStyle="bold"
             app:setCatTodoCount="@{categoryInfo}"
             app:layout_constraintBaseline_toBaselineOf="@+id/category_finished_count"
             app:layout_constraintStart_toStartOf="parent"

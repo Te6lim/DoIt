@@ -6,23 +6,26 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.doit.ActionCallback
 import com.example.doit.R
 import com.example.doit.databinding.ItemCategoryBinding
 
-class CategoriesAdapter : ListAdapter<CategoryInfo, CategoryViewHolder>(CategoriesDiffCallBack()) {
+class CategoriesAdapter(
+    private val actionCallback: ActionCallback<CategoryInfo>
+) : ListAdapter<CategoryInfo, CategoryViewHolder>(CategoriesDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         return CategoryViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), actionCallback)
     }
 
 }
 
 class CategoryViewHolder(
-    private val itemHolder: ItemCategoryBinding
+    private val itemHolder: ItemCategoryBinding,
 ) : RecyclerView.ViewHolder(itemHolder.root) {
 
     companion object {
@@ -35,8 +38,11 @@ class CategoryViewHolder(
         }
     }
 
-    fun bind(category: CategoryInfo) {
+    fun bind(category: CategoryInfo, actionCallback: ActionCallback<CategoryInfo>) {
         itemHolder.categoryInfo = category
+        itemView.setOnClickListener {
+            actionCallback.onClick(absoluteAdapterPosition, category, itemView)
+        }
     }
 }
 

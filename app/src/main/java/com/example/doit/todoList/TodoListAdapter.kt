@@ -1,17 +1,17 @@
 package com.example.doit.todoList
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.doit.ActionCallback
 import com.example.doit.R
 import com.example.doit.database.Todo
 import com.example.doit.databinding.ItemTodoBinding
 
-class TodoListAdapter(private val callback: ActionCallback) :
+class TodoListAdapter(private val callback: ActionCallback<Todo>) :
     ListAdapter<Todo, TodoViewHolder>(TodoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
@@ -38,14 +38,14 @@ class TodoViewHolder(
         }
     }
 
-    fun bind(todo: Todo, callback: ActionCallback) {
+    fun bind(todo: Todo, callback: ActionCallback<Todo>) {
         with(itemViewBinding) {
             todoItem = todo
 
-            todoCheckBox.isChecked = todo.isCompleted
+            todoCheckBox.isChecked = todo.isFinished
 
             todoCheckBox.setOnClickListener {
-                callback.onCheck(todo.apply { isCompleted = todoCheckBox.isChecked })
+                callback.onCheck(todo, itemView)
             }
 
             itemView.setOnLongClickListener {
@@ -55,7 +55,9 @@ class TodoViewHolder(
                 true
             }
 
-            itemView.setOnClickListener { callback.onClick(absoluteAdapterPosition, itemView) }
+            itemView.setOnClickListener {
+                callback.onClick(absoluteAdapterPosition, todo, itemView)
+            }
 
             callback.selectedView(absoluteAdapterPosition, itemView)
 
@@ -73,15 +75,4 @@ class TodoDiffCallback : DiffUtil.ItemCallback<Todo>() {
         return oldItem == newItem
     }
 
-}
-
-interface ActionCallback {
-
-    fun onCheck(todo: Todo)
-
-    fun onLongPress(position: Int, holder: View, adapter: TodoListAdapter) {}
-
-    fun onClick(position: Int, holder: View) {}
-
-    fun selectedView(position: Int, holder: View)
 }
