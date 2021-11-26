@@ -20,7 +20,7 @@ private const val ITEM_VIEW_TYPE_CAT = 0
 private const val ITEM_VIEW_TYPE_HEADER = 1
 
 class CategoriesAdapter(
-    private val actionCallback: ActionCallback<CategoryInfo>
+    private val actionCallback: ActionCallback<CategoryInfo>,
 ) : ListAdapter<DataItem, RecyclerView.ViewHolder>(CategoriesDiffCallBack()) {
 
     private val adapterScope = CoroutineScope(Dispatchers.Main)
@@ -87,9 +87,21 @@ class CategoryViewHolder(
 
     fun bind(category: CategoryInfo, actionCallback: ActionCallback<CategoryInfo>) {
         itemHolder.categoryInfo = category
-        itemView.setOnClickListener {
-            actionCallback.onClick(absoluteAdapterPosition, category, itemView)
+
+        with(itemView) {
+            setOnClickListener {
+                actionCallback.onClick(absoluteAdapterPosition, category, itemView)
+            }
+
+            setOnLongClickListener {
+                actionCallback.onLongPress(
+                    absoluteAdapterPosition, itemView, bindingAdapter as CategoriesAdapter
+                )
+                true
+            }
         }
+
+        itemHolder.executePendingBindings()
     }
 }
 
@@ -108,6 +120,7 @@ class HeaderViewHolder(
 
     fun bind(item: DataItem.Header) {
         itemHolder.headerItem = item
+        itemHolder.executePendingBindings()
     }
 }
 

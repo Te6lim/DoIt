@@ -67,7 +67,10 @@ class TodoListFragment : Fragment() {
             }
 
             @SuppressLint("NotifyDataSetChanged")
-            override fun onLongPress(position: Int, holder: View, adapter: TodoListAdapter) {
+            override fun <H : RecyclerView.ViewHolder> onLongPress(
+                position: Int, holder: View, adapter: RecyclerView.Adapter<H>
+            ) {
+
                 todoListViewModel.setItemSelected(position)
                 if (!todoListViewModel.isLongPressed) {
                     todoListViewModel.isLongPressed = true
@@ -141,7 +144,6 @@ class TodoListFragment : Fragment() {
                 todoListViewModel.clickAction()
                 todoListViewModel.isLongPressed = false
                 adapter.notifyDataSetChanged()
-                mode?.finish()
             }
         }
 
@@ -210,8 +212,8 @@ class TodoListFragment : Fragment() {
                     actionMode = mainActivity.startSupportActionMode(actionModeCallback)
                     binding.addNew.visibility = View.GONE
                 } else {
-                    actionMode.let {
-                        actionModeCallback.onDestroyActionMode(it)
+                    actionMode?.let {
+                        it.finish()
                         binding.addNew.visibility = View.VISIBLE
 
                     }

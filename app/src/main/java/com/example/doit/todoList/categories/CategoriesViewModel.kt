@@ -6,6 +6,10 @@ import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
 
+enum class DialogOptions(val value: String) {
+    OPTION_A("Make default"), OPTION_B("Clear"), OPTION_C("Delete")
+}
+
 class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
 
     private val todos = todoDb.getAll()
@@ -29,6 +33,12 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
             _catListInfo.value = getList(catList, todoList)
         }
     }
+
+    fun categoriesList(): List<Category> = categories.value!!
+
+    private val _longClicked = MutableLiveData<Boolean>()
+    val longClicked: LiveData<Boolean>
+        get() = _longClicked
 
     private fun getList(catList: List<Category>, todoList: List<Todo>): List<CategoryInfo> {
         val catInfoList = mutableListOf<CategoryInfo>()

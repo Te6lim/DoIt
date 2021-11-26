@@ -13,7 +13,7 @@ class TodoListViewModel(
 ) : ViewModel() {
 
     private val categories = catDb.getAll()
-    private val allList = todoDb.getAll()
+    private val allTodos = todoDb.getAll()
 
     private val _todoList = MutableLiveData<List<Todo>>()
     val todoList: LiveData<List<Todo>>
@@ -59,13 +59,13 @@ class TodoListViewModel(
     }
 
     val defaultTransform = Transformations.map(defaultCategory) { cat ->
-        allList.value?.let { list ->
+        allTodos.value?.let { list ->
             _todoList.value = filter(list, cat!!)
             resetItemsState()
         }
     }
 
-    val isTodoListEmpty = Transformations.map(allList) { list ->
+    val isTodoListEmpty = Transformations.map(allTodos) { list ->
         defaultCategory.value?.let { category ->
             _todoList.value = filter(list!!, category)
             resetItemsState()

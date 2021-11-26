@@ -1,13 +1,16 @@
 package com.example.doit
 
 import android.view.View
-import com.example.doit.todoList.TodoListAdapter
+import androidx.recyclerview.widget.RecyclerView
 
 interface ActionCallback<T> {
 
     fun onCheck(t: T, holder: View) {}
 
-    fun onLongPress(position: Int, holder: View, adapter: TodoListAdapter) {}
+    fun <H : RecyclerView.ViewHolder> onLongPress(
+        position: Int, holder: View, adapter: RecyclerView.Adapter<H>
+    ) {
+    }
 
     fun onClick(position: Int, t: T, holder: View) {}
 
