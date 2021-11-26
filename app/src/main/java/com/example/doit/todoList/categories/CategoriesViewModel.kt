@@ -1,7 +1,9 @@
 package com.example.doit.todoList.categories
 
 import androidx.lifecycle.*
+import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
+import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
 
 class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
@@ -15,40 +17,34 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
 
 
     val todoListTransform = Transformations.map(todos) { todoList ->
-        val catInfoList = mutableListOf<CategoryInfo>()
         categories.value?.let { catList ->
-            catList.forEach { cat ->
-                val listFilter = todoList!!.filter { it.category == cat.name }
-                catInfoList.add(
-                    CategoryInfo(
-                        cat.id,
-                        cat.name,
-                        listFilter.filter { !it.isFinished }.size,
-                        listFilter.filter { it.isFinished }.size
-                    )
-                )
+            todoList?.let {
+                _catListInfo.value = getList(catList, it)
             }
         }
-
-        _catListInfo.value = catInfoList
     }
 
     val categoriesTransform = Transformations.map(categories) { catList ->
-        val catInfoList = mutableListOf<CategoryInfo>()
         todos.value?.let { todoList ->
-            catList.forEach { cat ->
-                val listFilter = todoList.filter { it.category == cat.name }
-                catInfoList.add(
-                    CategoryInfo(
-                        cat.id,
-                        cat.name,
-                        listFilter.filter { !it.isFinished }.size,
-                        listFilter.filter { it.isFinished }.size
-                    )
-                )
-            }
+            _catListInfo.value = getList(catList, todoList)
         }
-        _catListInfo.value = catInfoList
+    }
+
+    private fun getList(catList: List<Category>, todoList: List<Todo>): List<CategoryInfo> {
+        val catInfoList = mutableListOf<CategoryInfo>()
+        catList.forEach { cat ->
+            val listFilter = todoList.filter { it.category == cat.name }
+            catInfoList.add(
+                CategoryInfo(
+                    cat.id,
+                    cat.name,
+                    listFilter.filter { !it.isFinished }.size,
+                    listFilter.filter { it.isFinished }.size,
+                    cat.isDefault
+                )
+            )
+        }
+        return catInfoList
     }
 }
 
@@ -57,6 +53,7 @@ data class CategoryInfo(
     val name: String,
     val todoCount: Int,
     val todoCompletedCount: Int,
+    val isDefault: Boolean
 )
 
 class CategoriesViewModelFactory(

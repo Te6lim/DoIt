@@ -1,8 +1,6 @@
 package com.example.doit.todoList.createTodo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
@@ -11,15 +9,12 @@ import kotlinx.coroutines.*
 import java.time.LocalDateTime
 
 class CreateTodoViewModel(
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao, defaultCategoryId: Int
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao
 ) : ViewModel() {
 
     companion object {
         const val DEFAULT_CATEGORY = "Work"
     }
-
-    private val viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     val categories = catDb.getAll()
 
@@ -38,12 +33,8 @@ class CreateTodoViewModel(
     val category: LiveData<Category>
         get() = _category
 
-    init {
-        emitCategory(defaultCategoryId)
-    }
-
     fun add(todoInfo: TodoInfo) {
-        uiScope.launch {
+        viewModelScope.launch {
             val todo = Todo(
                 todoString = todoInfo.description,
                 category = todoInfo.category,
@@ -74,15 +65,15 @@ class CreateTodoViewModel(
     }
 
     fun addNewCategory(newCategory: String, default: Boolean = false) {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                catDb.insert(Category(name = newCategory,isDefault = default))
+                catDb.insert(Category(name = newCategory, isDefault = default))
             }
         }
     }
 
     fun emitCategory(id: Int) {
-        uiScope.launch {
+        viewModelScope.launch {
             _category.value = getCat(id)
         }
     }
@@ -93,24 +84,11 @@ class CreateTodoViewModel(
         }
     }
 
-    /*fun delete(cat: String) {
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                catDb.delete(cat)
-            }
-        }
-    }*/
-
     fun makeCategoryEditTextVisible() {
         _categoryEditTextIsOpen.value = true
     }
 
     fun makeCategoryEditTextNotVisible() {
         _categoryEditTextIsOpen.value = false
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }

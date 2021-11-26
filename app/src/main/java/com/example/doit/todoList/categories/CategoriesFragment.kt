@@ -1,9 +1,8 @@
 package com.example.doit.todoList.categories
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -38,6 +37,25 @@ class CategoriesFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        val actionModeCallbacks = object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode?) {
+                TODO("Not yet implemented")
+            }
+
+        }
+
         val adapter = CategoriesAdapter(object : ActionCallback<CategoryInfo> {
 
             override fun onClick(position: Int, t: CategoryInfo, holder: View) {
@@ -58,7 +76,7 @@ class CategoriesFragment : Fragment() {
         viewModel.todoListTransform.observe(viewLifecycleOwner) {}
 
         viewModel.catListInfo.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+            adapter.submitListWithHeaders(it)
         }
 
         return binding.root

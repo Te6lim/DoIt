@@ -37,7 +37,6 @@ class CreateTodoFragment : Fragment() {
 
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb.databaseDao, categoryDb.dao,
-            CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId
         )
 
         viewModel = ViewModelProvider(
@@ -51,12 +50,17 @@ class CreateTodoFragment : Fragment() {
         with(viewModel) {
             categories.observe(viewLifecycleOwner) {
                 when (binding.categorySelection.childCount) {
-                    0 ->
+                    0 -> {
                         addCategoryViews(categories.value!!)
+                        emitCategory(
+                            CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId
+                        )
+                    }
+
                     else -> binding.categorySelection.addView(
                         RadioButton(requireContext()).apply {
-                            id = it[0].id
-                            text = it[0].name
+                            id = it[it.size - 1].id
+                            text = it[it.size - 1].name
                             this@CreateTodoFragment.viewModel.emitCategory(id)
                         }, 0
                     )

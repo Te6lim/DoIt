@@ -24,3 +24,11 @@ fun TextView.setCatTodoCompletedCount(catInfo: CategoryInfo?) {
         text = context.getString(R.string.finished_todo_count, catInfo.todoCompletedCount)
     }
 }
+
+@BindingAdapter("setHeaderText")
+fun TextView.setHeaderText(dataItem: DataItem.Header?) {
+    dataItem?.let {
+        text = if (it.isDefault) context.getString(R.string.default_header)
+        else context.getString(R.string.others_header)
+    }
+}

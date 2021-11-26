@@ -7,13 +7,12 @@ import com.example.doit.database.TodoDbDao
 
 class CreateTodoViewModelFactory(
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
-    private val defaultCategoryId: Int
 ) :
     ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
-            return CreateTodoViewModel(todoDb, catDb, defaultCategoryId) as T
+            return CreateTodoViewModel(todoDb, catDb) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

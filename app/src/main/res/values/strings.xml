@@ -43,4 +43,7 @@
     <string name="add_new_category">add new category</string>
     <string name="todo_count">Todos: %d</string>
     <string name="finished_todo_count">Finished: %d</string>
+    <string name="set_as_default">set as default</string>
+    <string name="default_header">Default</string>
+    <string name="others_header">Others</string>
 </resources>

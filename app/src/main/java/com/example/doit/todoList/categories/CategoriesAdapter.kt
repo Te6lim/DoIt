@@ -9,23 +9,70 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.ActionCallback
 import com.example.doit.R
 import com.example.doit.databinding.ItemCategoryBinding
+import com.example.doit.databinding.ItemHeaderCategoryBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.lang.ClassCastException
+
+private const val ITEM_VIEW_TYPE_CAT = 0
+private const val ITEM_VIEW_TYPE_HEADER = 1
 
 class CategoriesAdapter(
     private val actionCallback: ActionCallback<CategoryInfo>
-) : ListAdapter<CategoryInfo, CategoryViewHolder>(CategoriesDiffCallBack()) {
+) : ListAdapter<DataItem, RecyclerView.ViewHolder>(CategoriesDiffCallBack()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        return CategoryViewHolder.create(parent)
+    private val adapterScope = CoroutineScope(Dispatchers.Main)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            ITEM_VIEW_TYPE_CAT -> CategoryViewHolder.create(parent)
+            ITEM_VIEW_TYPE_HEADER -> HeaderViewHolder.create(parent)
+            else -> throw ClassCastException()
+        }
     }
 
-    override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        holder.bind(getItem(position), actionCallback)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is HeaderViewHolder -> {
+                holder.bind(getItem(position) as DataItem.Header)
+            }
+            is CategoryViewHolder -> {
+                val catItem = getItem(position) as DataItem.CategoryItem
+                holder.bind(catItem.catInfo, actionCallback)
+            }
+        }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is DataItem.Header -> ITEM_VIEW_TYPE_HEADER
+            is DataItem.CategoryItem -> ITEM_VIEW_TYPE_CAT
+        }
+    }
+
+    fun submitListWithHeaders(list: List<CategoryInfo>) {
+        adapterScope.launch {
+            val catList: MutableList<DataItem> = (list.toMutableList()).map {
+                DataItem.CategoryItem(it)
+            }.toMutableList()
+
+            val items: MutableList<DataItem> = mutableListOf(DataItem.Header(true))
+            items.apply {
+                addAll(catList)
+            }
+            items.add(2, DataItem.Header(false))
+
+            withContext(Dispatchers.Main) {
+                submitList(items)
+            }
+        }
+    }
 }
 
 class CategoryViewHolder(
-    private val itemHolder: ItemCategoryBinding,
+    private val itemHolder: ItemCategoryBinding
 ) : RecyclerView.ViewHolder(itemHolder.root) {
 
     companion object {
@@ -46,13 +93,45 @@ class CategoryViewHolder(
     }
 }
 
-class CategoriesDiffCallBack : DiffUtil.ItemCallback<CategoryInfo>() {
-    override fun areItemsTheSame(oldItem: CategoryInfo, newItem: CategoryInfo): Boolean {
+class HeaderViewHolder(
+    private val itemHolder: ItemHeaderCategoryBinding
+) : RecyclerView.ViewHolder(itemHolder.root) {
+    companion object {
+        fun create(parent: ViewGroup): HeaderViewHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            val holder = DataBindingUtil.inflate<ItemHeaderCategoryBinding>(
+                inflater, R.layout.item_header_category, parent, false
+            )
+            return HeaderViewHolder(holder)
+        }
+    }
+
+    fun bind(item: DataItem.Header) {
+        itemHolder.headerItem = item
+    }
+}
+
+class CategoriesDiffCallBack : DiffUtil.ItemCallback<DataItem>() {
+    override fun areItemsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
         return false
     }
 
-    override fun areContentsTheSame(oldItem: CategoryInfo, newItem: CategoryInfo): Boolean {
+    override fun areContentsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
         return false
     }
 
+}
+
+sealed class DataItem {
+    abstract val id: Int
+
+    class CategoryItem(val catInfo: CategoryInfo) : DataItem() {
+        override val id = catInfo.id
+
+    }
+
+    class Header(val isDefault: Boolean) : DataItem() {
+        override val id = Int.MIN_VALUE
+
+    }
 }
