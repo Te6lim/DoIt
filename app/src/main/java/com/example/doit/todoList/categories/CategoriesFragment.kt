@@ -14,6 +14,7 @@ import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentCategoriesBinding
 import com.example.doit.todoList.TodoListFragment
+import com.example.doit.todoList.toCategory
 
 class CategoriesFragment : Fragment() {
 
@@ -70,11 +71,11 @@ class CategoriesFragment : Fragment() {
                             }
 
                             DialogOptions.OPTION_B -> {
-
+                                viewModel.clearCategory(t.toCategory())
                             }
 
                             DialogOptions.OPTION_C -> {
-
+                                viewModel.deleteCategory(t.toCategory())
                             }
                         }
                     }

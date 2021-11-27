@@ -24,8 +24,8 @@ interface CategoryDao {
     @Insert
     fun insert(category: Category)
 
-    @Query("DELETE FROM category_table WHERE name = :name")
-    fun delete(name: String)
+    @Query("DELETE FROM category_table WHERE id = :catId")
+    fun delete(catId: Int)
 
     @Query("SELECT * FROM category_table WHERE id = :key LIMIT 1")
     fun get(key: Int): Category?

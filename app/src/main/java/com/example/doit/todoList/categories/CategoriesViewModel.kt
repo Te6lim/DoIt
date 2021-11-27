@@ -13,7 +13,10 @@ enum class DialogOptions(val value: String) {
     OPTION_A("Make default"), OPTION_B("Clear"), OPTION_C("Delete")
 }
 
-class CategoriesViewModel(private val catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
+class CategoriesViewModel(
+    private val catDb: CategoryDao,
+    private val todoDb: TodoDbDao
+) : ViewModel() {
 
     private val todos = todoDb.getAll()
     private val categories = catDb.getAll()
@@ -69,6 +72,27 @@ class CategoriesViewModel(private val catDb: CategoryDao, todoDb: TodoDbDao) : V
                         }
                     )
                 }
+            }
+        }
+    }
+
+    fun clearCategory(cat: Category) {
+        viewModelScope.launch {
+            todos.value!!.filter {
+                cat.name == it.category
+            }.forEach {
+                withContext(Dispatchers.IO) {
+                    todoDb.delete(it.todoId)
+                }
+            }
+        }
+    }
+
+    fun deleteCategory(cat: Category) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                clearCategory(cat)
+                catDb.delete(cat.id)
             }
         }
     }
