@@ -5,15 +5,22 @@ import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class DialogOptions(val value: String) {
     OPTION_A("Make default"), OPTION_B("Clear"), OPTION_C("Delete")
 }
 
-class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
+class CategoriesViewModel(private val catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
 
     private val todos = todoDb.getAll()
     private val categories = catDb.getAll()
+
+    val defaultCategory = Transformations.map(categories) { list ->
+        list.find { it.isDefault }
+    }
 
     private val _catListInfo = MutableLiveData<List<CategoryInfo>>()
     val catListInfo: LiveData<List<CategoryInfo>>
@@ -34,12 +41,6 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
         }
     }
 
-    fun categoriesList(): List<Category> = categories.value!!
-
-    private val _longClicked = MutableLiveData<Boolean>()
-    val longClicked: LiveData<Boolean>
-        get() = _longClicked
-
     private fun getList(catList: List<Category>, todoList: List<Todo>): List<CategoryInfo> {
         val catInfoList = mutableListOf<CategoryInfo>()
         catList.forEach { cat ->
@@ -55,6 +56,21 @@ class CategoriesViewModel(catDb: CategoryDao, todoDb: TodoDbDao) : ViewModel() {
             )
         }
         return catInfoList
+    }
+
+    fun changeDefault(id: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                with(catDb) {
+                    update(
+                        get(id)!!.apply {
+                            update(defaultCategory.value!!.apply { isDefault = false })
+                            isDefault = true
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 

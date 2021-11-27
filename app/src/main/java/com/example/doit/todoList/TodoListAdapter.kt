@@ -50,7 +50,7 @@ class TodoViewHolder(
 
             itemView.setOnLongClickListener {
                 callback.onLongPress(
-                    absoluteAdapterPosition, itemView, bindingAdapter as TodoListAdapter
+                    absoluteAdapterPosition, todo, itemView, bindingAdapter as TodoListAdapter
                 )
                 true
             }

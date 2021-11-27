@@ -68,7 +68,7 @@ class TodoListFragment : Fragment() {
 
             @SuppressLint("NotifyDataSetChanged")
             override fun <H : RecyclerView.ViewHolder> onLongPress(
-                position: Int, holder: View, adapter: RecyclerView.Adapter<H>
+                position: Int, t: Todo, holder: View, adapter: RecyclerView.Adapter<H>
             ) {
 
                 todoListViewModel.setItemSelected(position)

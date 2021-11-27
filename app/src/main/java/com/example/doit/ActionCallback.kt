@@ -8,7 +8,7 @@ interface ActionCallback<T> {
     fun onCheck(t: T, holder: View) {}
 
     fun <H : RecyclerView.ViewHolder> onLongPress(
-        position: Int, holder: View, adapter: RecyclerView.Adapter<H>
+        position: Int, t: T, holder: View, adapter: RecyclerView.Adapter<H>
     ) {
     }
 

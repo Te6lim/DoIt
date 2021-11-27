@@ -95,7 +95,7 @@ class CategoryViewHolder(
 
             setOnLongClickListener {
                 actionCallback.onLongPress(
-                    absoluteAdapterPosition, itemView, bindingAdapter as CategoriesAdapter
+                    absoluteAdapterPosition, category, itemView, bindingAdapter as CategoriesAdapter
                 )
                 true
             }
@@ -126,11 +126,11 @@ class HeaderViewHolder(
 
 class CategoriesDiffCallBack : DiffUtil.ItemCallback<DataItem>() {
     override fun areItemsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
-        return false
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
-        return false
+        return oldItem == newItem
     }
 
 }

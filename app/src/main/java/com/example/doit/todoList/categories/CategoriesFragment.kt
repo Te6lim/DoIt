@@ -54,22 +54,19 @@ class CategoriesFragment : Fragment() {
             }
 
             override fun <H : RecyclerView.ViewHolder> onLongPress(
-                position: Int, holder: View, adapter: RecyclerView.Adapter<H>
+                position: Int, t: CategoryInfo, holder: View, adapter: RecyclerView.Adapter<H>
             ) {
-
-                val realPosition = if (position < 2) position - 1
-                else position - 2
 
                 CategoriesDialogFragment(object : CatDialogInterface {
                     override fun getTitle(): String {
-                        return viewModel.categoriesList()[realPosition].name
+                        return t.name
                     }
 
                     override fun onOptionClicked(option: Int) {
 
                         when (DialogOptions.values()[option]) {
                             DialogOptions.OPTION_A -> {
-
+                                viewModel.changeDefault(t.id)
                             }
 
                             DialogOptions.OPTION_B -> {
@@ -83,7 +80,7 @@ class CategoriesFragment : Fragment() {
                     }
 
                     override fun isItemDefault(): Boolean {
-                        return viewModel.categoriesList()[realPosition].isDefault
+                        return t.isDefault
                     }
 
                 }).show(mainActivity.supportFragmentManager, "CAT_DIALOG")
@@ -91,13 +88,24 @@ class CategoriesFragment : Fragment() {
 
             override fun selectedView(position: Int, holder: View) {}
 
-        })
+        }).apply {
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                    binding.categoriesRecyclerView.scrollToPosition(0)
+                }
+            })
+        }
+
         binding.categoriesRecyclerView.adapter = adapter
 
         with(viewModel) {
             categoriesTransform.observe(viewLifecycleOwner) {}
 
             todoListTransform.observe(viewLifecycleOwner) {}
+
+            defaultCategory.observe(viewLifecycleOwner) {
+
+            }
 
         }
 
