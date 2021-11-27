@@ -116,6 +116,13 @@ class TodoListFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 return when (item?.itemId) {
                     R.id.edit -> {
+                        todoListViewModel.clickAction()
+                        findNavController().navigate(
+                            TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
+                                todoListViewModel.editTodo!!.catId
+                            ).setTodoId(todoListViewModel.editTodo!!.todoId)
+                        )
+                        todoListViewModel.isNavigating(true)
                         true
                     }
 

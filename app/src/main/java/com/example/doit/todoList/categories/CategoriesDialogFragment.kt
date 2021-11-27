@@ -10,8 +10,7 @@ class CategoriesDialogFragment(private val callBack: CatDialogInterface) : Dialo
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val items = if (callBack.isItemDefault()) arrayOf(
-            DialogOptions.OPTION_B.value,
-            DialogOptions.OPTION_C.value
+            DialogOptions.OPTION_B.value
         )
         else arrayOf(
             DialogOptions.OPTION_A.value,

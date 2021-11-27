@@ -67,7 +67,8 @@ class CategoriesFragment : Fragment() {
 
                         when (DialogOptions.values()[option]) {
                             DialogOptions.OPTION_A -> {
-                                viewModel.changeDefault(t.id)
+                                if (t.isDefault) viewModel.clearCategory(t.toCategory())
+                                else viewModel.changeDefault(t.id)
                             }
 
                             DialogOptions.OPTION_B -> {

@@ -31,6 +31,6 @@ data class Todo(
     @ColumnInfo(name = "deadline_date")
     var deadlineDate: LocalDateTime? = null,
 
-    @ColumnInfo(name = "category")
-    var category: String
+    @ColumnInfo(name = "categoryId")
+    var catId: Int
 )

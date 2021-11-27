@@ -29,6 +29,10 @@
         <argument
             android:name="defaultCategoryId"
             app:argType="integer" />
+        <argument
+            android:name="todoId"
+            android:defaultValue="-1L"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/completedTodoListFragment"

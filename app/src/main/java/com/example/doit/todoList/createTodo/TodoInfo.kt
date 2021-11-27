@@ -5,8 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import com.example.doit.database.Category
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 class TodoInfo {
+
+    var id: Long = -1
+
     var description: String = ""
         private set
 
@@ -22,11 +27,11 @@ class TodoInfo {
     var deadlineTime: LocalTime? = null
         private set
 
-    private val _deadlineEnabled = MutableLiveData<Boolean>(false)
+    private val _deadlineEnabled = MutableLiveData(false)
     val deadlineEnabled: LiveData<Boolean>
         get() = _deadlineEnabled
 
-    var category: String = CreateTodoViewModel.DEFAULT_CATEGORY
+    var category: Int = -1
         private set
 
     private val _dateUIString = MutableLiveData("DATE")
@@ -75,24 +80,40 @@ class TodoInfo {
     fun setIsDeadlineEnabled(value: Boolean) {
         _deadlineEnabled.value = value
         _isTodoValid.value = todoValid()
+        if (value) {
+            if (deadlineDate != null && dateIsInvalid(
+                    deadlineDate!!.year, deadlineDate!!.monthValue, deadlineDate!!.dayOfMonth,
+                    dateSet
+                )
+            ) {
+                invalidateDeadlineDate()
+            } else {
+                if (deadlineTime != null && timeIsInvalid(
+                        deadlineTime!!.hour, deadlineTime!!.minute, deadlineDate, dateSet, timeSet
+                    )
+                ) {
+                    invalidateDeadlineTime()
+                }
+            }
+        }
     }
 
     fun setDate(year: Int, month: Int, day: Int) {
         if (dateIsInvalid(year, month, day, LocalDate.now()))
             invalidateDate()
         else {
-            _dateUIString.value = "$year-$month-$day"
             dateSet = LocalDate.of(year, month, day)
+            _dateUIString.value = dateSet.format(DateTimeFormatter.ISO_DATE)
             _isDateValid.value = true
             _isTodoValid.value = todoValid()
 
-            if (deadlineDate != null) {
-                if (dateIsInvalid(
+            if (deadlineEnabled.value!!) {
+                if (deadlineDate != null && dateIsInvalid(
                         deadlineDate!!.year, deadlineDate!!.monthValue,
                         deadlineDate!!.dayOfMonth, dateSet
                     )
                 ) invalidateDate()
-                else if (timeIsInvalid(
+                else if (deadlineTime != null && timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
                         dateSet, deadlineDate!!, timeSet
                     )
@@ -106,13 +127,14 @@ class TodoInfo {
             invalidateTime()
         else {
             timeSet = LocalTime.of(hour, minute)
-            val meridian = if (hour < 12) "AM" else "PM"
-            _timeUIString.value = "${hour % 12}:$minute $meridian"
+            _timeUIString.value = timeSet.format(
+                DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+            )
             _isTimeValid.value = true
             _isTodoValid.value = todoValid()
 
-            if (deadlineTime != null) {
-                if (timeIsInvalid(
+            if (deadlineEnabled.value!!) {
+                if (deadlineTime != null && timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
                         deadlineDate!!, dateSet, timeSet
                     )
@@ -140,16 +162,22 @@ class TodoInfo {
             dateIsInvalid(year, month, day, dateSet)
         ) invalidateDeadlineDate()
         else {
-            deadlineDateUIString = "$year-$month-$day"
             deadlineDate = LocalDate.of(year, month, day)
+            deadlineDateUIString = deadlineDate!!.format(
+                DateTimeFormatter.ofLocalizedDate(
+                    FormatStyle.FULL
+                )
+            )
             _isDeadlineValid.value = true
 
             val hour = 23
             val minute = 59
             deadlineTime = LocalTime.of(hour, minute)
-            val meridian = if (hour < 12) "AM" else "PM"
-            _deadlineUIString.value = deadlineDateUIString.plus(
-                " by ${hour % 12}:$minute $meridian"
+            _deadlineUIString.value = deadlineDateUIString +
+                    " AT " + deadlineTime!!.format(
+                DateTimeFormatter.ofLocalizedTime(
+                    FormatStyle.SHORT
+                )
             )
             _isTodoValid.value = todoValid()
         }
@@ -169,9 +197,11 @@ class TodoInfo {
             ) invalidateDeadlineTime()
             else {
                 deadlineTime = LocalTime.of(hour, minute)
-                val meridian = if (hour < 12) "AM" else "PM"
-                _deadlineUIString.value = deadlineDateUIString.plus(
-                    " by ${hour % 12}:$minute $meridian"
+                _deadlineUIString.value = deadlineDateUIString +
+                        " AT " + deadlineTime!!.format(
+                    DateTimeFormatter.ofLocalizedTime(
+                        FormatStyle.SHORT
+                    )
                 )
                 _isDeadlineValid.value = true
                 _isTodoValid.value = todoValid()
@@ -211,6 +241,6 @@ class TodoInfo {
     }
 
     fun setCategory(cat: Category) {
-        category = cat.name
+        category = cat.id
     }
 }

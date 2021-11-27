@@ -35,15 +35,16 @@ class CreateTodoFragment : Fragment() {
         val categoryDb = CategoryDb.getInstance(requireContext())
         val todoDb = TodoDatabase.getInstance(requireContext())
 
+        binding.lifecycleOwner = this
+
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb.databaseDao, categoryDb.dao,
+            CreateTodoFragmentArgs.fromBundle(requireArguments()).todoId
         )
 
         viewModel = ViewModelProvider(
             this, viewModelFactory
         )[CreateTodoViewModel::class.java]
-
-        binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
 
@@ -109,6 +110,16 @@ class CreateTodoFragment : Fragment() {
                     todo.setCategory(it)
                     setTitleToDefaultCategoryName(it)
                     binding.categorySelection.findViewById<RadioButton>(it.id)?.isChecked = true
+                }
+            }
+
+            editTodo.observe(viewLifecycleOwner) {
+                it?.let {
+                    binding.todoDescription.setText(it.todoString)
+                    if (it.hasDeadline) {
+                        binding.deadlineSwitch.toggle()
+                    }
+                    initializeFields()
                 }
             }
         }

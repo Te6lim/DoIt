@@ -191,7 +191,7 @@
             android:layout_marginBottom="@dimen/margin_medium"
             android:enabled="@{viewModel.todo.isTodoValid}"
             android:onClick="@{() -> viewModel.createTodoInfo()}"
-            android:text="@string/create"
+            app:actionText="@{viewModel.editTodo}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

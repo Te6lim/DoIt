@@ -8,6 +8,7 @@
     <string name="time">Time</string>
     <string name="set_interval">Set</string>
     <string name="create">Create</string>
+    <string name="update">Update</string>
     <string name="start_time">Start Time</string>
     <string name="start_time_button_text">Start Time</string>
     <string name="create_todo">Create new Todo</string>

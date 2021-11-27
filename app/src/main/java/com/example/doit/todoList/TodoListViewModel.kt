@@ -77,7 +77,7 @@ class TodoListViewModel(
     val itemCountInCategory = Transformations.map(todoList) { list ->
         with(defaultCategory.value) {
             if (list.isEmpty() || this == null) ("All" to todoList.value!!.size)
-            else if (list[0].category != this.name) {
+            else if (list[0].catId != this.id) {
                 ("All" to todoList.value!!.size)
             } else (name to list.size)
         }
@@ -89,10 +89,13 @@ class TodoListViewModel(
 
     var isLongPressed = false
 
+    var editTodo: Todo? = null
+        private set
+
     private fun filter(allTodos: List<Todo>, defCat: Category): List<Todo> {
         return allTodos.let { list ->
             list.filter { todo ->
-                todo.category == defCat.name && !todo.isFinished
+                todo.catId == defCat.id && !todo.isFinished
             }.let { newList ->
                 if (newList.isEmpty()) {
                     list.filter { todo ->
@@ -164,6 +167,13 @@ class TodoListViewModel(
                 setContextActionBarEnabled(true)
                 if (list[position]) _selectionCount.value = _selectionCount.value!!.plus(1)
                 else _selectionCount.value = _selectionCount.value!!.minus(1)
+
+                if (selectionCount.value!! == 1) {
+                    for ((i, itemState) in itemsState.value!!.withIndex()) {
+                        if (itemState) editTodo = todoList.value!![i]
+                    }
+                }
+
             } else setContextActionBarEnabled(false)
             _viewHolderPosition.value = position
         }
@@ -177,6 +187,13 @@ class TodoListViewModel(
                         list[position] = false
                         _viewHolderPosition.value = position
                         _selectionCount.value = _selectionCount.value!!.minus(1)
+
+                        if (selectionCount.value!! == 1) {
+                            for ((i, itemState) in itemsState.value!!.withIndex()) {
+                                if (itemState) editTodo = todoList.value!![i]
+                            }
+                        }
+
                         if (!list.any { it }) setContextActionBarEnabled(false)
                     } else {
                         for ((i, isTrue) in list.withIndex()) {
@@ -192,6 +209,12 @@ class TodoListViewModel(
                     list[position] = true
                     _viewHolderPosition.value = position
                     _selectionCount.value = _selectionCount.value!!.plus(1)
+
+                    if (selectionCount.value!! == 1) {
+                        for ((i, itemState) in itemsState.value!!.withIndex()) {
+                            if (itemState) editTodo = todoList.value!![i]
+                        }
+                    }
                 }
             }
         }

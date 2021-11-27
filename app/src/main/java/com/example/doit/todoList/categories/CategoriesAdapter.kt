@@ -62,6 +62,7 @@ class CategoriesAdapter(
             items.apply {
                 addAll(catList)
             }
+
             items.add(2, DataItem.Header(false))
 
             withContext(Dispatchers.Main) {

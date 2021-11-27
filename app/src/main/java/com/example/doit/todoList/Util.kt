@@ -13,7 +13,7 @@ fun LocalDate.formatToString(formatter: DateTimeFormatter): String {
 }
 
 fun LocalTime.formatToString(): String {
-    val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
+    val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
     return format(formatter)
 }
 

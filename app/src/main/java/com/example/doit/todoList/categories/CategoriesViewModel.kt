@@ -47,7 +47,7 @@ class CategoriesViewModel(
     private fun getList(catList: List<Category>, todoList: List<Todo>): List<CategoryInfo> {
         val catInfoList = mutableListOf<CategoryInfo>()
         catList.forEach { cat ->
-            val listFilter = todoList.filter { it.category == cat.name }
+            val listFilter = todoList.filter { it.catId == cat.id }
             catInfoList.add(
                 CategoryInfo(
                     cat.id,
@@ -79,10 +79,14 @@ class CategoriesViewModel(
     fun clearCategory(cat: Category) {
         viewModelScope.launch {
             todos.value!!.filter {
-                cat.name == it.category
-            }.forEach {
+                cat.id == it.catId
+            }.apply {
                 withContext(Dispatchers.IO) {
-                    todoDb.delete(it.todoId)
+                    forEach {
+                        withContext(Dispatchers.IO) {
+                            todoDb.delete(it.todoId)
+                        }
+                    }
                 }
             }
         }

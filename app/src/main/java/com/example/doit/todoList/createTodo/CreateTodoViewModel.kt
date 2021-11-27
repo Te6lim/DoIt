@@ -9,12 +9,15 @@ import kotlinx.coroutines.*
 import java.time.LocalDateTime
 
 class CreateTodoViewModel(
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao, private val editTodoId: Long
 ) : ViewModel() {
 
     companion object {
         const val DEFAULT_CATEGORY = "Work"
     }
+
+    private val job = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     val categories = catDb.getAll()
 
@@ -33,11 +36,27 @@ class CreateTodoViewModel(
     val category: LiveData<Category>
         get() = _category
 
+    private val _editTodo = MutableLiveData<Todo?>()
+    val editTodo: LiveData<Todo?>
+        get() = _editTodo
+
+    init {
+        initializeEditTodo()
+    }
+
+    private fun initializeEditTodo() {
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                _editTodo.postValue(todoDb.get(editTodoId))
+            }
+        }
+    }
+
     fun add(todoInfo: TodoInfo) {
-        viewModelScope.launch {
+        uiScope.launch {
             val todo = Todo(
                 todoString = todoInfo.description,
-                category = todoInfo.category,
+                catId = todoInfo.category,
                 dateTodo = LocalDateTime.of(todoInfo.dateSet, todoInfo.timeSet),
                 hasDeadline = todoInfo.deadlineEnabled.value!!,
             ).apply {
@@ -45,13 +64,10 @@ class CreateTodoViewModel(
                     deadlineDate = LocalDateTime.of(todoInfo.deadlineDate, todoInfo.deadlineTime)
                 }
             }
-            addTodo(todo)
-        }
-    }
-
-    private suspend fun addTodo(todo: Todo) {
-        withContext(Dispatchers.IO) {
-            todoDb.insert(todo)
+            withContext(Dispatchers.IO) {
+                if (editTodo.value != null) todoDb.update(todo.apply { todoId = todoInfo.id })
+                else todoDb.insert(todo)
+            }
         }
     }
 
@@ -65,7 +81,7 @@ class CreateTodoViewModel(
     }
 
     fun addNewCategory(newCategory: String, default: Boolean = false) {
-        viewModelScope.launch {
+        uiScope.launch {
             withContext(Dispatchers.IO) {
                 catDb.insert(Category(name = newCategory, isDefault = default))
             }
@@ -73,7 +89,7 @@ class CreateTodoViewModel(
     }
 
     fun emitCategory(id: Int) {
-        viewModelScope.launch {
+        uiScope.launch {
             _category.value = getCat(id)
         }
     }
@@ -90,5 +106,48 @@ class CreateTodoViewModel(
 
     fun makeCategoryEditTextNotVisible() {
         _categoryEditTextIsOpen.value = false
+    }
+
+    fun initializeFields() {
+        uiScope.launch {
+            val todoEdit = editTodo.value!!
+            with(editTodo.value!!) {
+                todo.id = todoEdit.todoId
+                todo.setDescription(todoString)
+                todo.setDate(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
+                todo.setTime(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
+                if (todoEdit.hasDeadline) {
+                    todo.setIsDeadlineEnabled(true)
+                    todo.setDeadlineDate(
+                        deadlineDate!!.year,
+                        deadlineDate!!.monthValue,
+                        deadlineDate!!.dayOfMonth
+                    )
+                    todo.setDeadlineTime(
+                        deadlineDate!!.hour,
+                        deadlineDate!!.minute
+                    )
+                } else {
+                    todo.setIsDeadlineEnabled(false)
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        uiScope.cancel()
+    }
+}
+
+class CreateTodoViewModelFactory(
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao, private val editTodo: Long
+) :
+    ViewModelProvider.Factory {
+    @Suppress("unchecked_cast")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
+            return CreateTodoViewModel(todoDb, catDb, editTodo) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
