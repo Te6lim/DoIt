@@ -58,7 +58,7 @@ class CategoriesFragment : Fragment() {
                 position: Int, t: CategoryInfo, holder: View, adapter: RecyclerView.Adapter<H>
             ) {
 
-                CategoriesDialogFragment(object : CatDialogInterface {
+                CategoryOptionsDialogFragment(object : CatDialogInterface {
                     override fun getTitle(): String {
                         return t.name
                     }
@@ -67,15 +67,32 @@ class CategoriesFragment : Fragment() {
 
                         when (DialogOptions.values()[option]) {
                             DialogOptions.OPTION_A -> {
+                                EditCategoryDialogFragment(
+                                    object : EditCategoryDialogInterface {
+                                        override fun currentCategoryName() = t.name
+
+                                        override fun positiveAction(category: String) {
+                                            viewModel.updateCategory(
+                                                t.apply { name = category }.toCategory()
+                                            )
+                                        }
+
+                                    }).show(
+                                    (requireActivity().supportFragmentManager),
+                                    "EDIT_DIALOG"
+                                )
+                            }
+
+                            DialogOptions.OPTION_B -> {
                                 if (t.isDefault) viewModel.clearCategory(t.toCategory())
                                 else viewModel.changeDefault(t.id)
                             }
 
-                            DialogOptions.OPTION_B -> {
+                            DialogOptions.OPTION_C -> {
                                 viewModel.clearCategory(t.toCategory())
                             }
 
-                            DialogOptions.OPTION_C -> {
+                            DialogOptions.OPTION_D -> {
                                 viewModel.deleteCategory(t.toCategory())
                             }
                         }

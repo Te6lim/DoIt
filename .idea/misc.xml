@@ -6,6 +6,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/category_backgorund.xml" value="0.23055555555555557" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/category_background.xml" value="0.22777777777777777" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/completed_todo_background.xml" value="0.22777777777777777" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/dialog_background.xml" value="0.875" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_add.xml" value="0.22777777777777777" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_create.xml" value="0.23055555555555557" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_todo.xml" value="0.22777777777777777" />
@@ -32,6 +33,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/item_todo.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/item_todo_completed.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/item_todo_finished.xml" value="0.33" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/layout_category_edit.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/nav_header.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/menu/add_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/menu/categoires_menu.xml" value="0.22447916666666667" />

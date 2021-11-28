@@ -160,7 +160,7 @@ class TodoListFragment : Fragment() {
                     if (savedInstanceState != null)
                         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy
                             .values()[savedInstanceState.getInt(SCROLL)]
-                    else binding.todoList.scrollToPosition(0)
+                    else binding.todoList.scrollToPosition(positionStart)
                 }
             })
         }

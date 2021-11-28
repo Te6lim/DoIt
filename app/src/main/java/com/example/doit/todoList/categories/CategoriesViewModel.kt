@@ -10,7 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 enum class DialogOptions(val value: String) {
-    OPTION_A("Make default"), OPTION_B("Clear"), OPTION_C("Delete")
+    OPTION_A("Edit"), OPTION_B("Set as default"),
+    OPTION_C("Clear"), OPTION_D("Delete")
 }
 
 class CategoriesViewModel(
@@ -78,16 +79,8 @@ class CategoriesViewModel(
 
     fun clearCategory(cat: Category) {
         viewModelScope.launch {
-            todos.value!!.filter {
-                cat.id == it.catId
-            }.apply {
-                withContext(Dispatchers.IO) {
-                    forEach {
-                        withContext(Dispatchers.IO) {
-                            todoDb.delete(it.todoId)
-                        }
-                    }
-                }
+            withContext(Dispatchers.IO) {
+                todoDb.clearByCategory(cat.id)
             }
         }
     }
@@ -95,8 +88,16 @@ class CategoriesViewModel(
     fun deleteCategory(cat: Category) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                clearCategory(cat)
+                todoDb.clearByCategory(cat.id)
                 catDb.delete(cat.id)
+            }
+        }
+    }
+
+    fun updateCategory(category: Category) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                catDb.update(category)
             }
         }
     }
@@ -104,7 +105,7 @@ class CategoriesViewModel(
 
 data class CategoryInfo(
     val id: Int,
-    val name: String,
+    var name: String,
     val todoCount: Int,
     val todoCompletedCount: Int,
     val isDefault: Boolean
