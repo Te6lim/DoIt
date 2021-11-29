@@ -44,12 +44,13 @@ class CategoriesFragment : Fragment() {
 
         val adapter = CategoriesAdapter(object : ActionCallback<CategoryInfo> {
 
-
             override fun onClick(position: Int, t: CategoryInfo, holder: View) {
                 with(findNavController()) {
-                    previousBackStackEntry?.savedStateHandle?.set(
-                        TodoListFragment.DEF_KEY, t.id
-                    )
+                    if (t.todoCount != 0) {
+                        previousBackStackEntry?.savedStateHandle?.set(
+                            TodoListFragment.DEF_KEY, t.id
+                        )
+                    }
                     popBackStack()
                 }
             }

@@ -35,6 +35,7 @@
     <string name="todos">Todos</string>
     <string name="clear">clear</string>
     <string name="deadline_string">Deadline: %s at %s</string>
+    <string name="date_time_string">%s at %s</string>
     <string name="finished_date_string">Finished: %s at %s</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>

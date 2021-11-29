@@ -1,22 +1,21 @@
 package com.example.doit.todoList
 
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.doit.R
 import com.example.doit.database.Todo
-import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @BindingAdapter("setDate")
 fun TextView.setDate(item: Todo?) {
-    item?.let {
-        text = it.dateTodo.toLocalDate().formatToString(
-            DateTimeFormatter.ofLocalizedDate(
-                FormatStyle.FULL
-            )
+    item?.let { todo ->
+        text = context.getString(
+            R.string.date_time_string,
+            todo.dateTodo.toLocalDate().formatToString(
+                DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+            ), todo.dateTodo.toLocalTime().formatToString()
         )
     }
 }

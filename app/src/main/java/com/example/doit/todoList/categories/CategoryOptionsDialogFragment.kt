@@ -14,6 +14,12 @@ class CategoryOptionsDialogFragment(
     private val callBack: CatDialogInterface
 ) : DialogFragment() {
 
+    /* Find fix later */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val items = if (callBack.isItemDefault()) arrayOf(
             DialogOptions.OPTION_A.value,
@@ -39,6 +45,12 @@ class CategoryOptionsDialogFragment(
 class EditCategoryDialogFragment(
     private val callback: EditCategoryDialogInterface
 ) : DialogFragment() {
+
+    /* Find fix later */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = DataBindingUtil.inflate<LayoutCategoryEditBinding>(
