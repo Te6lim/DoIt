@@ -16,7 +16,8 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
-    private lateinit var drawer: DrawerLayout
+    lateinit var drawer: DrawerLayout
+        private set
     private lateinit var navView: NavigationView
 
     lateinit var mainViewModel: MainViewModel
