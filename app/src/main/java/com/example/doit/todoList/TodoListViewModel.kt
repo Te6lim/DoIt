@@ -60,14 +60,14 @@ class TodoListViewModel(
 
     val defaultTransform = Transformations.map(defaultCategory) { cat ->
         allTodos.value?.let { list ->
-            _todoList.value = filter(list, cat!!)
+            _todoList.value = filter(list, cat!!).sortedBy { !it.hasDeadline }
             resetItemsState()
         }
     }
 
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
         defaultCategory.value?.let { category ->
-            _todoList.value = filter(list!!, category)
+            _todoList.value = filter(list!!, category).sortedBy { !it.hasDeadline }
             resetItemsState()
         }
 
