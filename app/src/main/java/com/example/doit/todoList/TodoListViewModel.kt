@@ -24,21 +24,11 @@ class TodoListViewModel(
     val defaultCategory: LiveData<Category?>
         get() = _defaultCategory
 
-    private val _itemsState = MutableLiveData<MutableList<Boolean>>()
-    val itemsState: LiveData<MutableList<Boolean>>
-        get() = _itemsState
+    private var itemsState = mutableListOf<Boolean>()
 
     private val _isNavigating = MutableLiveData<Boolean>()
     val isNavigating: LiveData<Boolean>
         get() = _isNavigating
-
-    private val _contextActionBarEnabled = MutableLiveData(false)
-    val contextActionBarEnabled: LiveData<Boolean>
-        get() = _contextActionBarEnabled
-
-    private val _viewHolderPosition = MutableLiveData<Int>()
-    val viewHolderPosition: LiveData<Int>
-        get() = _viewHolderPosition
 
     private val _selectionCount = MutableLiveData(0)
     val selectionCount: LiveData<Int>
@@ -83,11 +73,18 @@ class TodoListViewModel(
         }
     }
 
+    fun itemsState() = itemsState.toList()
+
     private fun resetItemsState() {
-        _itemsState.postValue(MutableList(todoList.value!!.size) { false })
+        itemsState = (MutableList(todoList.value!!.size) { false })
     }
 
-    var isLongPressed = false
+    private val _isLongPressed = MutableLiveData(false)
+    val isLongPressed: LiveData<Boolean>
+        get() = _isLongPressed
+
+    var longPressStatusChanged = false
+        private set
 
     var editTodo: Todo? = null
         private set
@@ -154,84 +151,56 @@ class TodoListViewModel(
         _isNavigating.value = value
     }
 
-    fun setContextActionBarEnabled(value: Boolean) {
-        if (_contextActionBarEnabled.value!! != value) _contextActionBarEnabled.value = value
-    }
-
-    fun getItems() = itemsState.value?.toList()
-
-    fun setItemSelected(position: Int) {
-        itemsState.value?.let { list ->
-            list[position] = !list[position]
-            if (list.any { it }) {
-                setContextActionBarEnabled(true)
-                if (list[position]) _selectionCount.value = _selectionCount.value!!.plus(1)
-                else _selectionCount.value = _selectionCount.value!!.minus(1)
-
-                if (selectionCount.value!! == 1) {
-                    for ((i, itemState) in itemsState.value!!.withIndex()) {
-                        if (itemState) editTodo = todoList.value!![i]
-                    }
-                }
-
-            } else setContextActionBarEnabled(false)
-            _viewHolderPosition.value = position
-        }
-    }
-
-    fun clickAction(position: Int = -1) {
-        itemsState.value?.let { list ->
-            if (_contextActionBarEnabled.value!!) {
-                if (position < 0 || itemsState.value!![position]) {
-                    if (position >= 0) {
-                        list[position] = false
-                        _viewHolderPosition.value = position
-                        _selectionCount.value = _selectionCount.value!!.minus(1)
-
-                        if (selectionCount.value!! == 1) {
-                            for ((i, itemState) in itemsState.value!!.withIndex()) {
-                                if (itemState) editTodo = todoList.value!![i]
-                            }
-                        }
-
-                        if (!list.any { it }) setContextActionBarEnabled(false)
-                    } else {
-                        for ((i, isTrue) in list.withIndex()) {
-                            if (isTrue) {
-                                list[i] = false
-                                _viewHolderPosition.value = i
-                            }
-                        }
-                        setContextActionBarEnabled(false)
-                        _selectionCount.value = 0
-                    }
-                } else {
-                    list[position] = true
-                    _viewHolderPosition.value = position
-                    _selectionCount.value = _selectionCount.value!!.plus(1)
-
-                    if (selectionCount.value!! == 1) {
-                        for ((i, itemState) in itemsState.value!!.withIndex()) {
-                            if (itemState) editTodo = todoList.value!![i]
-                        }
-                    }
-                }
+    fun interact(position: Int = -1, isLongPress: Boolean = false): Boolean {
+        if (isLongPress) {
+            if (!_isLongPressed.value!!) {
+                itemsState = mutableListOf()
+                todoList.value!!.forEach { _ -> itemsState.add(false) }
+                _isLongPressed.value = true
+                longPressStatusChanged = true
             }
+            return actionOnLongPressActive(position)
+        } else {
+            if (_isLongPressed.value!!) return actionOnLongPressActive(position)
         }
+        return false
     }
 
-    fun selectAll() {
-        for ((i, value) in itemsState.value!!.withIndex()) {
-            if (!value) {
-                clickAction(i)
-            }
+    private fun actionOnLongPressActive(position: Int): Boolean {
+        if (position == -1) {
+            resetStateValues()
+            return false
         }
+
+        itemsState[position] = !itemsState[position]
+        if (itemsState[position]) {
+            _selectionCount.value = _selectionCount.value?.plus(1)
+        } else {
+            _selectionCount.value = _selectionCount.value?.minus(1)
+            if (_selectionCount.value == 0) resetStateValues()
+        }
+
+        if (selectionCount.value == 1) editTodo = todoList.value!![position]
+
+        return itemsState[position]
+    }
+
+    private fun resetStateValues() {
+        _selectionCount.value = 0
+        _isLongPressed.value = false
+        longPressStatusChanged = true
+        editTodo = null
+        resetItemsState()
+    }
+
+    fun setLongPressedStatusChanged(value: Boolean) {
+        longPressStatusChanged = value
     }
 
     fun deleteSelected() {
         viewModelScope.launch {
             val selectedId = mutableListOf<Long>()
-            for ((i, v) in itemsState.value!!.withIndex())
+            for ((i, v) in itemsState.withIndex())
                 if (v) selectedId.add(todoList.value!![i].todoId)
 
             withContext(Dispatchers.IO) {
@@ -242,10 +211,20 @@ class TodoListViewModel(
         }
     }
 
+    fun selectAll(value: Boolean) {
+        if (_isLongPressed.value!!) {
+            for ((i, _) in itemsState.withIndex()) {
+                itemsState[i] = value
+            }
+            if (value) _selectionCount.value = itemsState.size
+            else _selectionCount.value = 0
+        }
+    }
+
     fun updatedSelected() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                for ((i, v) in itemsState.value!!.withIndex()) {
+                for ((i, v) in itemsState.withIndex()) {
                     if (v) todoDb.update(todoList.value!![i].apply { isFinished = v })
                 }
                 resetItemsState()

@@ -11,8 +11,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.databinding.ActivityMainBinding
-import com.example.doit.finishedTodoList.FinishedTodoListFragment
-import com.example.doit.todoList.TodoListFragment
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -66,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                         toggle.syncState()
                     }
                     else -> {
-                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                     }
                 }
             }
