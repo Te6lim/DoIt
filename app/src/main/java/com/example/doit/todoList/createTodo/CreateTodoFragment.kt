@@ -39,7 +39,6 @@ class CreateTodoFragment : Fragment() {
 
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb.databaseDao, categoryDb.dao,
-            CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId,
             CreateTodoFragmentArgs.fromBundle(requireArguments()).todoId
         )
 

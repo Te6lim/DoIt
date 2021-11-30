@@ -12,7 +12,6 @@ import java.time.LocalTime
 
 class CreateTodoViewModel(
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
-    private val categoryId: Int,
     private val editTodoId: Long
 ) : ViewModel() {
 
@@ -147,15 +146,13 @@ class CreateTodoViewModel(
 }
 
 class CreateTodoViewModelFactory(
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao,
-    private val categoryId: Int,
-    private val editTodo: Long
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao, private val editTodo: Long
 ) :
     ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
-            return CreateTodoViewModel(todoDb, catDb, categoryId, editTodo) as T
+            return CreateTodoViewModel(todoDb, catDb, editTodo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
