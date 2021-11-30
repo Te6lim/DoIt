@@ -21,8 +21,8 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/margin_medium"
-        android:longClickable="true"
-        android:background="@drawable/category_background">
+        android:background="@drawable/category_background"
+        android:longClickable="true">
 
         <TextView
             android:id="@+id/category_title_text"
@@ -40,29 +40,55 @@
             tools:text="WORK" />
 
         <TextView
-            android:id="@+id/category_todo_count"
+            android:id="@+id/category_todo_count_header"
             style="@style/category_text_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:text="@string/todo_count_header"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/category_todo_count"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/category_todo_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/primaryColor"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/category_todo_count_header"
+            app:layout_constraintTop_toBottomOf="@+id/category_title_text"
             app:setCatTodoCount="@{categoryInfo}"
+            tools:text="12" />
+
+        <TextView
+            android:id="@+id/category_finished_count_header"
+            style="@style/category_text_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="@string/finished_todo_count_header"
+            android:textStyle="bold"
             app:layout_constraintBaseline_toBaselineOf="@+id/category_finished_count"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Todos: 12" />
+            app:layout_constraintEnd_toStartOf="@+id/category_finished_count" />
 
         <TextView
             android:id="@+id/category_finished_count"
-            style="@style/category_text_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            app:setCatTodoCompletedCount="@{categoryInfo}"
+            android:textColor="@color/primaryColor"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/category_title_text"
-            app:layout_constraintVertical_bias="1.0"
-            tools:text="Finished: 20" />
+            app:setCatTodoCompletedCount="@{categoryInfo}"
+            tools:text="20" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -49,4 +49,6 @@
     <string name="default_header">Default</string>
     <string name="others_header">Others</string>
     <string name="name">Name</string>
+    <string name="todo_count_header">Todo: </string>
+    <string name="finished_todo_count_header">Finished: </string>
 </resources>

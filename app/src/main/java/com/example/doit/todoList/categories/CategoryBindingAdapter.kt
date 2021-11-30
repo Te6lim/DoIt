@@ -14,14 +14,14 @@ fun TextView.setCatName(catInfo: CategoryInfo?) {
 @BindingAdapter("setCatTodoCount")
 fun TextView.setCatTodoCount(catInfo: CategoryInfo?) {
     catInfo?.let {
-        text = context.getString(R.string.todo_count, catInfo.todoCount)
+        text = catInfo.todoCount.toString()
     }
 }
 
 @BindingAdapter("setCatTodoCompletedCount")
 fun TextView.setCatTodoCompletedCount(catInfo: CategoryInfo?) {
     catInfo?.let {
-        text = context.getString(R.string.finished_todo_count, catInfo.todoCompletedCount)
+        text = catInfo.todoCompletedCount.toString()
     }
 }
 
