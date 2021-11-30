@@ -9,11 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.doit.MainActivity
 import com.example.doit.R
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDb
@@ -26,12 +24,6 @@ class CreateTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoCreateBinding
     private lateinit var viewModel: CreateTodoViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        (requireActivity() as MainActivity).drawer
-            .setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -47,6 +39,7 @@ class CreateTodoFragment : Fragment() {
 
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb.databaseDao, categoryDb.dao,
+            CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId,
             CreateTodoFragmentArgs.fromBundle(requireArguments()).todoId
         )
 
@@ -56,14 +49,14 @@ class CreateTodoFragment : Fragment() {
 
         binding.viewModel = viewModel
 
+        val categoryId = CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId
+
         with(viewModel) {
             categories.observe(viewLifecycleOwner) {
                 when (binding.categorySelection.childCount) {
                     0 -> {
                         addCategoryViews(categories.value!!)
-                        emitCategory(
-                            CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId
-                        )
+                        if (categoryId != -1) emitCategory(categoryId)
                     }
 
                     else -> binding.categorySelection.addView(
@@ -122,9 +115,10 @@ class CreateTodoFragment : Fragment() {
             }
 
             editTodo.observe(viewLifecycleOwner) {
-                it?.let {
-                    binding.todoDescription.setText(it.todoString)
-                    if (it.hasDeadline) {
+                it?.let { todo ->
+                    emitCategory(todo.catId)
+                    binding.todoDescription.setText(todo.todoString)
+                    if (todo.hasDeadline) {
                         binding.deadlineSwitch.toggle()
                     }
                     initializeFields()

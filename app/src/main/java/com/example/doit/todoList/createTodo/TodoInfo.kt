@@ -15,10 +15,10 @@ class TodoInfo {
     var description: String = ""
         private set
 
-    var dateSet: LocalDate = LocalDate.now()
+    var dateSet: LocalDate? = null
         private set
 
-    var timeSet: LocalTime = LocalTime.now()
+    var timeSet: LocalTime? = null
         private set
 
     var deadlineDate: LocalDate? = null
@@ -34,11 +34,11 @@ class TodoInfo {
     var category: Int = -1
         private set
 
-    private val _dateUIString = MutableLiveData("DATE")
+    private val _dateUIString = MutableLiveData("TODAY")
     val dateUIString: LiveData<String>
         get() = _dateUIString
 
-    private val _timeUIString = MutableLiveData("TIME")
+    private val _timeUIString = MutableLiveData("NOW")
     val timeUIString: LiveData<String>
         get() = _timeUIString
 
@@ -83,13 +83,15 @@ class TodoInfo {
         if (value) {
             if (deadlineDate != null && dateIsInvalid(
                     deadlineDate!!.year, deadlineDate!!.monthValue, deadlineDate!!.dayOfMonth,
-                    dateSet
+                    dateSet ?: LocalDate.now()
                 )
             ) {
                 invalidateDeadlineDate()
             } else {
                 if (deadlineTime != null && timeIsInvalid(
-                        deadlineTime!!.hour, deadlineTime!!.minute, deadlineDate, dateSet, timeSet
+                        deadlineTime!!.hour, deadlineTime!!.minute, deadlineDate,
+                        dateSet ?: LocalDate.now(),
+                        timeSet ?: LocalTime.now()
                     )
                 ) {
                     invalidateDeadlineTime()
@@ -103,19 +105,19 @@ class TodoInfo {
             invalidateDate()
         else {
             dateSet = LocalDate.of(year, month, day)
-            _dateUIString.value = dateSet.format(DateTimeFormatter.ISO_DATE)
+            _dateUIString.value = dateSet!!.format(DateTimeFormatter.ISO_DATE)
             _isDateValid.value = true
             _isTodoValid.value = todoValid()
 
             if (deadlineEnabled.value!!) {
                 if (deadlineDate != null && dateIsInvalid(
                         deadlineDate!!.year, deadlineDate!!.monthValue,
-                        deadlineDate!!.dayOfMonth, dateSet
+                        deadlineDate!!.dayOfMonth, dateSet ?: LocalDate.now()
                     )
                 ) invalidateDate()
                 else if (deadlineTime != null && timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
-                        dateSet, deadlineDate!!, timeSet
+                        dateSet, deadlineDate!!, timeSet ?: LocalTime.now()
                     )
                 ) invalidateTime()
             }
@@ -123,11 +125,15 @@ class TodoInfo {
     }
 
     fun setTime(hour: Int, minute: Int) {
-        if (timeIsInvalid(hour, minute, dateSet, LocalDate.now(), LocalTime.now()))
+        if (timeIsInvalid(
+                hour, minute, dateSet ?: LocalDate.now(),
+                LocalDate.now(), LocalTime.now()
+            )
+        )
             invalidateTime()
         else {
             timeSet = LocalTime.of(hour, minute)
-            _timeUIString.value = timeSet.format(
+            _timeUIString.value = timeSet!!.format(
                 DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
             )
             _isTimeValid.value = true
@@ -136,7 +142,8 @@ class TodoInfo {
             if (deadlineEnabled.value!!) {
                 if (deadlineTime != null && timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
-                        deadlineDate!!, dateSet, timeSet
+                        deadlineDate!!, dateSet ?: LocalDate.now(),
+                        timeSet ?: LocalTime.now()
                     )
                 ) invalidateTime()
             }
@@ -146,20 +153,20 @@ class TodoInfo {
     private fun invalidateDate() {
         _isDateValid.value = false
         _dateUIString.value = "INVALID DATE!"
-        dateSet = LocalDate.now()
+        dateSet = null
         _isTodoValid.value = todoValid()
     }
 
     private fun invalidateTime() {
         _isTimeValid.value = false
         _timeUIString.value = "INVALID TIME!"
-        timeSet = LocalTime.now()
+        timeSet = null
         _isTodoValid.value = todoValid()
     }
 
     fun setDeadlineDate(year: Int, month: Int, day: Int) {
         if (!_isDateValid.value!! || !isTimeValid.value!! ||
-            dateIsInvalid(year, month, day, dateSet)
+            dateIsInvalid(year, month, day, dateSet ?: LocalDate.now())
         ) invalidateDeadlineDate()
         else {
             deadlineDate = LocalDate.of(year, month, day)
@@ -193,7 +200,11 @@ class TodoInfo {
     fun setDeadlineTime(hour: Int, minute: Int) {
         if (_isDeadlineValid.value!!) {
             if (!_isDateValid.value!! || !isTimeValid.value!! ||
-                timeIsInvalid(hour, minute, deadlineDate, dateSet, timeSet)
+                timeIsInvalid(
+                    hour, minute, deadlineDate,
+                    dateSet ?: LocalDate.now(),
+                    timeSet ?: LocalTime.now()
+                )
             ) invalidateDeadlineTime()
             else {
                 deadlineTime = LocalTime.of(hour, minute)

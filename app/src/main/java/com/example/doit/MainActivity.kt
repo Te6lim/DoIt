@@ -72,7 +72,9 @@ class MainActivity : AppCompatActivity() {
 
             contextActionbarActive.observe(this@MainActivity) { isActive ->
                 if (isActive) drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                else drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                else if (
+                    navController.currentDestination!!.id == navController.graph.startDestination
+                ) drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
             }
         }
 

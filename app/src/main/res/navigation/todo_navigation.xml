@@ -28,6 +28,7 @@
         tools:layout="@layout/fragment_todo_create">
         <argument
             android:name="defaultCategoryId"
+            android:defaultValue="-1"
             app:argType="integer" />
         <argument
             android:name="todoId"

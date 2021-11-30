@@ -114,7 +114,6 @@ class TodoListFragment : Fragment() {
                     R.id.edit -> {
                         findNavController().navigate(
                             TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                                todoListViewModel.editTodo!!.catId
                             ).setTodoId(todoListViewModel.editTodo!!.todoId)
                         )
                         todoListViewModel.interact()
@@ -169,8 +168,7 @@ class TodoListFragment : Fragment() {
         binding.addNew.setOnClickListener {
             findNavController().navigate(
                 TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                    todoListViewModel.defaultCategory.value!!.id
-                )
+                ).setDefaultCategoryId(todoListViewModel.defaultCategory.value!!.id)
             )
             todoListViewModel.isNavigating(true)
         }

@@ -6,10 +6,14 @@ import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
 import kotlinx.coroutines.*
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 class CreateTodoViewModel(
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao, private val editTodoId: Long
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao,
+    private val categoryId: Int,
+    private val editTodoId: Long
 ) : ViewModel() {
 
     companion object {
@@ -57,7 +61,10 @@ class CreateTodoViewModel(
             val todo = Todo(
                 todoString = todoInfo.description,
                 catId = todoInfo.category,
-                dateTodo = LocalDateTime.of(todoInfo.dateSet, todoInfo.timeSet),
+                dateTodo = LocalDateTime.of(
+                    todoInfo.dateSet ?: LocalDate.now(),
+                    todoInfo.timeSet ?: LocalTime.now()
+                ),
                 hasDeadline = todoInfo.deadlineEnabled.value!!,
             ).apply {
                 if (hasDeadline) {
@@ -140,13 +147,15 @@ class CreateTodoViewModel(
 }
 
 class CreateTodoViewModelFactory(
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao, private val editTodo: Long
+    private val todoDb: TodoDbDao, private val catDb: CategoryDao,
+    private val categoryId: Int,
+    private val editTodo: Long
 ) :
     ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
-            return CreateTodoViewModel(todoDb, catDb, editTodo) as T
+            return CreateTodoViewModel(todoDb, catDb, categoryId, editTodo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
