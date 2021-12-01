@@ -40,8 +40,13 @@ class CreateTodoViewModel(
         get() = _category
 
     private val _editTodo = MutableLiveData<Todo?>()
-    val editTodo: LiveData<Todo?>
-        get() = _editTodo
+    val editTodo = Transformations.map(_editTodo) {
+        it?.let {
+            initializeFields(it)
+            emitCategory(it.catId)
+            it
+        }
+    }
 
     init {
         initializeEditTodo()
@@ -58,7 +63,7 @@ class CreateTodoViewModel(
     fun add(todoInfo: TodoInfo) {
         uiScope.launch {
             val todo = Todo(
-                todoString = todoInfo.description,
+                todoString = todoInfo.description.value!!,
                 catId = todoInfo.category,
                 dateTodo = LocalDateTime.of(
                     todoInfo.dateSet ?: LocalDate.now(),
@@ -114,10 +119,10 @@ class CreateTodoViewModel(
         _categoryEditTextIsOpen.value = false
     }
 
-    fun initializeFields() {
+    private fun initializeFields(editTodo: Todo) {
         uiScope.launch {
-            val todoEdit = editTodo.value!!
-            with(editTodo.value!!) {
+            val todoEdit = editTodo
+            with(editTodo) {
                 todo.id = todoEdit.todoId
                 todo.setDescription(todoString)
                 todo.setDate(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)

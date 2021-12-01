@@ -12,8 +12,9 @@ class TodoInfo {
 
     var id: Long = -1
 
-    var description: String = ""
-        private set
+    private val _description = MutableLiveData("")
+    val description: LiveData<String>
+        get() = _description
 
     var dateSet: LocalDate? = null
         private set
@@ -65,7 +66,7 @@ class TodoInfo {
         get() = _isTodoValid
 
     fun todoValid(): Boolean {
-        return (description.isNotEmpty() &&
+        return (description.value!!.isNotEmpty() &&
                 (!_deadlineEnabled.value!! || (_deadlineEnabled.value!! && deadlineDate != null &&
                         deadlineTime != null)) &&
                 _isDateValid.value!! && _isTimeValid.value!!
@@ -73,7 +74,7 @@ class TodoInfo {
     }
 
     fun setDescription(d: String) {
-        description = d
+        _description.value = d
         _isTodoValid.value = todoValid()
     }
 

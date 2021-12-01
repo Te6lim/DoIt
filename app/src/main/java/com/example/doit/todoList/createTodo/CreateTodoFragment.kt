@@ -114,14 +114,7 @@ class CreateTodoFragment : Fragment() {
             }
 
             editTodo.observe(viewLifecycleOwner) {
-                it?.let { todo ->
-                    emitCategory(todo.catId)
-                    binding.todoDescription.setText(todo.todoString)
-                    if (todo.hasDeadline) {
-                        binding.deadlineSwitch.toggle()
-                    }
-                    initializeFields()
-                }
+
             }
         }
 
