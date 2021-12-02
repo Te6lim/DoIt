@@ -14,6 +14,11 @@
             android:id="@+id/finished_todos_navView"
             android:icon="@drawable/ic_finished_todos"
             android:title="@string/finished_todos" />
+
+        <item
+            android:id="@+id/summary_navView"
+            android:icon="@drawable/ic_summary"
+            android:title="@string/summary" />
     </group>
 
     <item

@@ -37,6 +37,8 @@ class FinishedTodoListFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        (requireActivity() as MainActivity).supportActionBar?.subtitle = null
+
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
             override fun onCheck(t: Todo, holder: View) {
                 viewModel.updateTodo(
@@ -54,13 +56,11 @@ class FinishedTodoListFragment : Fragment() {
         binding.completedTodoList.adapter = adapter
 
         viewModel.completedTodos.observe(viewLifecycleOwner) {
-            if (it.isEmpty()) setHasOptionsMenu(false)
-            else setHasOptionsMenu(true)
-            adapter.submitList(it)
-        }
-
-        viewModel.subtitleText.observe(viewLifecycleOwner) {
-            (requireActivity() as MainActivity).supportActionBar?.subtitle = it.toString()
+            it?.let {
+                if (it.isEmpty()) setHasOptionsMenu(false)
+                else setHasOptionsMenu(true)
+                adapter.submitList(it)
+            }
         }
 
         return binding.root

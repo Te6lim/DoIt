@@ -51,4 +51,5 @@
     <string name="name">Name</string>
     <string name="todo_count_header">Todo: </string>
     <string name="finished_todo_count_header">Finished: </string>
+    <string name="summary">Summary</string>
 </resources>

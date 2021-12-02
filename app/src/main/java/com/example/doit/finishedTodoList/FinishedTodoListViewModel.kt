@@ -13,15 +13,9 @@ class CompletedTodoListViewModel(private val todoDatabase: TodoDbDao) : ViewMode
     private val allTodos = todoDatabase.getAll()
 
     val completedTodos = Transformations.map(allTodos) {
-        it?.let { list ->
-            list.filter { todo ->
-                todo.isFinished
-            }
-        }
-    }
-
-    val subtitleText = Transformations.map(completedTodos) {
-        it.size
+        it?.filter { todo ->
+            todo.isFinished
+        }?.sortedBy { t -> t.dateFinished }?.reversed()
     }
 
     fun clearFinished() {
