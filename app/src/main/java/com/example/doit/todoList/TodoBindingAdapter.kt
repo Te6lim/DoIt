@@ -21,7 +21,7 @@ fun TextView.setDate(item: Todo?) {
             context.getString(
                 R.string.date_time_string,
                 todo.dateTodo.toLocalDate().formatToString(
-                    DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 ), todo.dateTodo.toLocalTime().formatToString()
             )
         }
@@ -41,7 +41,7 @@ fun TextView.setDeadlineDateString(item: Todo?) {
             } else {
                 context.getString(
                     R.string.finished_date_string, todo.dateFinished?.toLocalDate()?.formatToString(
-                        DateTimeFormatter.ISO_DATE
+                        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                     ), todo.dateFinished?.toLocalTime()?.formatToString()
                 )
             }
@@ -56,7 +56,7 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                 } else {
                     context.getString(
                         R.string.deadline_string, todo.deadlineDate?.toLocalDate()?.formatToString(
-                            DateTimeFormatter.ISO_DATE
+                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                         ), todo.deadlineDate?.toLocalTime()?.formatToString()
                     )
                 }

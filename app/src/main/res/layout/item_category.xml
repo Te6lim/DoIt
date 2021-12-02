@@ -46,7 +46,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/todo_count_header"
-            android:textStyle="bold"
             app:layout_constraintBaseline_toBaselineOf="@+id/category_todo_count"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -72,7 +71,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:text="@string/finished_todo_count_header"
-            android:textStyle="bold"
             app:layout_constraintBaseline_toBaselineOf="@+id/category_finished_count"
             app:layout_constraintEnd_toStartOf="@+id/category_finished_count" />
 

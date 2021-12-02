@@ -2,6 +2,7 @@ package com.example.doit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
@@ -51,6 +52,28 @@ class MainActivity : AppCompatActivity() {
 
         drawer.addDrawerListener(toggle)
 
+        drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                navView.checkedItem?.let {
+                    it.isChecked = false
+                    it.isChecked = true
+                }
+            }
+
+        })
+
         with(mainViewModel) {
             activeStartDestination.observe(this@MainActivity) {
                 when (it) {
@@ -65,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                         toggle.syncState()
                     }
                     else -> {
-                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                     }
                 }
             }
@@ -136,7 +159,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
+
 
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(findNavController(R.id.myNavHost), drawer)

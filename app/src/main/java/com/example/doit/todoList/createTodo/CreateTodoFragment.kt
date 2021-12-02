@@ -113,9 +113,7 @@ class CreateTodoFragment : Fragment() {
                 }
             }
 
-            editTodo.observe(viewLifecycleOwner) {
-
-            }
+            editTodo.observe(viewLifecycleOwner) { }
         }
 
         binding.categoryEditText.addTextChangedListener {
