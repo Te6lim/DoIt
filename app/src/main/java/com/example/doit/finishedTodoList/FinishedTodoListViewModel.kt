@@ -56,6 +56,14 @@ class FinishedTodoListViewModel(
         }
     }
 
+    fun emitCategory(id: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _defaultCategory.postValue(categoryDb.get(id))
+            }
+        }
+    }
+
     fun clearFinished() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

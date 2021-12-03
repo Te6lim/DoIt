@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/categories"
+        android:id="@+id/categoriesFragment"
         android:icon="@drawable/ic_categories"
-        android:title="@string/categories" />
+        android:title="@string/categories"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/clear"
         android:icon="@drawable/ic_delete"
         android:title="@string/clear"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>

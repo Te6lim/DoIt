@@ -6,6 +6,8 @@ import android.widget.CheckBox
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.doit.ActionCallback
 import com.example.doit.MainActivity
 import com.example.doit.R
@@ -14,12 +16,14 @@ import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoCompletedBinding
 import com.example.doit.todoList.TodoListAdapter
+import com.example.doit.todoList.TodoListFragment.Companion.DEF_KEY
 import java.time.LocalDateTime
 
 class FinishedTodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoCompletedBinding
     private lateinit var viewModel: FinishedTodoListViewModel
+    private lateinit var menuItems: Menu
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -61,15 +65,21 @@ class FinishedTodoListFragment : Fragment() {
         binding.completedTodoList.adapter = adapter
 
         with(viewModel) {
+
             awaitCategory.observe(viewLifecycleOwner) { }
 
             awaitTodoList.observe(viewLifecycleOwner) { }
 
             completedTodos.observe(viewLifecycleOwner) {
                 it?.let {
-                    if (it.isEmpty()) setHasOptionsMenu(false)
-                    else setHasOptionsMenu(true)
                     adapter.submitList(it)
+                }
+
+                val item = menuItems.findItem(R.id.clear)
+                if (it.isNullOrEmpty()) {
+                    if (item != null && item.isVisible) item.isVisible = false
+                } else {
+                    if (item != null && !item.isVisible) item.isVisible = true
                 }
             }
 
@@ -79,11 +89,20 @@ class FinishedTodoListFragment : Fragment() {
             }
         }
 
+        val handle = findNavController().currentBackStackEntry?.savedStateHandle
+        handle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
+            if (value != null) {
+                viewModel.emitCategory(value)
+                handle.remove<Int>(DEF_KEY)
+            }
+        }
+
         return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+        menuItems = menu
         inflater.inflate(R.menu.finished_todo_menu, menu)
     }
 
@@ -91,6 +110,11 @@ class FinishedTodoListFragment : Fragment() {
         return when (item.itemId) {
             R.id.clear -> {
                 viewModel.clearFinished()
+                true
+            }
+
+            R.id.categoriesFragment -> {
+                NavigationUI.onNavDestinationSelected(item, findNavController())
                 true
             }
             else -> super.onOptionsItemSelected(item)
