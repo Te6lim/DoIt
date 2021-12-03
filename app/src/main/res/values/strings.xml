@@ -52,4 +52,5 @@
     <string name="todo_count_header">Todo: </string>
     <string name="finished_todo_count_header">Finished: </string>
     <string name="summary">Summary</string>
+    <string name="share">Share</string>
 </resources>

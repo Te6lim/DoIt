@@ -28,10 +28,6 @@ class CategoriesFragment : Fragment() {
             inflater, R.layout.fragment_categories, container, false
         )
 
-        mainActivity = (requireActivity() as MainActivity).apply {
-            supportActionBar?.subtitle = null
-        }
-
         val todoDbDao = TodoDatabase.getInstance(requireContext()).databaseDao
         val categoryDbDao = CategoryDb.getInstance(requireContext()).dao
         val viewModelFactory = CategoriesViewModelFactory(categoryDbDao, todoDbDao)

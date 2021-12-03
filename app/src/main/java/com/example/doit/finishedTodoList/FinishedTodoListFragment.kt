@@ -23,7 +23,7 @@ class FinishedTodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoCompletedBinding
     private lateinit var viewModel: FinishedTodoListViewModel
-    private lateinit var menuItems: Menu
+    private var menuItems: Menu? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -75,11 +75,13 @@ class FinishedTodoListFragment : Fragment() {
                     adapter.submitList(it)
                 }
 
-                val item = menuItems.findItem(R.id.clear)
+                val item = menuItems?.findItem(R.id.clear)
                 if (it.isNullOrEmpty()) {
-                    if (item != null && item.isVisible) item.isVisible = false
+                    if (item != null && item.isVisible)
+                        item.isVisible = false
                 } else {
-                    if (item != null && !item.isVisible) item.isVisible = true
+                    if (item != null && !item.isVisible)
+                        item.isVisible = true
                 }
             }
 
