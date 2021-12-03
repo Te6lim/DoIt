@@ -7,9 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.example.doit.ActionCallback
-import com.example.doit.MainActivity
-import com.example.doit.R
+import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentCategoriesBinding
@@ -17,8 +15,6 @@ import com.example.doit.todoList.TodoListFragment
 import com.example.doit.todoList.toCategory
 
 class CategoriesFragment : Fragment() {
-
-    private lateinit var mainActivity: MainActivity
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -81,16 +77,50 @@ class CategoriesFragment : Fragment() {
                             }
 
                             DialogOptions.OPTION_B -> {
-                                if (t.isDefault) viewModel.clearCategory(t.toCategory())
-                                else viewModel.changeDefault(t.id)
+                                if (t.isDefault) {
+                                    ConfirmationDialog(object : ConfirmationCallbacks {
+                                        override fun message(): String {
+                                            return "Clear all todos in ${t.name} ?"
+                                        }
+
+                                        override fun positiveAction() {
+                                            viewModel.clearCategory(t.toCategory())
+                                        }
+
+                                    }).show(
+                                        requireActivity().supportFragmentManager, "CF"
+                                    )
+                                } else viewModel.changeDefault(t.id)
                             }
 
                             DialogOptions.OPTION_C -> {
-                                viewModel.clearCategory(t.toCategory())
+                                ConfirmationDialog(object : ConfirmationCallbacks {
+                                    override fun message(): String {
+                                        return "Clear all todos in ${t.name} ?"
+                                    }
+
+                                    override fun positiveAction() {
+                                        viewModel.clearCategory(t.toCategory())
+                                    }
+
+                                }).show(
+                                    requireActivity().supportFragmentManager, "CF"
+                                )
                             }
 
                             DialogOptions.OPTION_D -> {
-                                viewModel.deleteCategory(t.toCategory())
+                                ConfirmationDialog(object : ConfirmationCallbacks {
+                                    override fun message(): String {
+                                        return "Delete ${t.name} ?"
+                                    }
+
+                                    override fun positiveAction() {
+                                        viewModel.deleteCategory(t.toCategory())
+                                    }
+
+                                }).show(
+                                    requireActivity().supportFragmentManager, "CF"
+                                )
                             }
                         }
                     }

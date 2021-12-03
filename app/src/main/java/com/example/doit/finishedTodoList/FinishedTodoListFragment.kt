@@ -125,7 +125,7 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
     }
 
     override fun message(): String {
-        return "clear finished Todos from ${viewModel.categoryCountPair.value!!.first}?"
+        return "clear finished Todos from ${viewModel.categoryCountPair.value!!.first} ?"
     }
 
     override fun positiveAction() {

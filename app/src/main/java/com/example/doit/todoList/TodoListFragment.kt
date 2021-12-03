@@ -284,7 +284,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     override fun message(): String {
         return "Delete ${todoListViewModel.selectionCount.value!!} todos " +
-                "from ${todoListViewModel.defaultCategory.value!!.name}?"
+                "from ${todoListViewModel.defaultCategory.value!!.name} ?"
     }
 
     override fun positiveAction() {
