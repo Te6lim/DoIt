@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.example.doit.ActionCallback
-import com.example.doit.MainActivity
-import com.example.doit.R
+import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
@@ -19,7 +17,7 @@ import com.example.doit.todoList.TodoListAdapter
 import com.example.doit.todoList.TodoListFragment.Companion.DEF_KEY
 import java.time.LocalDateTime
 
-class FinishedTodoListFragment : Fragment() {
+class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
 
     private lateinit var binding: FragmentListTodoCompletedBinding
     private lateinit var viewModel: FinishedTodoListViewModel
@@ -85,7 +83,7 @@ class FinishedTodoListFragment : Fragment() {
                 }
             }
 
-            subtitleData.observe(viewLifecycleOwner) {
+            categoryCountPair.observe(viewLifecycleOwner) {
                 (requireActivity() as MainActivity).supportActionBar?.subtitle =
                     requireContext().getString(R.string.category_plus_count, it.first, it.second)
             }
@@ -111,15 +109,26 @@ class FinishedTodoListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.clear -> {
-                viewModel.clearFinished()
+                ConfirmationDialog(this).show(
+                    (requireActivity()).supportFragmentManager, "C"
+                )
                 true
             }
 
             R.id.categoriesFragment -> {
                 NavigationUI.onNavDestinationSelected(item, findNavController())
+                (requireActivity() as MainActivity).supportActionBar?.subtitle = null
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun message(): String {
+        return "clear finished Todos from ${viewModel.categoryCountPair.value!!.first}?"
+    }
+
+    override fun positiveAction() {
+        viewModel.clearFinishedTodos()
     }
 }

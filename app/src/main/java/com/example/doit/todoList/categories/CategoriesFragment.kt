@@ -99,7 +99,7 @@ class CategoriesFragment : Fragment() {
                         return t.isDefault
                     }
 
-                }).show(mainActivity.supportFragmentManager, "CAT_DIALOG")
+                }).show(requireActivity().supportFragmentManager, "CAT_DIALOG")
             }
 
             override fun selectedView(position: Int, holder: View) {}

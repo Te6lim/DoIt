@@ -13,16 +13,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
-import com.example.doit.ActionCallback
-import com.example.doit.MainActivity
-import com.example.doit.R
+import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
 import java.time.LocalDateTime
 
-class TodoListFragment : Fragment() {
+class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     companion object {
         const val SCROLL = "SCROLL"
@@ -140,8 +138,9 @@ class TodoListFragment : Fragment() {
                     }
 
                     R.id.delete -> {
-                        todoListViewModel.deleteSelected()
-                        todoListViewModel.interact()
+                        ConfirmationDialog(this@TodoListFragment).show(
+                            mainActivity.supportFragmentManager, "T"
+                        )
                         true
                     }
                     else -> false
@@ -281,5 +280,15 @@ class TodoListFragment : Fragment() {
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY.ordinal
         )
         super.onSaveInstanceState(outState)
+    }
+
+    override fun message(): String {
+        return "Delete ${todoListViewModel.selectionCount.value!!} todos " +
+                "from ${todoListViewModel.defaultCategory.value!!.name}?"
+    }
+
+    override fun positiveAction() {
+        todoListViewModel.deleteSelected()
+        todoListViewModel.interact()
     }
 }

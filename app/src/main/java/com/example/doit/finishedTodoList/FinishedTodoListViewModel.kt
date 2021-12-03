@@ -44,7 +44,7 @@ class FinishedTodoListViewModel(
     val completedTodos: LiveData<List<Todo>>
         get() = _completedTodos
 
-    val subtitleData = Transformations.map(completedTodos) {
+    val categoryCountPair = Transformations.map(completedTodos) {
         Pair(defaultCategory.value!!.name, it.size)
     }
 
@@ -64,12 +64,12 @@ class FinishedTodoListViewModel(
         }
     }
 
-    fun clearFinished() {
+    fun clearFinishedTodos() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 allTodos.value?.let {
                     it.filter { todo ->
-                        todo.isFinished
+                        todo.isFinished && todo.catId == defaultCategory.value!!.id
                     }.let { list ->
                         list.forEach { todo ->
                             todoDatabase.delete(todo.todoId)
