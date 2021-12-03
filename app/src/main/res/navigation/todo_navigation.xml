@@ -19,7 +19,7 @@
             app:popExitAnim="@anim/fall_out" />
         <action
             android:id="@+id/action_todoListFragment_to_completedTodoListFragment"
-            app:destination="@id/completedTodoListFragment" />
+            app:destination="@id/finishedTodoListFragment" />
     </fragment>
     <fragment
         android:id="@+id/createTodoFragment"
@@ -36,9 +36,9 @@
             app:argType="long" />
     </fragment>
     <fragment
-        android:id="@+id/completedTodoListFragment"
+        android:id="@+id/finishedTodoListFragment"
         android:name="com.example.doit.finishedTodoList.FinishedTodoListFragment"
-        android:label="@string/completed"
+        android:label="@string/finished"
         tools:layout="@layout/fragment_list_todo_completed">
         <action
             android:id="@+id/action_completedTodoListFragment_to_todoListFragment"

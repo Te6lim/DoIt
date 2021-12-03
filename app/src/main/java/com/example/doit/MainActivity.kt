@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                         navView.setCheckedItem(R.id.todos_navView)
                         toggle.syncState()
                     }
-                    R.id.completedTodoListFragment -> {
+                    R.id.finishedTodoListFragment -> {
                         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                         navView.setCheckedItem(R.id.finished_todos_navView)
                         toggle.syncState()
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.finished_todos_navView -> {
-                        if (graph.startDestination != R.id.completedTodoListFragment) {
+                        if (graph.startDestination != R.id.finishedTodoListFragment) {
                             val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true
                             ).build()
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                                 savedInstanceState, navOptions
                             )
                             toggle.syncState()
-                            graph.startDestination = R.id.completedTodoListFragment
+                            graph.startDestination = R.id.finishedTodoListFragment
                         }
 
                         drawer.closeDrawer(GravityCompat.START)

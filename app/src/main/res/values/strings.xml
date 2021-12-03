@@ -31,7 +31,7 @@
     <string name="categories_selection">categories selection</string>
     <string name="drawer_open">drawer open</string>
     <string name="drawer_close">drawer close</string>
-    <string name="completed">Completed</string>
+    <string name="finished">Finished</string>
     <string name="todos">Todos</string>
     <string name="clear">clear</string>
     <string name="deadline_string">Deadline: %s at %s</string>

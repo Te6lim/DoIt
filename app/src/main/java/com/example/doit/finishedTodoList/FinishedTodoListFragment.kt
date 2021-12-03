@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.doit.ActionCallback
 import com.example.doit.MainActivity
 import com.example.doit.R
+import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoCompletedBinding
@@ -18,7 +19,7 @@ import java.time.LocalDateTime
 class FinishedTodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentListTodoCompletedBinding
-    private lateinit var viewModel: CompletedTodoListViewModel
+    private lateinit var viewModel: FinishedTodoListViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -30,10 +31,14 @@ class FinishedTodoListFragment : Fragment() {
         setHasOptionsMenu(true)
 
         val todoDatabase = TodoDatabase.getInstance(requireContext())
-        val viewModelFactory = FinishedTodoListViewModelFactory(todoDatabase.databaseDao)
+        val categoryDatabase = CategoryDb.getInstance(requireContext())
+        val viewModelFactory = FinishedTodoListViewModelFactory(
+            categoryDatabase.dao,
+            todoDatabase.databaseDao,
+        )
         viewModel = ViewModelProvider(
             this, viewModelFactory
-        )[CompletedTodoListViewModel::class.java]
+        )[FinishedTodoListViewModel::class.java]
 
         binding.lifecycleOwner = this
 
@@ -55,11 +60,22 @@ class FinishedTodoListFragment : Fragment() {
 
         binding.completedTodoList.adapter = adapter
 
-        viewModel.completedTodos.observe(viewLifecycleOwner) {
-            it?.let {
-                if (it.isEmpty()) setHasOptionsMenu(false)
-                else setHasOptionsMenu(true)
-                adapter.submitList(it)
+        with(viewModel) {
+            awaitCategory.observe(viewLifecycleOwner) { }
+
+            awaitTodoList.observe(viewLifecycleOwner) { }
+
+            completedTodos.observe(viewLifecycleOwner) {
+                it?.let {
+                    if (it.isEmpty()) setHasOptionsMenu(false)
+                    else setHasOptionsMenu(true)
+                    adapter.submitList(it)
+                }
+            }
+
+            subtitleData.observe(viewLifecycleOwner) {
+                (requireActivity() as MainActivity).supportActionBar?.subtitle =
+                    requireContext().getString(R.string.category_plus_count, it.first, it.second)
             }
         }
 
@@ -68,7 +84,7 @@ class FinishedTodoListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.completed_todo_menu, menu)
+        inflater.inflate(R.menu.finished_todo_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

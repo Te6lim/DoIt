@@ -7,6 +7,7 @@ import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
 import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
+import java.lang.IllegalArgumentException
 
 class TodoListViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao
@@ -231,5 +232,18 @@ class TodoListViewModel(
                 _selectionCount.postValue(0)
             }
         }
+    }
+}
+
+class TodoListViewModelFactory(
+    private val categoryDb: CategoryDao,
+    private val database: TodoDbDao
+) : ViewModelProvider.Factory {
+    @Suppress("unchecked_cast")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TodoListViewModel::class.java)) {
+            return TodoListViewModel(categoryDb, database) as T
+        }
+        throw IllegalArgumentException("unknown viewModel class")
     }
 }

@@ -7,7 +7,7 @@
 
         <item
             android:id="@+id/todos_navView"
-            android:icon="@drawable/ic_todos"
+            android:icon="@drawable/ic_todo"
             android:title="@string/todos" />
 
         <item
