@@ -1,7 +1,6 @@
 package com.example.doit.todoList
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.CheckBox
@@ -268,6 +267,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         return when (item.itemId) {
             R.id.categoriesFragment -> {
                 NavigationUI.onNavDestinationSelected(item, findNavController())
+                todoListViewModel.isNavigating(true)
                 true
             }
             else -> super.onOptionsItemSelected(item)

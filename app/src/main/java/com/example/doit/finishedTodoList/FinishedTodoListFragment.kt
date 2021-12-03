@@ -87,6 +87,13 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
                 (requireActivity() as MainActivity).supportActionBar?.subtitle =
                     requireContext().getString(R.string.category_plus_count, it.first, it.second)
             }
+
+            navigating.observe(viewLifecycleOwner) { itIsTrue ->
+                if (itIsTrue) {
+                    (requireActivity() as MainActivity).supportActionBar?.subtitle = null
+                    viewModel.isNavigating(false)
+                }
+            }
         }
 
         val handle = findNavController().currentBackStackEntry?.savedStateHandle
@@ -117,7 +124,7 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
 
             R.id.categoriesFragment -> {
                 NavigationUI.onNavDestinationSelected(item, findNavController())
-                (requireActivity() as MainActivity).supportActionBar?.subtitle = null
+                viewModel.isNavigating(true)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -48,6 +48,10 @@ class FinishedTodoListViewModel(
         Pair(defaultCategory.value!!.name, it.size)
     }
 
+    private val _navigating = MutableLiveData<Boolean>()
+    val navigating: LiveData<Boolean>
+        get() = _navigating
+
     private fun initializeCategory() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -86,6 +90,10 @@ class FinishedTodoListViewModel(
                 todoDatabase.update(todo)
             }
         }
+    }
+
+    fun isNavigating(value: Boolean) {
+        _navigating.value = value
     }
 }
 
