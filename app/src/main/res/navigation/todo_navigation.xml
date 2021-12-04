@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_todoListFragment_to_completedTodoListFragment"
             app:destination="@id/finishedTodoListFragment" />
+        <action
+            android:id="@+id/action_todoListFragment_to_summaryFragment"
+            app:destination="@id/summaryFragment" />
     </fragment>
     <fragment
         android:id="@+id/createTodoFragment"
@@ -39,14 +42,29 @@
         android:id="@+id/finishedTodoListFragment"
         android:name="com.example.doit.finishedTodoList.FinishedTodoListFragment"
         android:label="@string/finished"
-        tools:layout="@layout/fragment_list_todo_completed">
+        tools:layout="@layout/fragment_list_todo_finished">
         <action
             android:id="@+id/action_completedTodoListFragment_to_todoListFragment"
             app:destination="@id/todoListFragment" />
+        <action
+            android:id="@+id/action_finishedTodoListFragment_to_summaryFragment"
+            app:destination="@id/summaryFragment" />
     </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
         android:name="com.example.doit.todoList.categories.CategoriesFragment"
         android:label="@string/categories"
         tools:layout="@layout/fragment_categories" />
+    <fragment
+        android:id="@+id/summaryFragment"
+        android:name="com.example.doit.summary.SummaryFragment"
+        android:label="@string/summary"
+        tools:layout="@layout/fragment_summary">
+        <action
+            android:id="@+id/action_summaryFragment_to_finishedTodoListFragment"
+            app:destination="@id/finishedTodoListFragment" />
+        <action
+            android:id="@+id/action_summaryFragment_to_todoListFragment"
+            app:destination="@id/todoListFragment" />
+    </fragment>
 </navigation>

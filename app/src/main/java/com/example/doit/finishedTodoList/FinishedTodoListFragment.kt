@@ -27,7 +27,7 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_list_todo_completed, container, false
+            inflater, R.layout.fragment_list_todo_finished, container, false
         )
 
         setHasOptionsMenu(true)
