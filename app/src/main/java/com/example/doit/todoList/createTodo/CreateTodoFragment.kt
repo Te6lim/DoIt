@@ -68,7 +68,7 @@ class CreateTodoFragment : Fragment() {
                 }
             }
 
-            todoInfo.observe(viewLifecycleOwner) {
+            todoModel.observe(viewLifecycleOwner) {
                 if (it.todoValid()) {
                     add(it)
                     findNavController().apply {
@@ -107,7 +107,7 @@ class CreateTodoFragment : Fragment() {
 
             category.observe(viewLifecycleOwner) {
                 it?.let {
-                    todo.setCategory(it)
+                    model.setCategory(it)
                     setTitleToDefaultCategoryName(it)
                     binding.categorySelection.findViewById<RadioButton>(it.id)?.isChecked = true
                 }
@@ -127,12 +127,12 @@ class CreateTodoFragment : Fragment() {
         }
 
         binding.todoDescription.addTextChangedListener {
-            viewModel.todo.setDescription(it.toString())
+            viewModel.model.setDescription(it.toString())
         }
 
         binding.deadlineSwitch.setOnCheckedChangeListener { _, isOn ->
             binding.deadlineButton.isEnabled = isOn
-            viewModel.todo.setIsDeadlineEnabled(isOn)
+            viewModel.model.setIsDeadlineEnabled(isOn)
         }
 
         binding.deadlineButton.setOnClickListener {
@@ -140,7 +140,7 @@ class CreateTodoFragment : Fragment() {
             val mi = LocalTime.now().minute
 
             TimePickerDialog(requireContext(), { _, hour, min ->
-                viewModel.todo.setDeadlineTime(hour, min)
+                viewModel.model.setDeadlineTime(hour, min)
             }, h, mi, false).show()
 
             val y = Calendar.getInstance().get(Calendar.YEAR)
@@ -148,7 +148,7 @@ class CreateTodoFragment : Fragment() {
             val d = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
             DatePickerDialog(requireContext(), { _, year, month, day ->
-                viewModel.todo.setDeadlineDate(year, month + 1, day)
+                viewModel.model.setDeadlineDate(year, month + 1, day)
             }, y, m, d).show()
         }
 
@@ -158,7 +158,7 @@ class CreateTodoFragment : Fragment() {
             val d = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
             DatePickerDialog(requireContext(), { _, year, month, day ->
-                viewModel.todo.setDate(year, month + 1, day)
+                viewModel.model.setDate(year, month + 1, day)
             }, y, m, d).show()
         }
 
@@ -166,7 +166,7 @@ class CreateTodoFragment : Fragment() {
             val h = LocalTime.now().hour
             val m = LocalTime.now().minute
             TimePickerDialog(context, { _, hourOfDay, minute ->
-                viewModel.todo.setTime(hourOfDay, minute)
+                viewModel.model.setTime(hourOfDay, minute)
             }, h, m, false).show()
         }
 

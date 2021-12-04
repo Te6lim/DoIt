@@ -24,11 +24,11 @@ class CreateTodoViewModel(
 
     val categories = catDb.getAll()
 
-    private val _todoInfo = MutableLiveData<TodoInfo>()
-    val todoInfo: LiveData<TodoInfo>
-        get() = _todoInfo
+    private val _todoModel = MutableLiveData<TodoModel>()
+    val todoModel: LiveData<TodoModel>
+        get() = _todoModel
 
-    var todo = TodoInfo()
+    var model = TodoModel()
         private set
 
     private val _categoryEditTextIsOpen = MutableLiveData<Boolean>()
@@ -60,35 +60,35 @@ class CreateTodoViewModel(
         }
     }
 
-    fun add(todoInfo: TodoInfo) {
+    fun add(todoModel: TodoModel) {
         uiScope.launch {
             val todo = Todo(
-                todoString = todoInfo.description.value!!,
-                catId = todoInfo.category,
+                todoString = todoModel.description.value!!,
+                catId = todoModel.category,
                 dateTodo = LocalDateTime.of(
-                    todoInfo.dateSet ?: LocalDate.now(),
-                    todoInfo.timeSet ?: LocalTime.now()
+                    todoModel.dateSet ?: LocalDate.now(),
+                    todoModel.timeSet ?: LocalTime.now()
                 ),
-                hasDeadline = todoInfo.deadlineEnabled.value!!,
+                hasDeadline = todoModel.deadlineEnabled.value!!,
             ).apply {
                 if (hasDeadline) {
-                    deadlineDate = LocalDateTime.of(todoInfo.deadlineDate, todoInfo.deadlineTime)
+                    deadlineDate = LocalDateTime.of(todoModel.deadlineDate, todoModel.deadlineTime)
                 }
             }
             withContext(Dispatchers.IO) {
-                if (editTodo.value != null) todoDb.update(todo.apply { todoId = todoInfo.id })
+                if (editTodo.value != null) todoDb.update(todo.apply { todoId = todoModel.id })
                 else todoDb.insert(todo)
             }
         }
     }
 
     fun createTodoInfo() {
-        _todoInfo.value = todo
+        _todoModel.value = model
     }
 
     fun clearTodoInfo() {
-        todo = TodoInfo()
-        _todoInfo.value = todo
+        model = TodoModel()
+        _todoModel.value = model
     }
 
     fun addNewCategory(newCategory: String, default: Boolean = false) {
@@ -123,23 +123,23 @@ class CreateTodoViewModel(
         uiScope.launch {
             val todoEdit = editTodo
             with(editTodo) {
-                todo.id = todoEdit.todoId
-                todo.setDescription(todoString)
-                todo.setDate(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
-                todo.setTime(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
+                model.id = todoEdit.todoId
+                model.setDescription(todoString)
+                model.setDate(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
+                model.setTime(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
                 if (todoEdit.hasDeadline) {
-                    todo.setIsDeadlineEnabled(true)
-                    todo.setDeadlineDate(
+                    model.setIsDeadlineEnabled(true)
+                    model.setDeadlineDate(
                         deadlineDate!!.year,
                         deadlineDate!!.monthValue,
                         deadlineDate!!.dayOfMonth
                     )
-                    todo.setDeadlineTime(
+                    model.setDeadlineTime(
                         deadlineDate!!.hour,
                         deadlineDate!!.minute
                     )
                 } else {
-                    todo.setIsDeadlineEnabled(false)
+                    model.setIsDeadlineEnabled(false)
                 }
             }
         }

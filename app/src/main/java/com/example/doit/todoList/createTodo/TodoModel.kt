@@ -8,7 +8,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-class TodoInfo {
+class TodoModel {
 
     var id: Long = -1
 
