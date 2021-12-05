@@ -20,7 +20,7 @@ class TodoListViewModel(
     val todoList: LiveData<List<Todo>>
         get() = _todoList
 
-    var defaultCategory: Category? = null
+    private var defaultCategory: Category? = null
 
     private val _activeCategory = MutableLiveData<Category>()
     val activeCategory: LiveData<Category>
@@ -47,7 +47,7 @@ class TodoListViewModel(
                 }
             }
         }
-        if (_activeCategory.value == null) emitDefault()
+        emitDefault()
     }
 
     val defaultTransform = Transformations.map(activeCategory) { cat ->
@@ -61,7 +61,7 @@ class TodoListViewModel(
         activeCategory.value?.let { category ->
             val newList = filter(list!!, category).sortedBy { !it.hasDeadline }
             if (newList.isEmpty())
-                _activeCategory.value = defaultCategory
+                _activeCategory.value = defaultCategory!!
             else _todoList.value = newList
             resetItemsState()
         }
