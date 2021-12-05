@@ -20,10 +20,11 @@ class TodoListViewModel(
     val todoList: LiveData<List<Todo>>
         get() = _todoList
 
+    var defaultCategory: Category? = null
 
-    private val _defaultCategory = MutableLiveData<Category?>()
-    val defaultCategory: LiveData<Category?>
-        get() = _defaultCategory
+    private val _activeCategory = MutableLiveData<Category>()
+    val activeCategory: LiveData<Category>
+        get() = _activeCategory
 
     private var itemsState = mutableListOf<Boolean>()
 
@@ -46,10 +47,10 @@ class TodoListViewModel(
                 }
             }
         }
-        if (_defaultCategory.value == null) emitDefault()
+        if (_activeCategory.value == null) emitDefault()
     }
 
-    val defaultTransform = Transformations.map(defaultCategory) { cat ->
+    val defaultTransform = Transformations.map(activeCategory) { cat ->
         allTodos.value?.let { list ->
             _todoList.value = filter(list, cat!!).sortedBy { !it.hasDeadline }
             resetItemsState()
@@ -57,8 +58,11 @@ class TodoListViewModel(
     }
 
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
-        defaultCategory.value?.let { category ->
-            _todoList.value = filter(list!!, category).sortedBy { !it.hasDeadline }
+        activeCategory.value?.let { category ->
+            val newList = filter(list!!, category).sortedBy { !it.hasDeadline }
+            if (newList.isEmpty())
+                _activeCategory.value = defaultCategory
+            else _todoList.value = newList
             resetItemsState()
         }
 
@@ -66,18 +70,15 @@ class TodoListViewModel(
     }
 
     val itemCountInCategory = Transformations.map(todoList) { list ->
-        with(defaultCategory.value) {
-            if (list.isEmpty() || this == null) ("All" to todoList.value!!.size)
-            else if (list[0].catId != this.id) {
-                ("All" to todoList.value!!.size)
-            } else (name to list.size)
+        with(activeCategory.value) {
+            this!!.name to list.size
         }
     }
 
     fun itemsState() = itemsState.toList()
 
     private fun resetItemsState() {
-        itemsState = (MutableList(todoList.value!!.size) { false })
+        itemsState = MutableList(todoList.value!!.size) { false }
     }
 
     private val _isLongPressed = MutableLiveData(false)
@@ -94,26 +95,21 @@ class TodoListViewModel(
         return allTodos.let { list ->
             list.filter { todo ->
                 todo.catId == defCat.id && !todo.isFinished
-            }.let { newList ->
-                if (newList.isEmpty()) {
-                    list.filter { todo ->
-                        !todo.isFinished
-                    }
-                } else newList
             }
         }
     }
 
     private fun emitDefault() {
         viewModelScope.launch {
-            _defaultCategory.value = getDefault()
+            _activeCategory.value = getDefault()
+            defaultCategory = _activeCategory.value
         }
     }
 
-    fun emitDisplayCategoryAsDefault(id: Int) {
-        if (defaultCategory.value != null) {
+    fun emitAsActiveCategory(id: Int) {
+        if (activeCategory.value != null) {
             viewModelScope.launch {
-                _defaultCategory.value = getCategoryById(id)
+                _activeCategory.value = getCategoryById(id)
             }
         }
     }

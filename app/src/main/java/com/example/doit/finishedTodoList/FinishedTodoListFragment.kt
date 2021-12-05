@@ -12,14 +12,14 @@ import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
-import com.example.doit.databinding.FragmentListTodoCompletedBinding
+import com.example.doit.databinding.FragmentListTodoFinishedBinding
 import com.example.doit.todoList.TodoListAdapter
 import com.example.doit.todoList.TodoListFragment.Companion.DEF_KEY
 import java.time.LocalDateTime
 
 class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
 
-    private lateinit var binding: FragmentListTodoCompletedBinding
+    private lateinit var binding: FragmentListTodoFinishedBinding
     private lateinit var viewModel: FinishedTodoListViewModel
     private var menuItems: Menu? = null
 

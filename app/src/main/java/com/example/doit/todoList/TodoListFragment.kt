@@ -167,7 +167,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         binding.addNew.setOnClickListener {
             findNavController().navigate(
                 TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                ).setDefaultCategoryId(todoListViewModel.defaultCategory.value!!.id)
+                ).setDefaultCategoryId(todoListViewModel.activeCategory.value!!.id)
             )
             todoListViewModel.isNavigating(true)
         }
@@ -236,7 +236,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
             if (value != null) {
-                todoListViewModel.emitDisplayCategoryAsDefault(value)
+                todoListViewModel.emitAsActiveCategory(value)
                 savedStateHandle.remove<Int>(DEF_KEY)
             }
         }
@@ -284,7 +284,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     override fun message(): String {
         return "Delete ${todoListViewModel.selectionCount.value!!} todos " +
-                "from ${todoListViewModel.defaultCategory.value!!.name} ?"
+                "from ${todoListViewModel.activeCategory.value!!.name} ?"
     }
 
     override fun positiveAction() {
