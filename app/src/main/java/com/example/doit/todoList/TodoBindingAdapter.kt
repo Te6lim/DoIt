@@ -20,8 +20,8 @@ fun TextView.setDate(item: Todo?) {
                     with(todo.dateTodo.toLocalDate()) {
                         when {
                             this == LocalDate.now() -> "Today"
-                            this == LocalDate.of(
-                                this.year, this.monthValue, this.dayOfMonth + 1
+                            LocalDate.now() == LocalDate.of(
+                                this.year, this.monthValue, this.dayOfMonth - 1
                             ) -> "Tomorrow"
                             else -> this.formatToString(
                                 DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
@@ -46,9 +46,9 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                     with(todo.dateFinished!!.toLocalDate()) {
                         when {
                             this == LocalDate.now() -> "Today"
-                            this == LocalDate.of(
+                            LocalDate.now() == LocalDate.of(
                                 this.year, this.monthValue, this.dayOfMonth + 1
-                            ) -> "Tomorrow"
+                            ) -> "Yesterday"
                             else -> this.formatToString(
                                 DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                             )
@@ -64,7 +64,7 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                     with(todo.deadlineDate!!.toLocalDate()) {
                         when {
                             this == LocalDate.now() -> "Today"
-                            this == LocalDate.of(
+                            LocalDate.now() == LocalDate.of(
                                 this.year, this.monthValue, this.dayOfMonth - 1
                             ) -> "Tomorrow"
                             else -> this.formatToString(
