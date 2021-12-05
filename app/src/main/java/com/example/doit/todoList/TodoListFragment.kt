@@ -236,7 +236,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
             if (value != null) {
-                todoListViewModel.emitAsActiveCategory(value)
+                todoListViewModel.emitAsActive(value)
                 savedStateHandle.remove<Int>(DEF_KEY)
             }
         }

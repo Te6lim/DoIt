@@ -47,6 +47,7 @@ class TodoListViewModel(
                 }
             }
         }
+
         emitDefault()
     }
 
@@ -101,16 +102,17 @@ class TodoListViewModel(
 
     private fun emitDefault() {
         viewModelScope.launch {
-            _activeCategory.value = getDefault()
-            defaultCategory = _activeCategory.value
+            val newDefault = getDefault()
+            if (newDefault != defaultCategory) {
+                _activeCategory.value = newDefault
+                defaultCategory = _activeCategory.value
+            }
         }
     }
 
-    fun emitAsActiveCategory(id: Int) {
-        if (activeCategory.value != null) {
-            viewModelScope.launch {
-                _activeCategory.value = getCategoryById(id)
-            }
+    fun emitAsActive(id: Int) {
+        viewModelScope.launch {
+            _activeCategory.value = getCategoryById(id)
         }
     }
 
