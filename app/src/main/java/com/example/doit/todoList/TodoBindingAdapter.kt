@@ -13,23 +13,23 @@ import java.time.format.FormatStyle
 fun TextView.setDate(item: Todo?) {
     item?.let { todo ->
         if (todo.dateFinished == null) {
-            text = if (todo.dateTodo.toLocalDate() == LocalDate.now()) {
-                context.getString(
-                    R.string.remind_me, context.getString(
-                        R.string.date_time_string, "Today",
-                        todo.dateTodo.toLocalTime().formatToString()
-                    )
+            text = context.getString(
+                R.string.remind_me, context.getString(
+                    R.string.date_time_string,
+
+                    with(todo.dateTodo.toLocalDate()) {
+                        when {
+                            this == LocalDate.now() -> "Today"
+                            this == LocalDate.of(
+                                this.year, this.monthValue, this.dayOfMonth + 1
+                            ) -> "Tomorrow"
+                            else -> this.formatToString(
+                                DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                            )
+                        }
+                    }, todo.dateTodo.toLocalTime().formatToString()
                 )
-            } else {
-                context.getString(
-                    R.string.remind_me, context.getString(
-                        R.string.date_time_string,
-                        todo.dateTodo.toLocalDate().formatToString(
-                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                        ), todo.dateTodo.toLocalTime().formatToString()
-                    )
-                )
-            }
+            )
         } else visibility = View.GONE
     }
 }
@@ -39,33 +39,40 @@ fun TextView.setDeadlineDateString(item: Todo?) {
     item?.let { todo ->
         if (todo.dateFinished != null) {
             visibility = View.VISIBLE
-            text = if (todo.dateFinished!!.toLocalDate() == LocalDate.now()) {
+            text =
                 context.getString(
                     R.string.finished_date_string,
-                    "Today", todo.dateFinished?.toLocalTime()?.formatToString()
+
+                    with(todo.dateFinished!!.toLocalDate()) {
+                        when {
+                            this == LocalDate.now() -> "Today"
+                            this == LocalDate.of(
+                                this.year, this.monthValue, this.dayOfMonth + 1
+                            ) -> "Tomorrow"
+                            else -> this.formatToString(
+                                DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                            )
+                        }
+                    }, todo.dateFinished?.toLocalTime()?.formatToString()
                 )
-            } else {
-                context.getString(
-                    R.string.finished_date_string, todo.dateFinished?.toLocalDate()?.formatToString(
-                        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                    ), todo.dateFinished?.toLocalTime()?.formatToString()
-                )
-            }
         } else {
             if (todo.hasDeadline) {
                 visibility = View.VISIBLE
-                text = if (todo.deadlineDate!!.toLocalDate() == LocalDate.now()) {
-                    context.getString(
-                        R.string.deadline_string,
-                        "Today", todo.deadlineDate?.toLocalTime()?.formatToString()
-                    )
-                } else {
-                    context.getString(
-                        R.string.deadline_string, todo.deadlineDate?.toLocalDate()?.formatToString(
-                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                        ), todo.deadlineDate?.toLocalTime()?.formatToString()
-                    )
-                }
+                text = context.getString(
+                    R.string.deadline_string,
+
+                    with(todo.deadlineDate!!.toLocalDate()) {
+                        when {
+                            this == LocalDate.now() -> "Today"
+                            this == LocalDate.of(
+                                this.year, this.monthValue, this.dayOfMonth - 1
+                            ) -> "Tomorrow"
+                            else -> this.formatToString(
+                                DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                            )
+                        }
+                    }, todo.deadlineDate?.toLocalTime()?.formatToString()
+                )
             } else visibility = View.GONE
         }
     }
