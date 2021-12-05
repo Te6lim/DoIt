@@ -12,19 +12,25 @@ import java.time.format.FormatStyle
 @BindingAdapter("setDate")
 fun TextView.setDate(item: Todo?) {
     item?.let { todo ->
-        text = if (todo.dateTodo.toLocalDate() == LocalDate.now()) {
-            context.getString(
-                R.string.date_time_string, "Today",
-                todo.dateTodo.toLocalTime().formatToString()
-            )
-        } else {
-            context.getString(
-                R.string.date_time_string,
-                todo.dateTodo.toLocalDate().formatToString(
-                    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                ), todo.dateTodo.toLocalTime().formatToString()
-            )
-        }
+        if (todo.dateFinished == null) {
+            text = if (todo.dateTodo.toLocalDate() == LocalDate.now()) {
+                context.getString(
+                    R.string.remind_me, context.getString(
+                        R.string.date_time_string, "Today",
+                        todo.dateTodo.toLocalTime().formatToString()
+                    )
+                )
+            } else {
+                context.getString(
+                    R.string.remind_me, context.getString(
+                        R.string.date_time_string,
+                        todo.dateTodo.toLocalDate().formatToString(
+                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                        ), todo.dateTodo.toLocalTime().formatToString()
+                    )
+                )
+            }
+        } else visibility = View.GONE
     }
 }
 
