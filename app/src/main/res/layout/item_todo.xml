@@ -52,8 +52,8 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toTopOf="@+id/deadline_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/date_text"
@@ -69,10 +69,10 @@
             android:layout_marginBottom="8dp"
             android:text="@{todoItem.todoString}"
             android:textColor="@android:color/black"
-            app:layout_constraintBottom_toBottomOf="@+id/todo_check_box"
+            app:layout_constraintBottom_toTopOf="@+id/deadline_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/todo_check_box"
-            app:layout_constraintTop_toTopOf="@+id/todo_check_box" />
+            app:layout_constraintTop_toBottomOf="@+id/date_text" />
 
         <TextView
             android:id="@+id/deadline_text"
