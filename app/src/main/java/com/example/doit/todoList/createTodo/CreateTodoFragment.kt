@@ -80,6 +80,17 @@ class CreateTodoFragment : Fragment() {
                 }
             }
 
+            model.deadlineDate.observe(viewLifecycleOwner) {
+                it?.let {
+                    val h = LocalTime.now().hour
+                    val mi = LocalTime.now().minute
+
+                    TimePickerDialog(requireContext(), { _, hour, min ->
+                        viewModel.model.setDeadlineTime(hour, min)
+                    }, h, mi, false).show()
+                }
+            }
+
             categoryEditTextIsOpen.observe(viewLifecycleOwner) { isOpen ->
                 if (isOpen) {
                     with(binding) {
@@ -136,12 +147,6 @@ class CreateTodoFragment : Fragment() {
         }
 
         binding.deadlineButton.setOnClickListener {
-            val h = LocalTime.now().hour
-            val mi = LocalTime.now().minute
-
-            TimePickerDialog(requireContext(), { _, hour, min ->
-                viewModel.model.setDeadlineTime(hour, min)
-            }, h, mi, false).show()
 
             val y = Calendar.getInstance().get(Calendar.YEAR)
             val m = Calendar.getInstance().get(Calendar.MONTH)

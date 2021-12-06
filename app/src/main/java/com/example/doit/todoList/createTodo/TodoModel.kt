@@ -22,8 +22,9 @@ class TodoModel {
     var timeSet: LocalTime? = null
         private set
 
-    var deadlineDate: LocalDate? = null
-        private set
+    private val _deadlineDate = MutableLiveData<LocalDate?>()
+    val deadlineDate: LiveData<LocalDate?>
+        get() = _deadlineDate
 
     var deadlineTime: LocalTime? = null
         private set
@@ -67,8 +68,9 @@ class TodoModel {
 
     fun todoValid(): Boolean {
         return (description.value!!.isNotEmpty() &&
-                (!_deadlineEnabled.value!! || (_deadlineEnabled.value!! && deadlineDate != null &&
-                        deadlineTime != null)) &&
+                (!_deadlineEnabled.value!! ||
+                        (_deadlineEnabled.value!! &&
+                                deadlineDate.value != null && deadlineTime != null)) &&
                 _isDateValid.value!! && _isTimeValid.value!!
                 )
     }
@@ -82,15 +84,16 @@ class TodoModel {
         _deadlineEnabled.value = value
         _isTodoValid.value = todoValid()
         if (value) {
-            if (deadlineDate != null && dateIsInvalid(
-                    deadlineDate!!.year, deadlineDate!!.monthValue, deadlineDate!!.dayOfMonth,
+            if (deadlineDate.value != null && dateIsInvalid(
+                    deadlineDate.value!!.year, deadlineDate.value!!.monthValue,
+                    deadlineDate.value!!.dayOfMonth,
                     dateSet ?: LocalDate.now()
                 )
             ) {
                 invalidateDeadlineDate()
             } else {
                 if (deadlineTime != null && timeIsInvalid(
-                        deadlineTime!!.hour, deadlineTime!!.minute, deadlineDate,
+                        deadlineTime!!.hour, deadlineTime!!.minute, deadlineDate.value,
                         dateSet ?: LocalDate.now(),
                         timeSet ?: LocalTime.now()
                     )
@@ -111,14 +114,14 @@ class TodoModel {
             _isTodoValid.value = todoValid()
 
             if (deadlineEnabled.value!!) {
-                if (deadlineDate != null && dateIsInvalid(
-                        deadlineDate!!.year, deadlineDate!!.monthValue,
-                        deadlineDate!!.dayOfMonth, dateSet ?: LocalDate.now()
+                if (deadlineDate.value != null && dateIsInvalid(
+                        deadlineDate.value!!.year, deadlineDate.value!!.monthValue,
+                        deadlineDate.value!!.dayOfMonth, dateSet ?: LocalDate.now()
                     )
                 ) invalidateDate()
                 else if (deadlineTime != null && timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
-                        dateSet, deadlineDate!!, timeSet ?: LocalTime.now()
+                        dateSet, deadlineDate.value!!, timeSet ?: LocalTime.now()
                     )
                 ) invalidateTime()
             }
@@ -143,7 +146,7 @@ class TodoModel {
             if (deadlineEnabled.value!!) {
                 if (deadlineTime != null && timeIsInvalid(
                         deadlineTime!!.hour, deadlineTime!!.minute,
-                        deadlineDate!!, dateSet ?: LocalDate.now(),
+                        deadlineDate.value!!, dateSet ?: LocalDate.now(),
                         timeSet ?: LocalTime.now()
                     )
                 ) invalidateTime()
@@ -170,8 +173,8 @@ class TodoModel {
             dateIsInvalid(year, month, day, dateSet ?: LocalDate.now())
         ) invalidateDeadlineDate()
         else {
-            deadlineDate = LocalDate.of(year, month, day)
-            deadlineDateUIString = deadlineDate!!.format(
+            _deadlineDate.value = LocalDate.of(year, month, day)
+            deadlineDateUIString = deadlineDate.value!!.format(
                 DateTimeFormatter.ofLocalizedDate(
                     FormatStyle.FULL
                 )
@@ -194,7 +197,7 @@ class TodoModel {
     private fun invalidateDeadlineDate() {
         _deadlineUIString.value = "INVALID DATE!"
         _isDeadlineValid.value = false
-        deadlineDate = null
+        _deadlineDate.value = null
         _isTodoValid.value = todoValid()
     }
 
@@ -202,7 +205,7 @@ class TodoModel {
         if (_isDeadlineValid.value!!) {
             if (!_isDateValid.value!! || !isTimeValid.value!! ||
                 timeIsInvalid(
-                    hour, minute, deadlineDate,
+                    hour, minute, deadlineDate.value,
                     dateSet ?: LocalDate.now(),
                     timeSet ?: LocalTime.now()
                 )

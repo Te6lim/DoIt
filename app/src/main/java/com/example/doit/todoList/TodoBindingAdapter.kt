@@ -16,13 +16,20 @@ fun TextView.setDate(item: Todo?) {
             text = context.getString(
                 R.string.remind_me, context.getString(
                     R.string.date_time_string,
-
                     with(todo.dateTodo.toLocalDate()) {
+                        val day = this.dayOfMonth - 1
+
                         when {
                             this == LocalDate.now() -> "Today"
-                            LocalDate.now() == LocalDate.of(
-                                this.year, this.monthValue, this.dayOfMonth - 1
-                            ) -> "Tomorrow"
+
+                            day in (1..LocalDate.now().month.length(
+                                (this.year % 100 == 0 && this.year % 4 == 0 || this.year % 400 == 0)
+                            )) && LocalDate.now() == LocalDate.of(
+                                this.year, this.monthValue, day
+                            ) -> {
+                                "Tomorrow"
+                            }
+
                             else -> this.formatToString(
                                 DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                             )
@@ -42,13 +49,20 @@ fun TextView.setDeadlineDateString(item: Todo?) {
             text =
                 context.getString(
                     R.string.finished_date_string,
-
                     with(todo.dateFinished!!.toLocalDate()) {
+                        val day = this.dayOfMonth + 1
+
                         when {
                             this == LocalDate.now() -> "Today"
-                            LocalDate.now() == LocalDate.of(
-                                this.year, this.monthValue, this.dayOfMonth + 1
-                            ) -> "Yesterday"
+
+                            day in (1..LocalDate.now().month.length(
+                                (this.year % 100 == 0 && this.year % 4 == 0 || this.year % 400 == 0)
+                            )) && LocalDate.now() == LocalDate.of(
+                                this.year, this.monthValue, day
+                            ) -> {
+                                "Yesterday"
+                            }
+
                             else -> this.formatToString(
                                 DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                             )
@@ -60,13 +74,20 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                 visibility = View.VISIBLE
                 text = context.getString(
                     R.string.deadline_string,
-
                     with(todo.deadlineDate!!.toLocalDate()) {
+                        val day = this.dayOfMonth - 1
+
                         when {
                             this == LocalDate.now() -> "Today"
-                            LocalDate.now() == LocalDate.of(
-                                this.year, this.monthValue, this.dayOfMonth - 1
-                            ) -> "Tomorrow"
+
+                            day in (1..LocalDate.now().month.length(
+                                (this.year % 100 == 0 && this.year % 4 == 0 || this.year % 400 == 0)
+                            )) && LocalDate.now() == LocalDate.of(
+                                this.year, this.monthValue, day
+                            ) -> {
+                                "Tomorrow"
+                            }
+
                             else -> this.formatToString(
                                 DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                             )

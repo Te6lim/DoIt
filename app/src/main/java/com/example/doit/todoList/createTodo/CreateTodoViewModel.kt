@@ -72,7 +72,8 @@ class CreateTodoViewModel(
                 hasDeadline = todoModel.deadlineEnabled.value!!,
             ).apply {
                 if (hasDeadline) {
-                    deadlineDate = LocalDateTime.of(todoModel.deadlineDate, todoModel.deadlineTime)
+                    deadlineDate =
+                        LocalDateTime.of(todoModel.deadlineDate.value, todoModel.deadlineTime)
                 }
             }
             withContext(Dispatchers.IO) {
