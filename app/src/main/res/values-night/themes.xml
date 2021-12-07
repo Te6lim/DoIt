@@ -12,5 +12,18 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="windowActionModeOverlay">true</item>>
+        <item name="actionModeStyle">@style/myActionModeStyle</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_close</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
+    </style>
+
+    <style name="Theme.DoIt.NoActionBar" parent="Theme.DoIt">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="myActionModeStyle" parent="Widget.AppCompat.ActionMode">
+        <item name="background">@color/primaryColor</item>
     </style>
 </resources>

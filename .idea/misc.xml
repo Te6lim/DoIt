@@ -17,6 +17,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/line.xml" value="0.2222222222222222" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/rounded_background.xml" value="0.240625" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/todo_background.xml" value="0.22870370370370371" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/activity_categories.xml" value="0.15806159420289856" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/activity_main.xml" value="0.1743659420289855" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/alternate_actionbar.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/category_item.xml" value="0.18070652173913043" />
@@ -26,6 +27,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_categories.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_list_todo.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_list_todo_completed.xml" value="0.2006340579710145" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_list_todo_finished.xml" value="0.15806159420289856" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_settings.xml" value="0.18885869565217392" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_summary.xml" value="0.1766304347826087" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/fragment_todo_completed.xml" value="0.18070652173913043" />

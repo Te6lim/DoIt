@@ -10,9 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DoIt">
         <activity
+            android:name=".CategoriesActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.DoIt.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

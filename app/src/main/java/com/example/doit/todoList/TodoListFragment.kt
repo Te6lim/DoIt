@@ -1,16 +1,18 @@
 package com.example.doit.todoList
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.CheckBox
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.*
 import com.example.doit.database.CategoryDb
@@ -31,6 +33,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     private lateinit var mainActivity: MainActivity
 
+    private lateinit var content: ActivityResultLauncher<Intent>
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -41,6 +45,14 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         mainActivity = (requireActivity() as MainActivity)
 
         setHasOptionsMenu(true)
+
+        content =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                result.data?.let {
+                    val id = it.getIntExtra(DEF_KEY, Int.MIN_VALUE)
+                    if (id != Int.MIN_VALUE) todoListViewModel.emitAsActive(id)
+                }
+            }
 
         val todoDatabase = TodoDatabase.getInstance(requireContext())
         val categoryDatabase = CategoryDb.getInstance(requireContext())
@@ -56,7 +68,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
 
             override fun onCheck(t: Todo, holder: View) {
-
                 todoListViewModel.updateTodo(
                     t.apply {
                         isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
@@ -233,13 +244,13 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
             }
         }
 
-        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        /*val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
             if (value != null) {
                 todoListViewModel.emitAsActive(value)
                 savedStateHandle.remove<Int>(DEF_KEY)
             }
-        }
+        }*/
 
         return binding.root
     }
@@ -266,7 +277,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.categoriesFragment -> {
-                NavigationUI.onNavDestinationSelected(item, findNavController())
+                //NavigationUI.onNavDestinationSelected(item, findNavController())
+                content.launch(Intent(requireContext(), CategoriesActivity::class.java))
                 todoListViewModel.isNavigating(true)
                 true
             }

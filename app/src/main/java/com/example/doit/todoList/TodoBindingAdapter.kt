@@ -18,7 +18,6 @@ fun TextView.setDate(item: Todo?) {
                     R.string.date_time_string,
                     with(todo.dateTodo.toLocalDate()) {
                         val day = this.dayOfMonth - 1
-
                         when {
                             this == LocalDate.now() -> "Today"
 
@@ -51,7 +50,6 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                     R.string.finished_date_string,
                     with(todo.dateFinished!!.toLocalDate()) {
                         val day = this.dayOfMonth + 1
-
                         when {
                             this == LocalDate.now() -> "Today"
 
@@ -76,7 +74,6 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                     R.string.deadline_string,
                     with(todo.deadlineDate!!.toLocalDate()) {
                         val day = this.dayOfMonth - 1
-
                         when {
                             this == LocalDate.now() -> "Today"
 

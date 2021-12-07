@@ -8,17 +8,17 @@ import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.databinding.ActivityMainBinding
+import com.example.doit.finishedTodoList.FinishedTodoListFragment
+import com.example.doit.todoList.TodoListFragment
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var drawer: DrawerLayout
-        private set
     private lateinit var navView: NavigationView
 
     lateinit var mainViewModel: MainViewModel
@@ -120,16 +120,21 @@ class MainActivity : AppCompatActivity() {
             with(navController) {
                 when (menuItem.itemId) {
                     R.id.todos_navView -> {
-                        if (graph.startDestination != R.id.todoListFragment) {
-                            val navOptions = NavOptions.Builder().setPopUpTo(
+                        if (true) {
+                            val homeFragment = TodoListFragment()
+                            supportFragmentManager.beginTransaction()
+                                .replace(R.id.myNavHost, homeFragment)
+                                .commit()
+
+                            /*val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true
                             ).build()
                             navigate(
                                 R.id.action_completedTodoListFragment_to_todoListFragment,
                                 savedInstanceState, navOptions
-                            )
+                            )*/
                             toggle.syncState()
-                            graph.startDestination = R.id.todoListFragment
+                            //graph.startDestination = R.id.todoListFragment
                         }
 
                         drawer.closeDrawer(GravityCompat.START)
@@ -137,16 +142,20 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.finished_todos_navView -> {
-                        if (graph.startDestination != R.id.finishedTodoListFragment) {
-                            val navOptions = NavOptions.Builder().setPopUpTo(
+                        if (true) {
+                            val homeFragment = FinishedTodoListFragment()
+                            supportFragmentManager.beginTransaction()
+                                .replace(R.id.myNavHost, homeFragment).commit()
+
+                            /*val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true
                             ).build()
                             navigate(
                                 R.id.action_todoListFragment_to_completedTodoListFragment,
                                 savedInstanceState, navOptions
-                            )
+                            )*/
                             toggle.syncState()
-                            graph.startDestination = R.id.finishedTodoListFragment
+                            //graph.startDestination = R.id.finishedTodoListFragment
                         }
 
                         drawer.closeDrawer(GravityCompat.START)
