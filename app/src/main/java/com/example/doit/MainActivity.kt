@@ -11,8 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.databinding.ActivityMainBinding
-import com.example.doit.finishedTodoList.FinishedTodoListFragment
-import com.example.doit.todoList.TodoListFragment
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -107,7 +105,6 @@ class MainActivity : AppCompatActivity() {
                 if (currentDestination?.id == graph.startDestination || sd != graph.startDestination
                 ) {
                     graph.startDestination = sd
-                    mainViewModel.setActiveStartDestination(sd)
                 }
             }
         }
@@ -120,11 +117,10 @@ class MainActivity : AppCompatActivity() {
             with(navController) {
                 when (menuItem.itemId) {
                     R.id.todos_navView -> {
-                        if (true) {
-                            val homeFragment = TodoListFragment()
-                            supportFragmentManager.beginTransaction()
-                                .replace(R.id.myNavHost, homeFragment)
-                                .commit()
+                        if (currentDestination!!.id != R.id.todoListFragment) {
+                            graph = graph.apply {
+                                startDestination = R.id.todoListFragment
+                            }
 
                             /*val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true
@@ -142,10 +138,10 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.finished_todos_navView -> {
-                        if (true) {
-                            val homeFragment = FinishedTodoListFragment()
-                            supportFragmentManager.beginTransaction()
-                                .replace(R.id.myNavHost, homeFragment).commit()
+                        if (currentDestination!!.id != R.id.finishedTodoListFragment) {
+                            graph = graph.apply {
+                                startDestination = R.id.finishedTodoListFragment
+                            }
 
                             /*val navOptions = NavOptions.Builder().setPopUpTo(
                                 currentDestination!!.id, true

@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.*
 import com.example.doit.database.CategoryDb
@@ -244,13 +245,13 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
             }
         }
 
-        /*val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
             if (value != null) {
                 todoListViewModel.emitAsActive(value)
                 savedStateHandle.remove<Int>(DEF_KEY)
             }
-        }*/
+        }
 
         return binding.root
     }
@@ -277,8 +278,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.categoriesFragment -> {
-                //NavigationUI.onNavDestinationSelected(item, findNavController())
-                content.launch(Intent(requireContext(), CategoriesActivity::class.java))
+                NavigationUI.onNavDestinationSelected(item, findNavController())
                 todoListViewModel.isNavigating(true)
                 true
             }

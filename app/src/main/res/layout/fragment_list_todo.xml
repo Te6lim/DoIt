@@ -16,7 +16,6 @@
             android:id="@+id/todoList"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@color/listBackground"
             android:visibility="visible"
             android:scrollbars="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
