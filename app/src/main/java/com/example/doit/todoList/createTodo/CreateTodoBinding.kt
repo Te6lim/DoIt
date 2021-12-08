@@ -50,12 +50,14 @@ fun Button.setTimeText(time: LiveData<LocalTime?>?) {
 @BindingAdapter("setDeadlineText")
 fun Button.setDeadlineText(date: LiveData<LocalDateTime?>?) {
     date?.let {
-        date.value?.let { d ->
-            text = context.getString(
-                R.string.date_time_string,
-                d.toLocalDate().formatToString(DateTimeFormatter.ISO_DATE),
-                d.toLocalTime().formatToString()
-            )
-        }
+        if (it.value != null) {
+            it.value!!.let { d ->
+                text = context.getString(
+                    R.string.date_time_string,
+                    d.toLocalDate().formatToString(DateTimeFormatter.ISO_DATE),
+                    d.toLocalTime().formatToString()
+                )
+            }
+        } else text = context.getString(R.string.set_deadline)
     }
 }

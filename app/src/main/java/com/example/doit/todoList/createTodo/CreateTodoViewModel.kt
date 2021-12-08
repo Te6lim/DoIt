@@ -148,6 +148,8 @@ class CreateTodoViewModel(
         }
     }
 
+    fun isEditTodoActive() = editTodoId != -1L
+
     override fun onCleared() {
         uiScope.cancel()
     }

@@ -80,17 +80,6 @@ class CreateTodoFragment : Fragment() {
                 }
             }
 
-            model.deadlineDateLive.observe(viewLifecycleOwner) {
-                it?.let {
-                    val h = LocalTime.now().hour
-                    val mi = LocalTime.now().minute
-
-                    TimePickerDialog(requireContext(), { _, hour, min ->
-                        viewModel.model.setDeadlineTime(hour, min)
-                    }, h, mi, false).show()
-                }
-            }
-
             categoryEditTextIsOpen.observe(viewLifecycleOwner) { isOpen ->
                 if (isOpen) {
                     with(binding) {
@@ -153,6 +142,14 @@ class CreateTodoFragment : Fragment() {
 
             DatePickerDialog(requireContext(), { _, year, month, day ->
                 viewModel.model.setDeadlineDate(year, month + 1, day)
+
+                val h = LocalTime.now().hour
+                val mi = LocalTime.now().minute
+
+                TimePickerDialog(requireContext(), { _, hour, min ->
+                    viewModel.model.setDeadlineTime(hour, min)
+                }, h, mi, false).show()
+
             }, y, m, d).show()
         }
 

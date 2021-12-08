@@ -49,8 +49,13 @@ class TodoModel {
     }
 
     fun setDateTodo(year: Int, month: Int, day: Int) {
-        val date = LocalDate.of(year, month, day)
+        if (_deadlineDateLive.value != null) {
+            _deadlineDateLive.value = null
+            _deadlineDateIsValid.value = false
+        }
 
+        val date = LocalDate.of(year, month, day)
+        _timeTodoIsValid.value = timeIsValid(timeTodoLive.value ?: LocalTime.now(), date)
         _dateTodoIsValid.value = dateIsValid(date, LocalDate.now())
 
         _dateTodoLive.value = date
@@ -59,8 +64,12 @@ class TodoModel {
     }
 
     fun setTimeTodo(hour: Int, minute: Int) {
-        val time = LocalTime.of(hour, minute)
+        if (_deadlineDateLive.value != null) {
+            _deadlineDateLive.value = null
+            _deadlineDateIsValid.value = false
+        }
 
+        val time = LocalTime.of(hour, minute)
         _timeTodoIsValid.value = timeIsValid(time, dateTodoLive.value ?: LocalDate.now())
 
         _timeTodoLive.value = time
@@ -106,7 +115,7 @@ class TodoModel {
     private fun timeIsValid(time: LocalTime, date: LocalDate): Boolean {
         if (date != LocalDate.now()) return true
         if (time.hour < LocalTime.now().hour) return false
-        else if (time.minute < LocalTime.now().minute) return false
+        if (time.hour == LocalTime.now().hour && time.minute < LocalTime.now().minute) return false
         return true
     }
 
@@ -114,7 +123,7 @@ class TodoModel {
         if (hasDeadline.value!!) {
 
             if (_description.value.isNullOrEmpty() || !dateTodoIsValid.value!! ||
-                !timeTodoIsValid.value!! && !deadlineDateIsValid.value!!
+                !timeTodoIsValid.value!! || !deadlineDateIsValid.value!!
             ) {
                 if (_isTodoValid.value!!) _isTodoValid.value = false
             } else if (!_isTodoValid.value!!) _isTodoValid.value = true
@@ -132,5 +141,6 @@ class TodoModel {
 
     fun setHasDeadlineEnabled(value: Boolean) {
         _hasDeadline.value = value
+        isTodoValid()
     }
 }
