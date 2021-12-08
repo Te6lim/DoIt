@@ -69,7 +69,7 @@ class CreateTodoFragment : Fragment() {
             }
 
             todoModel.observe(viewLifecycleOwner) {
-                if (it.todoValid()) {
+                if (it.isTodoValid.value!!) {
                     add(it)
                     findNavController().apply {
                         val id = binding.categorySelection.checkedRadioButtonId
@@ -80,7 +80,7 @@ class CreateTodoFragment : Fragment() {
                 }
             }
 
-            model.deadlineDate.observe(viewLifecycleOwner) {
+            model.deadlineDateLive.observe(viewLifecycleOwner) {
                 it?.let {
                     val h = LocalTime.now().hour
                     val mi = LocalTime.now().minute
@@ -118,7 +118,6 @@ class CreateTodoFragment : Fragment() {
 
             category.observe(viewLifecycleOwner) {
                 it?.let {
-                    model.setCategory(it)
                     setTitleToDefaultCategoryName(it)
                     binding.categorySelection.findViewById<RadioButton>(it.id)?.isChecked = true
                 }
@@ -143,7 +142,7 @@ class CreateTodoFragment : Fragment() {
 
         binding.deadlineSwitch.setOnCheckedChangeListener { _, isOn ->
             binding.deadlineButton.isEnabled = isOn
-            viewModel.model.setIsDeadlineEnabled(isOn)
+            viewModel.model.setHasDeadlineEnabled(isOn)
         }
 
         binding.deadlineButton.setOnClickListener {
@@ -163,7 +162,7 @@ class CreateTodoFragment : Fragment() {
             val d = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
             DatePickerDialog(requireContext(), { _, year, month, day ->
-                viewModel.model.setDate(year, month + 1, day)
+                viewModel.model.setDateTodo(year, month + 1, day)
             }, y, m, d).show()
         }
 
@@ -171,7 +170,7 @@ class CreateTodoFragment : Fragment() {
             val h = LocalTime.now().hour
             val m = LocalTime.now().minute
             TimePickerDialog(context, { _, hourOfDay, minute ->
-                viewModel.model.setTime(hourOfDay, minute)
+                viewModel.model.setTimeTodo(hourOfDay, minute)
             }, h, m, false).show()
         }
 

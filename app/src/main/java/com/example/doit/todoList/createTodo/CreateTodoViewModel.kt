@@ -64,20 +64,23 @@ class CreateTodoViewModel(
         uiScope.launch {
             val todo = Todo(
                 todoString = todoModel.description.value!!,
-                catId = todoModel.category,
+                catId = category.value!!.id,
                 dateTodo = LocalDateTime.of(
-                    todoModel.dateSet ?: LocalDate.now(),
-                    todoModel.timeSet ?: LocalTime.now()
+                    todoModel.dateTodoLive.value ?: LocalDate.now(),
+                    todoModel.timeTodoLive.value ?: LocalTime.now()
                 ),
-                hasDeadline = todoModel.deadlineEnabled.value!!,
+                hasDeadline = todoModel.hasDeadline.value!!,
             ).apply {
                 if (hasDeadline) {
                     deadlineDate =
-                        LocalDateTime.of(todoModel.deadlineDate.value, todoModel.deadlineTime)
+                        LocalDateTime.of(
+                            todoModel.deadlineDateLive.value!!.toLocalDate(),
+                            todoModel.deadlineDateLive.value!!.toLocalTime()
+                        )
                 }
             }
             withContext(Dispatchers.IO) {
-                if (editTodo.value != null) todoDb.update(todo.apply { todoId = todoModel.id })
+                if (editTodo.value != null) todoDb.update(todo.apply { todoId = editTodoId })
                 else todoDb.insert(todo)
             }
         }
@@ -124,12 +127,11 @@ class CreateTodoViewModel(
         uiScope.launch {
             val todoEdit = editTodo
             with(editTodo) {
-                model.id = todoEdit.todoId
                 model.setDescription(todoString)
-                model.setDate(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
-                model.setTime(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
+                model.setDateTodo(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
+                model.setTimeTodo(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
                 if (todoEdit.hasDeadline) {
-                    model.setIsDeadlineEnabled(true)
+                    model.setHasDeadlineEnabled(true)
                     model.setDeadlineDate(
                         deadlineDate!!.year,
                         deadlineDate!!.monthValue,
@@ -140,7 +142,7 @@ class CreateTodoViewModel(
                         deadlineDate!!.minute
                     )
                 } else {
-                    model.setIsDeadlineEnabled(false)
+                    model.setHasDeadlineEnabled(false)
                 }
             }
         }

@@ -6,6 +6,11 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import com.example.doit.R
 import com.example.doit.database.Todo
+import com.example.doit.todoList.formatToString
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @BindingAdapter("setColor")
 fun Button.setColor(item: LiveData<Boolean>?) {
@@ -22,4 +27,35 @@ fun Button.setColor(item: LiveData<Boolean>?) {
 fun Button.actionText(value: Todo?) {
     text = if (value != null) context.getString(R.string.update)
     else context.getString(R.string.create)
+}
+
+@BindingAdapter("setDateText")
+fun Button.setDateText(date: LiveData<LocalDate?>?) {
+    date?.let {
+        date.value?.let { d ->
+            text = d.formatToString(DateTimeFormatter.ISO_DATE)
+        }
+    }
+}
+
+@BindingAdapter("setTimeText")
+fun Button.setTimeText(time: LiveData<LocalTime?>?) {
+    time?.let {
+        time.value?.let { t ->
+            text = t.formatToString()
+        }
+    }
+}
+
+@BindingAdapter("setDeadlineText")
+fun Button.setDeadlineText(date: LiveData<LocalDateTime?>?) {
+    date?.let {
+        date.value?.let { d ->
+            text = context.getString(
+                R.string.date_time_string,
+                d.toLocalDate().formatToString(DateTimeFormatter.ISO_DATE),
+                d.toLocalTime().formatToString()
+            )
+        }
+    }
 }
