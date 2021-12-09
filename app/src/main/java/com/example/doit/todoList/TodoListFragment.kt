@@ -27,6 +27,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     companion object {
         const val SCROLL = "SCROLL"
         const val DEF_KEY = "KEY"
+        const val ADDRESS = "Todolist"
     }
 
     private lateinit var binding: FragmentListTodoBinding
@@ -278,7 +279,9 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.categoriesFragment -> {
-                NavigationUI.onNavDestinationSelected(item, findNavController())
+                findNavController().navigate(
+                    TodoListFragmentDirections.actionTodoListFragmentToCategoriesFragment2(ADDRESS)
+                )
                 todoListViewModel.isNavigating(true)
                 true
             }

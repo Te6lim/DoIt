@@ -8,10 +8,15 @@ import com.example.doit.database.TodoDbDao
 import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
+import java.util.*
 
 class TodoListViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao
 ) : ViewModel() {
+
+    companion object {
+        var count = 0
+    }
 
     private val categories = catDb.getAll()
     private val allTodos = todoDb.getAll()
@@ -37,6 +42,7 @@ class TodoListViewModel(
         get() = _selectionCount
 
     val categoriesTransform = Transformations.map(categories) { catList ->
+        count = 0
         if (catList.isNullOrEmpty()) {
             val cat = Category(
                 name = CreateTodoViewModel.DEFAULT_CATEGORY, isDefault = true
@@ -53,7 +59,7 @@ class TodoListViewModel(
 
     val defaultTransform = Transformations.map(activeCategory) { cat ->
         allTodos.value?.let { list ->
-            _todoList.value = filter(list, cat!!).sortedBy { !it.hasDeadline }
+            _todoList.value = filter(list, cat).sortedBy { !it.hasDeadline }
             resetItemsState()
         }
     }
@@ -62,12 +68,15 @@ class TodoListViewModel(
         activeCategory.value?.let { category ->
             val newList = filter(list!!, category).sortedBy { !it.hasDeadline }
             if (newList.isEmpty())
-                _activeCategory.value = defaultCategory!!
+
+                if (count < categories.value!!.size) {
+                    _activeCategory.value = categories.value!![count++]
+                } else _activeCategory.value = null
             else _todoList.value = newList
             resetItemsState()
         }
 
-        list?.none { !it.isFinished } ?: false
+        list?.none { !it.isFinished } ?: true
     }
 
     val itemCountInCategory = Transformations.map(todoList) { list ->
@@ -92,10 +101,11 @@ class TodoListViewModel(
     var editTodo: Todo? = null
         private set
 
-    private fun filter(allTodos: List<Todo>, defCat: Category): List<Todo> {
+    private fun filter(allTodos: List<Todo>, defCat: Category?): List<Todo> {
         return allTodos.let { list ->
             list.filter { todo ->
-                todo.catId == defCat.id && !todo.isFinished
+                if (defCat != null) todo.catId == defCat.id && !todo.isFinished
+                else true
             }
         }
     }

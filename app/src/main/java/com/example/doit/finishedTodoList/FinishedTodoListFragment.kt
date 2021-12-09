@@ -6,7 +6,6 @@ import android.widget.CheckBox
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.*
@@ -19,6 +18,10 @@ import com.example.doit.todoList.TodoListFragment.Companion.DEF_KEY
 import java.time.LocalDateTime
 
 class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
+
+    companion object {
+        const val ADDRESS = "finishedTodoList"
+    }
 
     private lateinit var binding: FragmentListTodoFinishedBinding
     private lateinit var viewModel: FinishedTodoListViewModel
@@ -112,6 +115,9 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         super.onCreateOptionsMenu(menu, inflater)
         menuItems = menu
         inflater.inflate(R.menu.finished_todo_menu, menu)
+        viewModel.completedTodos.value?.let {
+            menu.findItem(R.id.clear).isVisible = it.isNotEmpty()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -124,7 +130,10 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
             }
 
             R.id.categoriesFragment -> {
-                NavigationUI.onNavDestinationSelected(item, findNavController())
+                findNavController().navigate(
+                    FinishedTodoListFragmentDirections
+                        .actionFinishedTodoListFragmentToCategoriesFragment(ADDRESS)
+                )
                 viewModel.isNavigating(true)
                 true
             }
@@ -133,7 +142,7 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
     }
 
     override fun message(): String {
-        return "clear finished Todos from ${viewModel.categoryCountPair.value!!.first} ?"
+        return "clear finished Todos from ${viewModel.categoryCountPair.value!!.first}?"
     }
 
     override fun positiveAction() {

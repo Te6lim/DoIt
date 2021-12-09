@@ -11,6 +11,7 @@ import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentCategoriesBinding
+import com.example.doit.finishedTodoList.FinishedTodoListFragment
 import com.example.doit.todoList.TodoListFragment
 import com.example.doit.todoList.toCategory
 
@@ -34,14 +35,28 @@ class CategoriesFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        val visitingFragmentAddress = CategoriesFragmentArgs.fromBundle(requireArguments()).visitor
+
         val adapter = CategoriesAdapter(object : ActionCallback<CategoryInfo> {
 
             override fun onClick(position: Int, t: CategoryInfo, holder: View) {
                 with(findNavController()) {
-                    if (t.todoCount != 0) {
-                        previousBackStackEntry?.savedStateHandle?.set(
-                            TodoListFragment.DEF_KEY, t.id
-                        )
+                    when (visitingFragmentAddress) {
+                        TodoListFragment.ADDRESS -> {
+                            if (t.todoCount != 0) {
+                                previousBackStackEntry?.savedStateHandle?.set(
+                                    TodoListFragment.DEF_KEY, t.id
+                                )
+                            }
+                        }
+
+                        FinishedTodoListFragment.ADDRESS -> {
+                            if (t.todoCompletedCount != 0) {
+                                previousBackStackEntry?.savedStateHandle?.set(
+                                    TodoListFragment.DEF_KEY, t.id
+                                )
+                            }
+                        }
                     }
                     popBackStack()
                 }

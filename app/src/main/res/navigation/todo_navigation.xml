@@ -17,6 +17,13 @@
             app:exitAnim="@anim/slide_left_from_center"
             app:popEnterAnim="@anim/slide_right_from_left"
             app:popExitAnim="@anim/fall_out" />
+        <action
+            android:id="@+id/action_todoListFragment_to_categoriesFragment2"
+            app:destination="@id/categoriesFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/createTodoFragment"
@@ -36,12 +43,24 @@
         android:id="@+id/finishedTodoListFragment"
         android:name="com.example.doit.finishedTodoList.FinishedTodoListFragment"
         android:label="@string/finished"
-        tools:layout="@layout/fragment_list_todo_finished" />
+        tools:layout="@layout/fragment_list_todo_finished">
+        <action
+            android:id="@+id/action_finishedTodoListFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
         android:name="com.example.doit.todoList.categories.CategoriesFragment"
         android:label="@string/categories"
-        tools:layout="@layout/fragment_categories" />
+        tools:layout="@layout/fragment_categories">
+        <argument
+            android:name="visitor"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/summaryFragment"
         android:name="com.example.doit.summary.SummaryFragment"
