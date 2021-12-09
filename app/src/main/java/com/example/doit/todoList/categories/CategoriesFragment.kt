@@ -2,6 +2,7 @@ package com.example.doit.todoList.categories
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -47,6 +48,11 @@ class CategoriesFragment : Fragment() {
                                 previousBackStackEntry?.savedStateHandle?.set(
                                     TodoListFragment.DEF_KEY, t.id
                                 )
+                                popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(), "Todos: 0", Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
 
@@ -55,10 +61,17 @@ class CategoriesFragment : Fragment() {
                                 previousBackStackEntry?.savedStateHandle?.set(
                                     TodoListFragment.DEF_KEY, t.id
                                 )
+                                popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(), "Finished: 0", Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
+                        else -> {
+                        }
                     }
-                    popBackStack()
+
                 }
             }
 

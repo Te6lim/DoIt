@@ -45,7 +45,7 @@ class TodoModel {
 
     fun setDescription(value: String) {
         _description.value = value
-        isTodoValid()
+        isValid()
     }
 
     fun setDateTodo(year: Int, month: Int, day: Int) {
@@ -60,7 +60,7 @@ class TodoModel {
 
         _dateTodoLive.value = date
 
-        isTodoValid()
+        isValid()
     }
 
     fun setTimeTodo(hour: Int, minute: Int) {
@@ -74,7 +74,7 @@ class TodoModel {
 
         _timeTodoLive.value = time
 
-        isTodoValid()
+        isValid()
     }
 
     fun setDeadlineDate(year: Int, month: Int, day: Int) {
@@ -89,7 +89,7 @@ class TodoModel {
             deadlineDate, LocalTime.of(23, 59)
         )
 
-        isTodoValid()
+        isValid()
     }
 
     fun setDeadlineTime(hour: Int, minute: Int) {
@@ -102,7 +102,7 @@ class TodoModel {
             deadlineDateLive.value!!.toLocalDate(), deadlineTime
         )
 
-        isTodoValid()
+        isValid()
     }
 
     private fun dateIsValid(date: LocalDate, referenceDate: LocalDate): Boolean {
@@ -119,7 +119,7 @@ class TodoModel {
         return true
     }
 
-    private fun isTodoValid() {
+    private fun isValid() {
         if (hasDeadline.value!!) {
 
             if (_description.value.isNullOrEmpty() || !dateTodoIsValid.value!! ||
@@ -141,6 +141,6 @@ class TodoModel {
 
     fun setHasDeadlineEnabled(value: Boolean) {
         _hasDeadline.value = value
-        isTodoValid()
+        isValid()
     }
 }

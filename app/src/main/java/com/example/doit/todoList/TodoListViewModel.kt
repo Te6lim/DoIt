@@ -70,7 +70,9 @@ class TodoListViewModel(
             if (newList.isEmpty())
 
                 if (count < categories.value!!.size) {
-                    _activeCategory.value = categories.value!![count++]
+                    if (categories.value!![count] != defaultCategory)
+                        _activeCategory.value = categories.value!![count++]
+                    else _activeCategory.value = categories.value!![++count]
                 } else _activeCategory.value = null
             else _todoList.value = newList
             resetItemsState()
