@@ -27,7 +27,7 @@ class FinishedTodoListViewModel(
     val completedTodos = fetchList(defaultCategory, allTodos)
 
     val categoryCountPair = Transformations.map(completedTodos) {
-        Pair(defaultCategory.value!!.name, it.size)
+        Pair(defaultCategory.value!!.name, it?.size ?: 0)
     }
 
     private val _navigating = MutableLiveData<Boolean>()
