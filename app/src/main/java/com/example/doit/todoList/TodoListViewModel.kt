@@ -246,10 +246,8 @@ class TodoListViewModel(
             inputA.value?.let { category ->
                 val newList = filter(list, category).sortedBy { !it.hasDeadline }
                 if (newList.isEmpty()) selectNextCategory()
-                else {
-                    result.value = newList
-                    resetItemsState(newList)
-                }
+                else resetItemsState(newList)
+                result.value = newList
             }
         }
 
