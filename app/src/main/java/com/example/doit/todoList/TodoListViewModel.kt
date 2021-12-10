@@ -265,7 +265,11 @@ class TodoListViewModel(
         if (count < categories.value!!.size) {
             if (categories.value!![count] != defaultCategory)
                 _activeCategory.value = categories.value!![count++]
-            else _activeCategory.value = categories.value!![++count]
+            else {
+                if (count + 1 < categories.value!!.size)
+                    _activeCategory.value = categories.value!![++count]
+                else _activeCategory.value = null
+            }
         } else _activeCategory.value = null
     }
 }
