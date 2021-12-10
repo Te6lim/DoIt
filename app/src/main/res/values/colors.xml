@@ -20,5 +20,10 @@
     <color name="colorRed">#FF0000</color>
     <color name="listBackground">#ffffff</color>
     <color name="outline">#8F8F8F</color>
+    <color name="selected_outline">#ACD9FF</color>
     <color name="selected">#C8E4FB</color>
+    <color name="deadline_safe">#2BA600</color>
+    <color name="deadline_safe_background">#322BA600</color>
+    <color name="deadline_close">#CAA600</color>
+    <color name="deadline_passed">#EF0000</color>
 </resources>

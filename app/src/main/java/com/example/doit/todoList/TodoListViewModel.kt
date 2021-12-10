@@ -231,29 +231,25 @@ class TodoListViewModel(
 
         val doOperationIfA = Observer<Category> { category ->
             inputB.value?.let { list ->
-                val newList = filter(list, category).sortedBy { !it.hasDeadline }
-                if (newList.isEmpty())
-
-                    if (count < categories.value!!.size) {
-                        if (categories.value!![count] != defaultCategory)
-                            _activeCategory.value = categories.value!![count++]
-                        else _activeCategory.value = categories.value!![++count]
-                    } else _activeCategory.value = null
-                else result.value = newList
+                if (!list.isNullOrEmpty()) {
+                    val newList = filter(list, category).sortedBy { !it.hasDeadline }
+                    if (newList.isEmpty()) selectNextCategory()
+                    else {
+                        result.value = newList
+                        resetItemsState(newList)
+                    }
+                }
             }
         }
 
         val doOperationIfB = Observer<List<Todo>?> { list ->
             inputA.value?.let { category ->
                 val newList = filter(list, category).sortedBy { !it.hasDeadline }
-                if (newList.isEmpty())
-
-                    if (count < categories.value!!.size) {
-                        if (categories.value!![count] != defaultCategory)
-                            _activeCategory.value = categories.value!![count++]
-                        else _activeCategory.value = categories.value!![++count]
-                    } else _activeCategory.value = null
-                else result.value = newList
+                if (newList.isEmpty()) selectNextCategory()
+                else {
+                    result.value = newList
+                    resetItemsState(newList)
+                }
             }
         }
 
@@ -263,6 +259,14 @@ class TodoListViewModel(
 
         inputB.let { result.addSource(it, doOperationIfB) }
         return result
+    }
+
+    private fun selectNextCategory() {
+        if (count < categories.value!!.size) {
+            if (categories.value!![count] != defaultCategory)
+                _activeCategory.value = categories.value!![count++]
+            else _activeCategory.value = categories.value!![++count]
+        } else _activeCategory.value = null
     }
 }
 
