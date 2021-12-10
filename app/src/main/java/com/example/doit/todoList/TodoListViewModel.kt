@@ -1,6 +1,7 @@
 package com.example.doit.todoList
 
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
@@ -8,7 +9,6 @@ import com.example.doit.database.TodoDbDao
 import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
-import java.util.*
 
 class TodoListViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao
@@ -21,11 +21,8 @@ class TodoListViewModel(
     private val categories = catDb.getAll()
     private val allTodos = todoDb.getAll()
 
-    private val _todoList = MutableLiveData<List<Todo>>()
-    val todoList: LiveData<List<Todo>>
-        get() = _todoList
-
-    private var defaultCategory: Category? = null
+    var defaultCategory: Category? = null
+        private set
 
     private val _activeCategory = MutableLiveData<Category>()
     val activeCategory: LiveData<Category>
@@ -57,40 +54,25 @@ class TodoListViewModel(
         emitDefault()
     }
 
-    val defaultTransform = Transformations.map(activeCategory) { cat ->
-        allTodos.value?.let { list ->
-            _todoList.value = filter(list, cat).sortedBy { !it.hasDeadline }
-            resetItemsState()
-        }
-    }
+    val todoList = fetchList(activeCategory, allTodos)
 
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
-        activeCategory.value?.let { category ->
-            val newList = filter(list!!, category).sortedBy { !it.hasDeadline }
-            if (newList.isEmpty())
-
-                if (count < categories.value!!.size) {
-                    if (categories.value!![count] != defaultCategory)
-                        _activeCategory.value = categories.value!![count++]
-                    else _activeCategory.value = categories.value!![++count]
-                } else _activeCategory.value = null
-            else _todoList.value = newList
-            resetItemsState()
-        }
-
+        list?.let { resetItemsState(it) }
         list?.none { !it.isFinished } ?: true
     }
 
     val itemCountInCategory = Transformations.map(todoList) { list ->
         with(activeCategory.value) {
-            this!!.name to list.size
+            this?.let {
+                it.name to list.size
+            } ?: defaultCategory!!.name to 0
         }
     }
 
     fun itemsState() = itemsState.toList()
 
-    private fun resetItemsState() {
-        itemsState = MutableList(todoList.value!!.size) { false }
+    private fun resetItemsState(list: List<Todo>) {
+        itemsState = MutableList(list.size) { false }
     }
 
     private val _isLongPressed = MutableLiveData(false)
@@ -113,12 +95,10 @@ class TodoListViewModel(
     }
 
     private fun emitDefault() {
-        viewModelScope.launch {
-            val newDefault = getDefault()
-            if (newDefault != defaultCategory) {
-                _activeCategory.value = newDefault
-                defaultCategory = _activeCategory.value
-            }
+        val newDefault = categories.value!!.find { it.isDefault }
+        if (newDefault != defaultCategory) {
+            _activeCategory.value = newDefault
+            defaultCategory = _activeCategory.value
         }
     }
 
@@ -144,7 +124,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo)
-                resetItemsState()
+                resetItemsState(todoList.value!!)
             }
         }
     }
@@ -153,7 +133,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
-                resetItemsState()
+                resetItemsState(todoList.value!!)
             }
         }
     }
@@ -201,7 +181,7 @@ class TodoListViewModel(
         _isLongPressed.value = false
         longPressStatusChanged = true
         editTodo = null
-        resetItemsState()
+        resetItemsState(todoList.value!!)
     }
 
     fun setLongPressedStatusChanged(value: Boolean) {
@@ -216,7 +196,7 @@ class TodoListViewModel(
 
             withContext(Dispatchers.IO) {
                 selectedId.forEach { todoDb.delete(it) }
-                resetItemsState()
+                resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }
         }
@@ -238,10 +218,51 @@ class TodoListViewModel(
                 for ((i, v) in itemsState.withIndex()) {
                     if (v) todoDb.update(todoList.value!![i].apply { isFinished = v })
                 }
-                resetItemsState()
+                resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }
         }
+    }
+
+    private fun fetchList(
+        inputA: LiveData<Category>, inputB: LiveData<List<Todo>?>
+    ): LiveData<List<Todo>> {
+        val result = MediatorLiveData<List<Todo>>()
+
+        val doOperationIfA = Observer<Category> { category ->
+            inputB.value?.let { list ->
+                val newList = filter(list, category).sortedBy { !it.hasDeadline }
+                if (newList.isEmpty())
+
+                    if (count < categories.value!!.size) {
+                        if (categories.value!![count] != defaultCategory)
+                            _activeCategory.value = categories.value!![count++]
+                        else _activeCategory.value = categories.value!![++count]
+                    } else _activeCategory.value = null
+                else result.value = newList
+            }
+        }
+
+        val doOperationIfB = Observer<List<Todo>?> { list ->
+            inputA.value?.let { category ->
+                val newList = filter(list, category).sortedBy { !it.hasDeadline }
+                if (newList.isEmpty())
+
+                    if (count < categories.value!!.size) {
+                        if (categories.value!![count] != defaultCategory)
+                            _activeCategory.value = categories.value!![count++]
+                        else _activeCategory.value = categories.value!![++count]
+                    } else _activeCategory.value = null
+                else result.value = newList
+            }
+        }
+
+        inputA.let {
+            result.addSource(it, doOperationIfA)
+        }
+
+        inputB.let { result.addSource(it, doOperationIfB) }
+        return result
     }
 }
 

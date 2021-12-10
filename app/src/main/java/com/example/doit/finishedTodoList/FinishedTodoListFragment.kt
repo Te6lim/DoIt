@@ -68,10 +68,6 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
 
         with(viewModel) {
 
-            awaitCategory.observe(viewLifecycleOwner) { }
-
-            awaitTodoList.observe(viewLifecycleOwner) { }
-
             completedTodos.observe(viewLifecycleOwner) {
                 it?.let {
                     adapter.submitList(it)

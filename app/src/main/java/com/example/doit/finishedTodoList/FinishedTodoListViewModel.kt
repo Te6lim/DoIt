@@ -18,31 +18,13 @@ class FinishedTodoListViewModel(
     private val defaultCategory: LiveData<Category>
         get() = _defaultCategory
 
+    private val allTodos = todoDatabase.getAll()
+
     init {
         initializeCategory()
     }
 
-    private val allTodos = todoDatabase.getAll()
-
-    val awaitCategory = Transformations.map(defaultCategory) {
-        allTodos.value?.let { list ->
-            _completedTodos.value = list.filter { todo ->
-                todo.isFinished && todo.catId == it.id
-            }.sortedBy { t -> t.dateFinished }.reversed()
-        }
-    }
-
-    val awaitTodoList = Transformations.map(allTodos) {
-        it?.let { list ->
-            _completedTodos.value = list.filter { todo ->
-                todo.isFinished && todo.catId == defaultCategory.value!!.id
-            }.sortedBy { t -> t.dateFinished }.reversed()
-        }
-    }
-
-    private val _completedTodos = MutableLiveData<List<Todo>>()
-    val completedTodos: LiveData<List<Todo>>
-        get() = _completedTodos
+    val completedTodos = fetchList(defaultCategory, allTodos)
 
     val categoryCountPair = Transformations.map(completedTodos) {
         Pair(defaultCategory.value!!.name, it.size)
@@ -94,6 +76,29 @@ class FinishedTodoListViewModel(
 
     fun isNavigating(value: Boolean) {
         _navigating.value = value
+    }
+
+    private fun fetchList(
+        category: LiveData<Category>, list: LiveData<List<Todo>?>
+    ): LiveData<List<Todo>> {
+        val result = MediatorLiveData<List<Todo>>()
+
+        val operationOnCategoryReady = Observer<Category> { cat ->
+            result.value = list.value?.filter { todo ->
+                todo.isFinished && todo.catId == cat.id
+            }?.sortedBy { t -> t.dateFinished }?.reversed()
+        }
+
+        val operationOnListReady = Observer<List<Todo>?> {
+            result.value = it.filter { todo ->
+                todo.isFinished && todo.catId == category.value!!.id
+            }.sortedBy { t -> t.dateFinished }.reversed()
+        }
+
+        result.addSource(category, operationOnCategoryReady)
+        result.addSource(list, operationOnListReady)
+
+        return result
     }
 }
 

@@ -24,11 +24,11 @@ class CreateTodoViewModel(
 
     val categories = catDb.getAll()
 
-    private val _todoModel = MutableLiveData<TodoModel>()
-    val todoModel: LiveData<TodoModel>
-        get() = _todoModel
+    private val _todoCreated = MutableLiveData<Boolean>()
+    val todoCreated: LiveData<Boolean>
+        get() = _todoCreated
 
-    var model = TodoModel()
+    var todoModel = TodoModel()
         private set
 
     private val _categoryEditTextIsOpen = MutableLiveData<Boolean>()
@@ -60,39 +60,37 @@ class CreateTodoViewModel(
         }
     }
 
-    fun add(todoModel: TodoModel) {
-        uiScope.launch {
-            val todo = Todo(
-                todoString = todoModel.description.value!!,
-                catId = category.value!!.id,
-                dateTodo = LocalDateTime.of(
-                    todoModel.dateTodoLive.value ?: LocalDate.now(),
-                    todoModel.timeTodoLive.value ?: LocalTime.now()
-                ),
-                hasDeadline = todoModel.hasDeadline.value!!,
-            ).apply {
-                if (hasDeadline) {
-                    deadlineDate =
-                        LocalDateTime.of(
-                            todoModel.deadlineDateLive.value!!.toLocalDate(),
-                            todoModel.deadlineDateLive.value!!.toLocalTime()
-                        )
-                }
+    fun createTodoInfo() {
+        val todo = Todo(
+            todoString = todoModel.description.value!!,
+            catId = category.value!!.id,
+            dateTodo = LocalDateTime.of(
+                todoModel.dateTodoLive.value ?: LocalDate.now(),
+                todoModel.timeTodoLive.value ?: LocalTime.now()
+            ),
+            hasDeadline = todoModel.hasDeadline.value!!,
+        ).apply {
+            if (hasDeadline) {
+                deadlineDate =
+                    LocalDateTime.of(
+                        todoModel.deadlineDateLive.value!!.toLocalDate(),
+                        todoModel.deadlineDateLive.value!!.toLocalTime()
+                    )
             }
+        }
+        uiScope.launch {
             withContext(Dispatchers.IO) {
                 if (editTodo.value != null) todoDb.update(todo.apply { todoId = editTodoId })
                 else todoDb.insert(todo)
             }
         }
-    }
 
-    fun createTodoInfo() {
-        _todoModel.value = model
+        _todoCreated.value = true
     }
 
     fun clearTodoInfo() {
-        model = TodoModel()
-        _todoModel.value = model
+        todoModel = TodoModel()
+        _todoCreated.value = false
     }
 
     fun addNewCategory(newCategory: String, default: Boolean = false) {
@@ -127,22 +125,22 @@ class CreateTodoViewModel(
         uiScope.launch {
             val todoEdit = editTodo
             with(editTodo) {
-                model.setDescription(todoString)
-                model.setDateTodo(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
-                model.setTimeTodo(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
+                todoModel.setDescription(todoString)
+                todoModel.setDateTodo(dateTodo.year, dateTodo.monthValue, dateTodo.dayOfMonth)
+                todoModel.setTimeTodo(dateTodo.toLocalTime().hour, dateTodo.toLocalTime().minute)
                 if (todoEdit.hasDeadline) {
-                    model.setHasDeadlineEnabled(true)
-                    model.setDeadlineDate(
+                    todoModel.setHasDeadlineEnabled(true)
+                    todoModel.setDeadlineDate(
                         deadlineDate!!.year,
                         deadlineDate!!.monthValue,
                         deadlineDate!!.dayOfMonth
                     )
-                    model.setDeadlineTime(
+                    todoModel.setDeadlineTime(
                         deadlineDate!!.hour,
                         deadlineDate!!.minute
                     )
                 } else {
-                    model.setHasDeadlineEnabled(false)
+                    todoModel.setHasDeadlineEnabled(false)
                 }
             }
         }

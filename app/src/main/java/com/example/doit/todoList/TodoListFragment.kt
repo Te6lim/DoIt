@@ -180,7 +180,11 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         binding.addNew.setOnClickListener {
             findNavController().navigate(
                 TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                ).setDefaultCategoryId(todoListViewModel.activeCategory.value!!.id)
+                ).setDefaultCategoryId(
+                    if (todoListViewModel.activeCategory.value != null)
+                        todoListViewModel.activeCategory.value!!.id
+                    else todoListViewModel.defaultCategory!!.id
+                )
             )
             todoListViewModel.isNavigating(true)
         }
@@ -188,8 +192,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         with(todoListViewModel) {
 
             categoriesTransform.observe(viewLifecycleOwner) {}
-
-            defaultTransform.observe(viewLifecycleOwner) {}
 
             todoList.observe(viewLifecycleOwner) { list ->
                 adapter.submitList(list)
@@ -209,7 +211,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
             itemCountInCategory.observe(viewLifecycleOwner) {
                 mainActivity.supportActionBar?.subtitle = resources.getString(
-                    R.string.category_plus_count, it.first, it.second
+                    R.string.category_plus_count, it?.first, it?.second
                 )
             }
 
