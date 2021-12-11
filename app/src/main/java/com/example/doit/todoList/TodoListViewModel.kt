@@ -233,11 +233,9 @@ class TodoListViewModel(
             inputB.value?.let { list ->
                 if (!list.isNullOrEmpty()) {
                     val newList = filter(list, category).sortedBy { !it.hasDeadline }
-                    if (newList.isEmpty()) selectNextCategory()
-                    else {
-                        result.value = newList
-                        resetItemsState(newList)
-                    }
+                    resetItemsState(newList)
+                    result.value = newList
+
                 }
             }
         }
@@ -245,17 +243,18 @@ class TodoListViewModel(
         val doOperationIfB = Observer<List<Todo>?> { list ->
             inputA.value?.let { category ->
                 val newList = filter(list, category).sortedBy { !it.hasDeadline }
-                if (newList.isEmpty()) selectNextCategory()
-                else resetItemsState(newList)
-                result.value = newList
+                if (newList.isEmpty())
+                    selectNextCategory()
+                else {
+                    resetItemsState(newList)
+                    result.value = newList
+                }
             }
         }
 
-        inputA.let {
-            result.addSource(it, doOperationIfA)
-        }
+        result.addSource(inputA, doOperationIfA)
 
-        inputB.let { result.addSource(it, doOperationIfB) }
+        result.addSource(inputB, doOperationIfB)
         return result
     }
 
