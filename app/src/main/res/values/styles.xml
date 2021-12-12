@@ -15,13 +15,14 @@
     <style name="summaryHead">
         <item name="android:fontFamily">@font/varela_round</item>
         <item name="android:textColor">@color/primaryColor</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="summaryTitle">
         <item name="android:textColor">@color/secondaryColor</item>
         <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

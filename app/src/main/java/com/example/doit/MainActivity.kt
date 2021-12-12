@@ -121,16 +121,7 @@ class MainActivity : AppCompatActivity() {
                             graph = graph.apply {
                                 startDestination = R.id.todoListFragment
                             }
-
-                            /*val navOptions = NavOptions.Builder().setPopUpTo(
-                                currentDestination!!.id, true
-                            ).build()
-                            navigate(
-                                R.id.action_completedTodoListFragment_to_todoListFragment,
-                                savedInstanceState, navOptions
-                            )*/
                             toggle.syncState()
-                            //graph.startDestination = R.id.todoListFragment
                         }
 
                         drawer.closeDrawer(GravityCompat.START)
@@ -142,18 +133,20 @@ class MainActivity : AppCompatActivity() {
                             graph = graph.apply {
                                 startDestination = R.id.finishedTodoListFragment
                             }
-
-                            /*val navOptions = NavOptions.Builder().setPopUpTo(
-                                currentDestination!!.id, true
-                            ).build()
-                            navigate(
-                                R.id.action_todoListFragment_to_completedTodoListFragment,
-                                savedInstanceState, navOptions
-                            )*/
                             toggle.syncState()
-                            //graph.startDestination = R.id.finishedTodoListFragment
                         }
 
+                        drawer.closeDrawer(GravityCompat.START)
+                        true
+                    }
+
+                    R.id.summary_navView -> {
+                        if (currentDestination!!.id != R.id.summaryFragment) {
+                            graph = graph.apply {
+                                startDestination = R.id.summaryFragment
+                            }
+                            toggle.syncState()
+                        }
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
