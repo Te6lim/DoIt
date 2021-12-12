@@ -267,7 +267,7 @@ class TodoListViewModel(
     }
 
     private fun selectNextCategory() {
-        val c = count++ % categories.value!!.size
+        val c = ++count % categories.value!!.size
         _activeCategory.value = categories.value!![c]
     }
 }
