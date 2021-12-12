@@ -28,6 +28,8 @@ class TodoListViewModel(
     val activeCategory: LiveData<Category>
         get() = _activeCategory
 
+    private var listIsReady: Boolean = true
+
     private var itemsState = mutableListOf<Boolean>()
 
     private val _isNavigating = MutableLiveData<Boolean>()
@@ -61,13 +63,9 @@ class TodoListViewModel(
         list?.none { !it.isFinished } ?: true
     }
 
-    val itemCountInCategory = Transformations.map(todoList) { list ->
-        with(activeCategory.value) {
-            this?.let {
-                it.name to list.size
-            } ?: defaultCategory!!.name to 0
-        }
-    }
+    private val _itemCountInCategory = MutableLiveData<Pair<String, Int>>()
+    val itemCountInCategory: LiveData<Pair<String, Int>>
+        get() = _itemCountInCategory
 
     fun itemsState() = itemsState.toList()
 
@@ -103,6 +101,7 @@ class TodoListViewModel(
     }
 
     fun emitAsActive(id: Int) {
+        listIsReady = false
         viewModelScope.launch {
             _activeCategory.value = getCategoryById(id)
         }
@@ -231,21 +230,30 @@ class TodoListViewModel(
 
         val doOperationIfA = Observer<Category> { category ->
             inputB.value?.let { list ->
-                if (!list.isNullOrEmpty()) {
+                if (!list.isNullOrEmpty() && listIsReady) {
                     val newList = filter(list, category).sortedBy { !it.hasDeadline }
-                    resetItemsState(newList)
-                    result.value = newList
-
+                    if (newList.isEmpty() && category != defaultCategory)
+                        selectNextCategory()
+                    else {
+                        _itemCountInCategory.value = category.name to newList.size
+                        resetItemsState(newList)
+                        result.value = newList
+                    }
+                } else {
+                    _itemCountInCategory.value = category.name to 0
+                    result.value = null
                 }
             }
         }
 
         val doOperationIfB = Observer<List<Todo>?> { list ->
+            listIsReady = true
             inputA.value?.let { category ->
                 val newList = filter(list, category).sortedBy { !it.hasDeadline }
                 if (newList.isEmpty())
                     selectNextCategory()
                 else {
+                    _itemCountInCategory.value = category.name to newList.size
                     resetItemsState(newList)
                     result.value = newList
                 }
@@ -259,15 +267,8 @@ class TodoListViewModel(
     }
 
     private fun selectNextCategory() {
-        if (count < categories.value!!.size) {
-            if (categories.value!![count] != defaultCategory)
-                _activeCategory.value = categories.value!![count++]
-            else {
-                if (count + 1 < categories.value!!.size)
-                    _activeCategory.value = categories.value!![++count]
-                else _activeCategory.value = null
-            }
-        } else _activeCategory.value = null
+        val c = ++count % categories.value!!.size
+        _activeCategory.value = categories.value!![c]
     }
 }
 
