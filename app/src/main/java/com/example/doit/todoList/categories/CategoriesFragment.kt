@@ -18,6 +18,11 @@ import com.example.doit.todoList.toCategory
 
 class CategoriesFragment : Fragment() {
 
+    companion object {
+        const val LIST_STATE_KEY: String = "CategoriesFragment"
+        const val DEF_KEY = "KEY"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -46,8 +51,9 @@ class CategoriesFragment : Fragment() {
                         TodoListFragment.ADDRESS -> {
                             if (t.todoCount != 0) {
                                 previousBackStackEntry?.savedStateHandle?.set(
-                                    TodoListFragment.DEF_KEY, t.id
+                                    DEF_KEY, t.id
                                 )
+                                previousBackStackEntry?.savedStateHandle?.set(LIST_STATE_KEY, true)
                                 popBackStack()
                             } else {
                                 Toast.makeText(
@@ -59,7 +65,7 @@ class CategoriesFragment : Fragment() {
                         FinishedTodoListFragment.ADDRESS -> {
                             if (t.todoCompletedCount != 0) {
                                 previousBackStackEntry?.savedStateHandle?.set(
-                                    TodoListFragment.DEF_KEY, t.id
+                                    DEF_KEY, t.id
                                 )
                                 popBackStack()
                             } else {
@@ -71,7 +77,6 @@ class CategoriesFragment : Fragment() {
                         else -> {
                         }
                     }
-
                 }
             }
 

@@ -16,13 +16,14 @@ import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.FragmentListTodoBinding
+import com.example.doit.todoList.categories.CategoriesFragment.Companion.DEF_KEY
+import com.example.doit.todoList.categories.CategoriesFragment.Companion.LIST_STATE_KEY
 import java.time.LocalDateTime
 
 class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     companion object {
         const val SCROLL = "SCROLL"
-        const val DEF_KEY = "KEY"
         const val ADDRESS = "Todolist"
     }
 
@@ -197,7 +198,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
             itemCountInCategory.observe(viewLifecycleOwner) {
                 mainActivity.supportActionBar?.subtitle = resources.getString(
-                    R.string.category_plus_count, it?.first, it?.second
+                    R.string.category_plus_count, it.first, it.second
                 )
             }
 
@@ -237,7 +238,9 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Int>(DEF_KEY)?.observe(viewLifecycleOwner) { value ->
             if (value != null) {
-                todoListViewModel.emitAsActive(value)
+                todoListViewModel.emitAsActive(
+                    value, savedStateHandle[LIST_STATE_KEY] ?: false
+                )
                 savedStateHandle.remove<Int>(DEF_KEY)
             }
         }

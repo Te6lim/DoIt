@@ -65,7 +65,7 @@ class TodoListViewModel(
 
     private val _itemCountInCategory = MutableLiveData<Pair<String, Int>>()
     val itemCountInCategory: LiveData<Pair<String, Int>>
-        get() = _itemCountInCategory
+    get() = _itemCountInCategory
 
     fun itemsState() = itemsState.toList()
 
@@ -100,8 +100,8 @@ class TodoListViewModel(
         }
     }
 
-    fun emitAsActive(id: Int) {
-        listIsReady = false
+    fun emitAsActive(id: Int, isListAvailable: Boolean) {
+        listIsReady = isListAvailable
         viewModelScope.launch {
             _activeCategory.value = getCategoryById(id)
         }
@@ -267,7 +267,7 @@ class TodoListViewModel(
     }
 
     private fun selectNextCategory() {
-        val c = ++count % categories.value!!.size
+        val c = count++ % categories.value!!.size
         _activeCategory.value = categories.value!![c]
     }
 }
