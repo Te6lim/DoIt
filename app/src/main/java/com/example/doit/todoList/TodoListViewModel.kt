@@ -267,8 +267,15 @@ class TodoListViewModel(
     }
 
     private fun selectNextCategory() {
-        val c = ++count % categories.value!!.size
-        _activeCategory.value = categories.value!![c]
+        var c = ++count % categories.value!!.size
+        var nextCategory = categories.value!![c]
+        var i = 0
+        while (i < categories.value!!.size - 1 && allTodos.value!!.none { it.catId == nextCategory.id }) {
+            c = ++count % categories.value!!.size
+            nextCategory = categories.value!![c]
+            ++i
+        }
+        _activeCategory.value = nextCategory
     }
 }
 

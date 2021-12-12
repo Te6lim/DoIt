@@ -241,7 +241,10 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                 todoListViewModel.emitAsActive(
                     value, savedStateHandle[LIST_STATE_KEY] ?: false
                 )
+                val isListAvailable: Boolean = savedStateHandle[LIST_STATE_KEY] ?: false
+                if (isListAvailable) savedStateHandle.remove<Boolean>(LIST_STATE_KEY)
                 savedStateHandle.remove<Int>(DEF_KEY)
+
             }
         }
 
