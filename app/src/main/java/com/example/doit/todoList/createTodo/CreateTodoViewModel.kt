@@ -80,32 +80,34 @@ class CreateTodoViewModel(
         }
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                if (editTodo.value != null) todoDb.update(editTodo.value!!.apply {
-                    todoString = todoModel.description.value!!
-                    catId = category.value!!.id
-                    dateTodo = LocalDateTime.of(
-                        todoModel.dateTodoLive.value ?: LocalDate.now(),
-                        todoModel.timeTodoLive.value ?: LocalTime.now()
-                    )
-                    hasDeadline = todoModel.hasDeadline.value!!
-                    if (hasDeadline) {
-                        deadlineDate =
-                            LocalDateTime.of(
-                                todoModel.deadlineDateLive.value!!.toLocalDate(),
-                                todoModel.deadlineDateLive.value!!.toLocalTime()
-                            )
-                    }
-                })
-                else todoDb.insert(todo)
+                if (editTodo.value != null) {
+                    todoDb.update(editTodo.value!!.apply {
+                        todoString = todoModel.description.value!!
+                        catId = category.value!!.id
+                        dateTodo = LocalDateTime.of(
+                            todoModel.dateTodoLive.value!!,
+                            todoModel.timeTodoLive.value!!
+                        )
+                        hasDeadline = todoModel.hasDeadline.value!!
+                        if (hasDeadline) {
+                            deadlineDate =
+                                LocalDateTime.of(
+                                    todoModel.deadlineDateLive.value!!.toLocalDate(),
+                                    todoModel.deadlineDateLive.value!!.toLocalTime()
+                                )
+                        }
+                    })
+                    clearTodoInfo()
+                } else todoDb.insert(todo)
             }
         }
 
         _todoCreated.value = true
     }
 
-    fun clearTodoInfo() {
+    private fun clearTodoInfo() {
         todoModel = TodoModel()
-        _todoCreated.value = false
+        _todoCreated.postValue(false)
     }
 
     fun addNewCategory(newCategory: String, default: Boolean = false) {
@@ -160,8 +162,6 @@ class CreateTodoViewModel(
             }
         }
     }
-
-    fun isEditTodoActive() = editTodoId != -1L
 
     override fun onCleared() {
         uiScope.cancel()

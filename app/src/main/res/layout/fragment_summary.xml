@@ -6,6 +6,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.example.doit.summary.SummaryViewModel" />
     </data>
 
     <ScrollView
@@ -32,13 +35,13 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/created_count_text"
                     style="@style/summaryHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:text="1000"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView5"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/finished_count_text"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="1000" />
 
@@ -57,13 +60,14 @@
                     tools:text="Created" />
 
                 <TextView
-                    android:id="@+id/textView5"
+                    android:id="@+id/finished_count_text"
                     style="@style/summaryHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:text="700"
+                    app:finishedTodoCount="@{viewModel.readySummary.todosFinished}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="700" />
@@ -80,17 +84,17 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toEndOf="@+id/textView7"
-                    app:layout_constraintTop_toBottomOf="@+id/textView5"
+                    app:layout_constraintTop_toBottomOf="@+id/finished_count_text"
                     tools:text="Finished" />
 
                 <TextView
-                    android:id="@+id/textView10"
+                    android:id="@+id/deadlineUnMet_count_text"
                     style="@style/summaryHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:text="100"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView8"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/deadlineMet_count_text"
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:text="100" />
 
@@ -110,7 +114,7 @@
                     tools:text="Deadlines unmet" />
 
                 <TextView
-                    android:id="@+id/textView8"
+                    android:id="@+id/deadlineMet_count_text"
                     style="@style/summaryHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -132,7 +136,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/textView7"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView8"
+                    app:layout_constraintTop_toBottomOf="@+id/deadlineMet_count_text"
                     tools:text="Deadlines met" />
 
                 <TextView
@@ -148,11 +152,11 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView22"
+                    app:layout_constraintTop_toBottomOf="@+id/discarded_text"
                     tools:text="Discarded" />
 
                 <TextView
-                    android:id="@+id/textView22"
+                    android:id="@+id/discarded_text"
                     style="@style/summaryHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

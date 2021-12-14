@@ -19,7 +19,7 @@ class TodoListViewModel(
     }
 
     private val categories = catDb.getAll()
-    private val allTodos = todoDb.getAll()
+    val allTodos = todoDb.getAll()
 
     var defaultCategory: Category? = null
         private set
@@ -40,8 +40,18 @@ class TodoListViewModel(
     val selectionCount: LiveData<Int>
         get() = _selectionCount
 
-    val categoriesTransform = Transformations.map(categories) {
+    val categoriesTransform = Transformations.map(categories) { catList ->
         count = 0
+        if (catList.isNullOrEmpty()) {
+            val cat = Category(
+                name = CreateTodoViewModel.DEFAULT_CATEGORY, isDefault = true
+            )
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    catDb.insert(cat)
+                }
+            }
+        }
         emitDefault()
     }
 

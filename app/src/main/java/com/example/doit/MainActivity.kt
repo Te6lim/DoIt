@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
+import com.example.doit.database.getInstance
 import com.example.doit.databinding.ActivityMainBinding
 import com.example.doit.summary.SummaryViewModel
 import com.example.doit.summary.SummaryViewModelFactory
@@ -25,6 +26,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
 
     lateinit var mainViewModel: MainViewModel
+        private set
+
+    lateinit var summaryViewModel: SummaryViewModel
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +46,15 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(
             this, viewModelFactory
         )[MainViewModel::class.java]
+
+        val catDb = CategoryDb.getInstance(this).dao
+        val todoDb = TodoDatabase.getInstance(this).databaseDao
+
+        summaryViewModel = ViewModelProvider(
+            this, SummaryViewModelFactory(
+                getInstance(this).summaryDao, catDb, todoDb
+            )
+        )[SummaryViewModel::class.java]
 
         drawer = mainBinding.drawer
         navView = mainBinding.navView
@@ -161,6 +174,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        summaryViewModel.readySummary.observe(this) {
+            val x = 9
         }
 
     }

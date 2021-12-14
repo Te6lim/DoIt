@@ -12,11 +12,11 @@ data class Summary(
     @ColumnInfo(name = "deadlinesMet") var deadlinesMet: Int = 0,
     @ColumnInfo(name = "deadlinesUnmet") var deadlinesUnmet: Int = 0,
     @ColumnInfo(name = "todosDiscarded") var todosDiscarded: Int = 0,
-    @ColumnInfo(name = "mostActiveCategory") var mostActiveCategory: Int = 0,
+    @ColumnInfo(name = "mostActiveCategory") var mostActiveCategory: Int = -1,
     @ColumnInfo(name = "leastActiveCategory") var leastActiveCategory: Int = 0,
-    @ColumnInfo(name = "mostSuccessfulCategory") var mostSuccessfulCategory: Int = 0,
+    @ColumnInfo(name = "mostSuccessfulCategory") var mostSuccessfulCategory: Int = -1,
     @ColumnInfo(name = "mostSuccessfulRatio") var mostSuccessfulRatio: Int = 0,
-    @ColumnInfo(name = "leastSuccessfulCategory") var leastSuccessfulCategory: Int = 0,
+    @ColumnInfo(name = "leastSuccessfulCategory") var leastSuccessfulCategory: Int = -1,
     @ColumnInfo(name = "leastSuccessfulRatio") var leastSuccessfulRatio: Int = 0
 )
 

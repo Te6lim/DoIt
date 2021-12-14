@@ -74,7 +74,6 @@ class CreateTodoFragment : Fragment() {
                         val id = binding.categorySelection.checkedRadioButtonId
                         previousBackStackEntry?.savedStateHandle?.set("KEY", id)
                     }.popBackStack()
-                    clearTodoInfo()
                 }
             }
 

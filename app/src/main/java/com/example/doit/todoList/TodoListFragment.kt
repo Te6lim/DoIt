@@ -52,25 +52,20 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
             this, viewModelFactory
         )[TodoListViewModel::class.java]
 
-        val summaryViewModel = ViewModelProvider(
-            this, SummaryViewModelFactory(
-                getInstance(requireContext()).summaryDao,
-                categoryDatabase.dao,
-                todoDatabase.databaseDao
-            )
-        )[SummaryViewModel::class.java]
-
         binding.lifecycleOwner = this
 
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
 
             override fun onCheck(t: Todo, holder: View) {
+                val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
                 todoListViewModel.updateTodo(
                     t.apply {
-                        isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
+                        isFinished = checkBox!!.isChecked
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
                     })
+                if (t.isFinished) mainActivity.summaryViewModel.updateFinishedCount(true)
+                else mainActivity.summaryViewModel.updateFinishedCount(false)
             }
 
             var isSelected: Boolean = false

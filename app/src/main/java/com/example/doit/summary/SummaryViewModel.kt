@@ -1,10 +1,7 @@
 package com.example.doit.summary
 
 import androidx.lifecycle.*
-import com.example.doit.database.CategoryDao
-import com.example.doit.database.Summary
-import com.example.doit.database.SummaryDao
-import com.example.doit.database.TodoDbDao
+import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -15,9 +12,28 @@ class SummaryViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao
 ) : ViewModel() {
 
-    private val allTodos = todoDb.getAll()
+    val allTodos = todoDb.getAll()
 
     private val summary = summaryDb.getSummary()
+
+    val readySummary = fetchReadySummary()
+
+    private fun fetchReadySummary(): LiveData<Summary> {
+        val result = MediatorLiveData<Summary>()
+        val action = Observer<Summary?> {
+            if (it == null) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(Summary())
+                    }
+                }
+            } else
+                result.value = it
+        }
+        result.addSource(summary, action)
+        return result
+    }
+
 
     private val _todoCreated = MutableLiveData<Boolean>()
     val todoCreated: LiveData<Boolean>
@@ -51,9 +67,9 @@ class SummaryViewModel(
     val mostSuccessful: LiveData<Int>
         get() = _mostSuccessful
 
-    private val _leastSuccesful = MutableLiveData<Int>()
+    private val _leastSuccessful = MutableLiveData<Int>()
     val leastSuccessful: LiveData<Int>
-        get() = _leastSuccesful
+        get() = _leastSuccessful
 
     fun setIsTodoCreated(value: Boolean) {
         _todoCreated.value = value
@@ -67,11 +83,15 @@ class SummaryViewModel(
         _discarded.value = value
     }
 
-    fun updateFinishedCount() {
+    fun updateFinishedCount(value: Boolean) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                summaryDb.insert(summary.value!!.mapExcept {
-                    todosFinished += 1
+                if (value)
+                    summaryDb.insert(summary.value!!.mapExcept {
+                        todosFinished += 1
+                    })
+                else summaryDb.insert(summary.value!!.mapExcept {
+                    todosFinished -= 1
                 })
             }
         }
