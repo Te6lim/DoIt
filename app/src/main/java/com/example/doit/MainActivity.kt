@@ -10,7 +10,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.example.doit.database.CategoryDao
+import com.example.doit.database.CategoryDb
+import com.example.doit.database.TodoDatabase
 import com.example.doit.databinding.ActivityMainBinding
+import com.example.doit.summary.SummaryViewModel
+import com.example.doit.summary.SummaryViewModelFactory
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
 
     lateinit var mainViewModel: MainViewModel
+        private set
+
+    lateinit var summaryViewModel: SummaryViewModel
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +45,13 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(
             this, viewModelFactory
         )[MainViewModel::class.java]
+        val categoryDao = CategoryDb.getInstance(this).dao
+        val todoDbDao = TodoDatabase.getInstance(this).databaseDao
+        val summaryViewModelFactory = SummaryViewModelFactory(categoryDao, todoDbDao)
+
+        summaryViewModel = ViewModelProvider(
+            this, summaryViewModelFactory
+        )[SummaryViewModel::class.java]
 
         drawer = mainBinding.drawer
         navView = mainBinding.navView

@@ -47,9 +47,9 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val categoryDatabase = CategoryDb.getInstance(requireContext())
 
         val viewModelFactory =
-            TodoListViewModelFactory(categoryDatabase.dao, todoDatabase.databaseDao)
+            TodoListViewModelFactory(viewModelStore, categoryDatabase.dao, todoDatabase.databaseDao)
         todoListViewModel = ViewModelProvider(
-            this, viewModelFactory
+            viewModelStore, viewModelFactory
         )[TodoListViewModel::class.java]
 
         binding.lifecycleOwner = this

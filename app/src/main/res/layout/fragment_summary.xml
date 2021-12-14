@@ -74,7 +74,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     android:text="Finished"
                     android:textAlignment="viewEnd"
@@ -128,8 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:text="Deadlines met"
                     app:layout_constraintEnd_toStartOf="@+id/textView7"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -143,7 +141,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
                     android:text="Discarded"
@@ -189,10 +186,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Work: 70%"
+                    android:text="Work"
                     app:layout_constraintBaseline_toBaselineOf="@+id/textView14"
                     app:layout_constraintStart_toStartOf="parent"
-                    tools:text="Work: 70%" />
+                    tools:text="Work" />
 
                 <TextView
                     android:id="@+id/textView13"
@@ -200,7 +197,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="16dp"
                     android:text="Most active"
                     app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
@@ -218,10 +214,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:text="play: 5%"
+                    android:text="play"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="play: 5%" />
+                    tools:text="play" />
 
                 <TextView
                     android:id="@+id/textView15"
@@ -254,7 +250,6 @@
                         style="@style/summaryHead"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin_small"
                         android:text="Career: 90%"
                         android:textAlignment="center"
                         tools:text="Career: 90%" />
@@ -264,7 +259,6 @@
                         style="@style/summaryTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_small"
                         android:text="Most successful"
                         android:textAlignment="center"
                         tools:text="Most successful" />
@@ -287,7 +281,6 @@
                         style="@style/summaryHead"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin_small"
                         android:text="Chores: 17%"
                         android:textAlignment="center"
                         tools:text="Chores: 17%" />
@@ -297,7 +290,6 @@
                         style="@style/summaryTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_small"
                         android:text="Least successful"
                         android:textAlignment="center"
                         tools:text="Least successful" />

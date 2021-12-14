@@ -1,22 +1,29 @@
 package com.example.doit.todoList
 
+import android.content.Context
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
+import com.example.doit.summary.SummaryViewModel
+import com.example.doit.summary.SummaryViewModelFactory
 import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
 class TodoListViewModel(
-    private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    store: ViewModelStore, private val catDb: CategoryDao, private val todoDb: TodoDbDao
 ) : ViewModel() {
 
     companion object {
         var count = 0
     }
+
+    private val summaryViewModel = ViewModelProvider(
+        store, SummaryViewModelFactory(catDb, todoDb)
+    )[SummaryViewModel::class.java]
 
     private val categories = catDb.getAll()
     private val allTodos = todoDb.getAll()
@@ -122,8 +129,10 @@ class TodoListViewModel(
     fun updateTodo(todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                if (todo.isFinished) summaryViewModel.setIsTodFinished(true)
                 todoDb.update(todo)
                 resetItemsState(todoList.value!!)
+                summaryViewModel.setIsTodFinished(null)
             }
         }
     }
@@ -131,8 +140,10 @@ class TodoListViewModel(
     fun delete(id: Long) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                summaryViewModel.setIsTodoDiscarded(true)
                 todoDb.delete(id)
                 resetItemsState(todoList.value!!)
+                summaryViewModel.setIsTodoDiscarded(false)
             }
         }
     }
@@ -249,6 +260,7 @@ class TodoListViewModel(
         val doOperationIfB = Observer<List<Todo>?> { list ->
             listIsReady = true
             inputA.value?.let { category ->
+                count = 0
                 val newList = filter(list, category).sortedBy { !it.hasDeadline }
                 if (newList.isEmpty())
                     selectNextCategory()
@@ -267,10 +279,15 @@ class TodoListViewModel(
     }
 
     private fun selectNextCategory() {
-        var c = ++count % categories.value!!.size
+        var c: Int
+        if (count == 0 && activeCategory.value!! == defaultCategory)
+            c = ++count % categories.value!!.size
+        else c = count++ % categories.value!!.size
         var nextCategory = categories.value!![c]
         var i = 0
-        while (i < categories.value!!.size - 1 && allTodos.value!!.none { it.catId == nextCategory.id }) {
+        while (
+            i < categories.value!!.size - 1 && allTodos.value!!.none { it.catId == nextCategory.id }
+        ) {
             c = ++count % categories.value!!.size
             nextCategory = categories.value!![c]
             ++i
@@ -280,13 +297,14 @@ class TodoListViewModel(
 }
 
 class TodoListViewModelFactory(
+    private val store: ViewModelStore,
     private val categoryDb: CategoryDao,
     private val database: TodoDbDao
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TodoListViewModel::class.java)) {
-            return TodoListViewModel(categoryDb, database) as T
+            return TodoListViewModel(store, categoryDb, database) as T
         }
         throw IllegalArgumentException("unknown viewModel class")
     }
