@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.*
-import com.example.doit.database.CategoryDb
-import com.example.doit.database.Todo
-import com.example.doit.database.TodoDatabase
+import com.example.doit.database.*
 import com.example.doit.databinding.FragmentListTodoBinding
+import com.example.doit.summary.SummaryViewModel
+import com.example.doit.summary.SummaryViewModelFactory
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.DEF_KEY
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.LIST_STATE_KEY
 import java.time.LocalDateTime
@@ -47,10 +47,18 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val categoryDatabase = CategoryDb.getInstance(requireContext())
 
         val viewModelFactory =
-            TodoListViewModelFactory(viewModelStore, categoryDatabase.dao, todoDatabase.databaseDao)
+            TodoListViewModelFactory(categoryDatabase.dao, todoDatabase.databaseDao)
         todoListViewModel = ViewModelProvider(
-            viewModelStore, viewModelFactory
+            this, viewModelFactory
         )[TodoListViewModel::class.java]
+
+        val summaryViewModel = ViewModelProvider(
+            this, SummaryViewModelFactory(
+                getInstance(requireContext()).summaryDao,
+                categoryDatabase.dao,
+                todoDatabase.databaseDao
+            )
+        )[SummaryViewModel::class.java]
 
         binding.lifecycleOwner = this
 

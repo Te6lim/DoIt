@@ -1,29 +1,22 @@
 package com.example.doit.todoList
 
-import android.content.Context
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
-import com.example.doit.summary.SummaryViewModel
-import com.example.doit.summary.SummaryViewModelFactory
 import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
 class TodoListViewModel(
-    store: ViewModelStore, private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    private val catDb: CategoryDao, private val todoDb: TodoDbDao
 ) : ViewModel() {
 
     companion object {
         var count = 0
     }
-
-    private val summaryViewModel = ViewModelProvider(
-        store, SummaryViewModelFactory(catDb, todoDb)
-    )[SummaryViewModel::class.java]
 
     private val categories = catDb.getAll()
     private val allTodos = todoDb.getAll()
@@ -47,19 +40,8 @@ class TodoListViewModel(
     val selectionCount: LiveData<Int>
         get() = _selectionCount
 
-    val categoriesTransform = Transformations.map(categories) { catList ->
+    val categoriesTransform = Transformations.map(categories) {
         count = 0
-        if (catList.isNullOrEmpty()) {
-            val cat = Category(
-                name = CreateTodoViewModel.DEFAULT_CATEGORY, isDefault = true
-            )
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    catDb.insert(cat)
-                }
-            }
-        }
-
         emitDefault()
     }
 
@@ -129,10 +111,8 @@ class TodoListViewModel(
     fun updateTodo(todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                if (todo.isFinished) summaryViewModel.setIsTodFinished(true)
                 todoDb.update(todo)
                 resetItemsState(todoList.value!!)
-                summaryViewModel.setIsTodFinished(null)
             }
         }
     }
@@ -140,10 +120,8 @@ class TodoListViewModel(
     fun delete(id: Long) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                summaryViewModel.setIsTodoDiscarded(true)
                 todoDb.delete(id)
                 resetItemsState(todoList.value!!)
-                summaryViewModel.setIsTodoDiscarded(false)
             }
         }
     }
@@ -297,14 +275,13 @@ class TodoListViewModel(
 }
 
 class TodoListViewModelFactory(
-    private val store: ViewModelStore,
     private val categoryDb: CategoryDao,
     private val database: TodoDbDao
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TodoListViewModel::class.java)) {
-            return TodoListViewModel(store, categoryDb, database) as T
+            return TodoListViewModel(categoryDb, database) as T
         }
         throw IllegalArgumentException("unknown viewModel class")
     }

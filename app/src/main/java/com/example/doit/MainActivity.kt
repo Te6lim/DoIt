@@ -27,9 +27,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var mainViewModel: MainViewModel
         private set
 
-    lateinit var summaryViewModel: SummaryViewModel
-        private set
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,13 +42,6 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(
             this, viewModelFactory
         )[MainViewModel::class.java]
-        val categoryDao = CategoryDb.getInstance(this).dao
-        val todoDbDao = TodoDatabase.getInstance(this).databaseDao
-        val summaryViewModelFactory = SummaryViewModelFactory(categoryDao, todoDbDao)
-
-        summaryViewModel = ViewModelProvider(
-            this, summaryViewModelFactory
-        )[SummaryViewModel::class.java]
 
         drawer = mainBinding.drawer
         navView = mainBinding.navView

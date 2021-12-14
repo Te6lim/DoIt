@@ -5,15 +5,12 @@ import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
-import com.example.doit.summary.SummaryViewModel
-import com.example.doit.summary.SummaryViewModelFactory
 import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 class CreateTodoViewModel(
-    private val store: ViewModelStore,
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
     private val editTodoId: Long
 ) : ViewModel() {
@@ -21,10 +18,6 @@ class CreateTodoViewModel(
     companion object {
         const val DEFAULT_CATEGORY = "Work"
     }
-
-    private val summaryViewModel = ViewModelProvider(
-        store, SummaryViewModelFactory(catDb, todoDb)
-    )[SummaryViewModel::class.java]
 
     private val job = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
@@ -87,12 +80,23 @@ class CreateTodoViewModel(
         }
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                if (editTodo.value != null) todoDb.update(todo.apply { todoId = editTodoId })
-                else {
-                    summaryViewModel.setIsTodoCreated(true)
-                    todoDb.insert(todo)
-                    summaryViewModel.setIsTodoCreated(false)
-                }
+                if (editTodo.value != null) todoDb.update(editTodo.value!!.apply {
+                    todoString = todoModel.description.value!!
+                    catId = category.value!!.id
+                    dateTodo = LocalDateTime.of(
+                        todoModel.dateTodoLive.value ?: LocalDate.now(),
+                        todoModel.timeTodoLive.value ?: LocalTime.now()
+                    )
+                    hasDeadline = todoModel.hasDeadline.value!!
+                    if (hasDeadline) {
+                        deadlineDate =
+                            LocalDateTime.of(
+                                todoModel.deadlineDateLive.value!!.toLocalDate(),
+                                todoModel.deadlineDateLive.value!!.toLocalTime()
+                            )
+                    }
+                })
+                else todoDb.insert(todo)
             }
         }
 
@@ -165,14 +169,13 @@ class CreateTodoViewModel(
 }
 
 class CreateTodoViewModelFactory(
-    private val store: ViewModelStore,
     private val todoDb: TodoDbDao, private val catDb: CategoryDao, private val editTodo: Long
 ) :
     ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
-            return CreateTodoViewModel(store, todoDb, catDb, editTodo) as T
+            return CreateTodoViewModel(todoDb, catDb, editTodo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -10,10 +10,10 @@ data class Category(
     val id: Int = 0,
 
     @ColumnInfo(name = "name")
-    var name: String = "",
+    var name: String = "Work",
 
     @ColumnInfo(name = "is_default")
-    var isDefault: Boolean = false
+    var isDefault: Boolean = true
 )
 
 @Dao

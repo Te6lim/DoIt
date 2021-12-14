@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.doit.R
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
+import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentSummaryBinding
 
 class SummaryFragment : Fragment() {
@@ -27,7 +28,9 @@ class SummaryFragment : Fragment() {
         val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
 
         val summaryViewModel = ViewModelProvider(
-            this, SummaryViewModelFactory(catDb, todoDb)
+            this, SummaryViewModelFactory(
+                getInstance(requireContext()).summaryDao, catDb, todoDb
+            )
         )[SummaryViewModel::class.java]
 
         binding.lifecycleOwner = this

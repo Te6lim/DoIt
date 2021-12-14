@@ -5,28 +5,20 @@ import com.example.doit.database.Category
 import com.example.doit.database.CategoryDao
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDbDao
-import com.example.doit.summary.SummaryViewModel
-import com.example.doit.summary.SummaryViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 
 class FinishedTodoListViewModel(
-    private val store: ViewModelStore,
-    private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    private val categoryDb: CategoryDao, private val todoDatabase: TodoDbDao
 ) : ViewModel() {
-
-    private val summaryViewModel = ViewModelProvider(
-        store, SummaryViewModelFactory(catDb, todoDb)
-    )[SummaryViewModel::class.java]
-
 
     private val _defaultCategory = MutableLiveData<Category>()
     private val defaultCategory: LiveData<Category>
         get() = _defaultCategory
 
-    private val allTodos = todoDb.getAll()
+    private val allTodos = todoDatabase.getAll()
 
     init {
         initializeCategory()
@@ -45,7 +37,7 @@ class FinishedTodoListViewModel(
     private fun initializeCategory() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _defaultCategory.postValue(catDb.getDefault())
+                _defaultCategory.postValue(categoryDb.getDefault())
             }
         }
     }
@@ -53,7 +45,7 @@ class FinishedTodoListViewModel(
     fun emitCategory(id: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _defaultCategory.postValue(catDb.get(id))
+                _defaultCategory.postValue(categoryDb.get(id))
             }
         }
     }
@@ -66,7 +58,7 @@ class FinishedTodoListViewModel(
                         todo.isFinished && todo.catId == defaultCategory.value!!.id
                     }.let { list ->
                         list.forEach { todo ->
-                            todoDb.delete(todo.todoId)
+                            todoDatabase.delete(todo.todoId)
                         }
                     }
                 }
@@ -77,9 +69,7 @@ class FinishedTodoListViewModel(
     fun updateTodo(todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                summaryViewModel.setIsTodFinished(false)
-                todoDb.update(todo)
-                summaryViewModel.setIsTodFinished(null)
+                todoDatabase.update(todo)
             }
         }
     }
@@ -113,7 +103,6 @@ class FinishedTodoListViewModel(
 }
 
 class FinishedTodoListViewModelFactory(
-    private val store: ViewModelStore,
     private val categoryDb: CategoryDao,
     private val todoDatabase: TodoDbDao
 ) :
@@ -121,7 +110,7 @@ class FinishedTodoListViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FinishedTodoListViewModel::class.java)) {
-            return FinishedTodoListViewModel(store, categoryDb, todoDatabase) as T
+            return FinishedTodoListViewModel(categoryDb, todoDatabase) as T
         }
         throw IllegalArgumentException("unknown view model class")
     }

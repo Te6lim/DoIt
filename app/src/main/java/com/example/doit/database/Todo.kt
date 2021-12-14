@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @Entity(tableName = "todo_table")
 data class Todo(
     @PrimaryKey(autoGenerate = true)
-    var todoId: Long = 0L,
+    val todoId: Long = 0L,
 
     @ColumnInfo(name = "todo_text")
     var todoString: String = "",
@@ -26,7 +26,7 @@ data class Todo(
     var isFinished: Boolean = false,
 
     @ColumnInfo(name = "has_deadline")
-    val hasDeadline: Boolean = false,
+    var hasDeadline: Boolean = false,
 
     @ColumnInfo(name = "deadline_date")
     var deadlineDate: LocalDateTime? = null,
