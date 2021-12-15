@@ -11,7 +11,10 @@ import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
+import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentListTodoFinishedBinding
+import com.example.doit.summary.SummaryViewModel
+import com.example.doit.summary.SummaryViewModelFactory
 import com.example.doit.todoList.TodoListAdapter
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.DEF_KEY
 import java.time.LocalDateTime
@@ -25,6 +28,8 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
     private lateinit var binding: FragmentListTodoFinishedBinding
     private lateinit var viewModel: FinishedTodoListViewModel
     private var menuItems: Menu? = null
+
+    private lateinit var summaryViewModel: SummaryViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -45,6 +50,15 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
             this, viewModelFactory
         )[FinishedTodoListViewModel::class.java]
 
+        val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
+        val catDb = CategoryDb.getInstance(requireContext()).dao
+
+        summaryViewModel = ViewModelProvider(
+            requireActivity(), SummaryViewModelFactory(
+                getInstance(requireActivity()).summaryDao
+            )
+        )[SummaryViewModel::class.java]
+
         binding.lifecycleOwner = this
 
         (requireActivity() as MainActivity).supportActionBar?.subtitle = null
@@ -52,12 +66,15 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
             override fun onCheck(t: Todo, holder: View) {
                 viewModel.updateTodo(
+                    t.catId,
                     t.apply {
                         isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
                     }
                 )
+                if (t.isFinished) summaryViewModel.updateFinishedCount(true)
+                else summaryViewModel.updateFinishedCount(false)
             }
 
             override fun selectedView(position: Int, holder: View) {}

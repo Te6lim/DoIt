@@ -20,6 +20,7 @@ class FinishedTodoListViewModel(
 
     private val allTodos = todoDatabase.getAll()
 
+
     init {
         initializeCategory()
     }
@@ -66,10 +67,16 @@ class FinishedTodoListViewModel(
         }
     }
 
-    fun updateTodo(todo: Todo) {
+    fun updateTodo(catId: Int, todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDatabase.update(todo)
+                categoryDb.update(
+                    categoryDb.get(catId)!!.apply {
+                        if (todo.isFinished) totalFinished += 1
+                        else totalFinished -= 1
+                    }
+                )
             }
         }
     }

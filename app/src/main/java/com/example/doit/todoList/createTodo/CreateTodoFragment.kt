@@ -52,9 +52,7 @@ class CreateTodoFragment : Fragment() {
         )[CreateTodoViewModel::class.java]
 
         summaryViewModel = ViewModelProvider(
-            requireActivity(), SummaryViewModelFactory(
-                getInstance(requireActivity()).summaryDao, catDb, todoDb
-            )
+            requireActivity(), SummaryViewModelFactory(getInstance(requireActivity()).summaryDao)
         )[SummaryViewModel::class.java]
 
         binding.viewModel = viewModel

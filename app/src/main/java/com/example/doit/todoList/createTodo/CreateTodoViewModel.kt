@@ -61,23 +61,6 @@ class CreateTodoViewModel(
     }
 
     fun createTodoInfo() {
-        val todo = Todo(
-            todoString = todoModel.description.value!!,
-            catId = category.value!!.id,
-            dateTodo = LocalDateTime.of(
-                todoModel.dateTodoLive.value ?: LocalDate.now(),
-                todoModel.timeTodoLive.value ?: LocalTime.now()
-            ),
-            hasDeadline = todoModel.hasDeadline.value!!,
-        ).apply {
-            if (hasDeadline) {
-                deadlineDate =
-                    LocalDateTime.of(
-                        todoModel.deadlineDateLive.value!!.toLocalDate(),
-                        todoModel.deadlineDateLive.value!!.toLocalTime()
-                    )
-            }
-        }
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 if (editTodo.value != null) {
@@ -98,7 +81,31 @@ class CreateTodoViewModel(
                         }
                     })
                     clearTodoInfo()
-                } else todoDb.insert(todo)
+                } else {
+
+                    val todo = Todo(
+                        todoString = todoModel.description.value!!,
+                        catId = category.value!!.id,
+                        dateTodo = LocalDateTime.of(
+                            todoModel.dateTodoLive.value ?: LocalDate.now(),
+                            todoModel.timeTodoLive.value ?: LocalTime.now()
+                        ),
+                        hasDeadline = todoModel.hasDeadline.value!!,
+                    ).apply {
+                        if (hasDeadline) {
+                            deadlineDate =
+                                LocalDateTime.of(
+                                    todoModel.deadlineDateLive.value!!.toLocalDate(),
+                                    todoModel.deadlineDateLive.value!!.toLocalTime()
+                                )
+                        }
+                    }
+
+                    todoDb.insert(todo)
+                    catDb.update(categories.value!!.find { it.id == todo.catId }!!.apply {
+                        this.totalCreated += 1
+                    })
+                }
             }
         }
 

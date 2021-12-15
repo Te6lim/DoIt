@@ -13,7 +13,13 @@ data class Category(
     var name: String = "Work",
 
     @ColumnInfo(name = "is_default")
-    var isDefault: Boolean = true
+    var isDefault: Boolean = true,
+
+    @ColumnInfo(name = "totalCreated")
+    var totalCreated: Int = 0,
+
+    @ColumnInfo(name = "totalFinished")
+    var totalFinished: Int = 0
 )
 
 @Dao

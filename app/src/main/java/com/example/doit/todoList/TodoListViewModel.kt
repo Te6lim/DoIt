@@ -18,7 +18,7 @@ class TodoListViewModel(
         var count = 0
     }
 
-    private val categories = catDb.getAll()
+    val categories = catDb.getAll()
     val allTodos = todoDb.getAll()
 
     var defaultCategory: Category? = null
@@ -122,6 +122,12 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo)
+                catDb.update(
+                    categories.value!!.find { it.id == todo.catId }!!.apply {
+                        if (todo.isFinished) totalFinished += 1
+                        else totalFinished -= 1
+                    }
+                )
                 resetItemsState(todoList.value!!)
             }
         }

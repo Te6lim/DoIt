@@ -55,9 +55,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         )[TodoListViewModel::class.java]
 
         summaryViewModel = ViewModelProvider(
-            requireActivity(), SummaryViewModelFactory(
-                getInstance(requireActivity()).summaryDao, catDb, todoDb
-            )
+            requireActivity(), SummaryViewModelFactory(getInstance(requireActivity()).summaryDao)
         )[SummaryViewModel::class.java]
 
         binding.lifecycleOwner = this
@@ -72,8 +70,13 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
                     })
-                if (t.isFinished) summaryViewModel.updateFinishedCount(true)
-                else summaryViewModel.updateFinishedCount(false)
+                if (t.isFinished) {
+                    summaryViewModel.updateFinishedCount(true)
+                    summaryViewModel.updateDeadlineStatus(t)
+                } else summaryViewModel.updateFinishedCount(false)
+
+                summaryViewModel.updateMostActive(todoListViewModel.categories.value!!, t.catId)
+                summaryViewModel.updateLeastActive(todoListViewModel.categories.value!!, t.catId)
             }
 
             var isSelected: Boolean = false

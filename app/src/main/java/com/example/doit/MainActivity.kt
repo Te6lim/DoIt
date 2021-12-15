@@ -10,9 +10,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.example.doit.database.CategoryDao
-import com.example.doit.database.CategoryDb
-import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.ActivityMainBinding
 import com.example.doit.summary.SummaryViewModel
@@ -46,12 +43,9 @@ class MainActivity : AppCompatActivity() {
             this, viewModelFactory
         )[MainViewModel::class.java]
 
-        val catDb = CategoryDb.getInstance(this).dao
-        val todoDb = TodoDatabase.getInstance(this).databaseDao
-
         summaryViewModel = ViewModelProvider(
             this, SummaryViewModelFactory(
-                getInstance(this).summaryDao, catDb, todoDb
+                getInstance(this).summaryDao
             )
         )[SummaryViewModel::class.java]
 
@@ -102,6 +96,12 @@ class MainActivity : AppCompatActivity() {
                         navView.setCheckedItem(R.id.finished_todos_navView)
                         toggle.syncState()
                     }
+
+                    R.id.summaryFragment -> {
+                        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                        navView.setCheckedItem(R.id.summary_navView)
+                        toggle.syncState()
+                    }
                     else -> {
                         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                     }
@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
                         if (currentDestination!!.id != R.id.todoListFragment) {
                             graph = graph.apply {
                                 startDestination = R.id.todoListFragment
+                                supportActionBar?.subtitle = null
                             }
                             toggle.syncState()
                         }
@@ -149,6 +150,7 @@ class MainActivity : AppCompatActivity() {
                         if (currentDestination!!.id != R.id.finishedTodoListFragment) {
                             graph = graph.apply {
                                 startDestination = R.id.finishedTodoListFragment
+                                supportActionBar?.subtitle = null
                             }
                             toggle.syncState()
                         }
@@ -161,6 +163,7 @@ class MainActivity : AppCompatActivity() {
                         if (currentDestination!!.id != R.id.summaryFragment) {
                             graph = graph.apply {
                                 startDestination = R.id.summaryFragment
+                                supportActionBar?.subtitle = null
                             }
                             toggle.syncState()
                         }

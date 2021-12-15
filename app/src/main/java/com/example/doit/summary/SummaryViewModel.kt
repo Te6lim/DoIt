@@ -1,6 +1,7 @@
 package com.example.doit.summary
 
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -8,11 +9,8 @@ import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 
 class SummaryViewModel(
-    private val summaryDb: SummaryDao,
-    private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    private val summaryDb: SummaryDao
 ) : ViewModel() {
-
-    val allTodos = todoDb.getAll()
 
     private val summary = summaryDb.getSummary()
 
@@ -32,55 +30,6 @@ class SummaryViewModel(
         }
         result.addSource(summary, action)
         return result
-    }
-
-
-    private val _todoCreated = MutableLiveData<Boolean>()
-    val todoCreated: LiveData<Boolean>
-        get() = _todoCreated
-
-    private val _todoFinished = MutableLiveData<Boolean>()
-    val todoFinished: LiveData<Boolean>
-        get() = _todoFinished
-
-    private val _deadlineMet = MutableLiveData<Boolean>()
-    val deadlineMet: LiveData<Boolean>
-        get() = _deadlineMet
-
-    private val _deadlineUnMet = MutableLiveData<Boolean>()
-    val deadlineUnMet: LiveData<Boolean>
-        get() = _deadlineUnMet
-
-    private val _discarded = MutableLiveData<Boolean>()
-    val discarded: LiveData<Boolean>
-        get() = _discarded
-
-    private val _mostActive = MutableLiveData<Int>()
-    val mostActive: LiveData<Int>
-        get() = _mostActive
-
-    private val _leastActive = MutableLiveData<Int>()
-    val leastActive: LiveData<Int>
-        get() = _leastActive
-
-    private val _mostSuccessful = MutableLiveData<Int>()
-    val mostSuccessful: LiveData<Int>
-        get() = _mostSuccessful
-
-    private val _leastSuccessful = MutableLiveData<Int>()
-    val leastSuccessful: LiveData<Int>
-        get() = _leastSuccessful
-
-    fun setIsTodoCreated(value: Boolean) {
-        _todoCreated.value = value
-    }
-
-    fun setIsTodFinished(value: Boolean) {
-        _todoFinished.value = value
-    }
-
-    fun setIsTodoDiscarded(value: Boolean) {
-        _discarded.value = value
     }
 
     fun updateFinishedCount(value: Boolean) {
@@ -107,11 +56,121 @@ class SummaryViewModel(
         }
     }
 
+    fun updateDeadlineStatus(todo: Todo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (todo.hasDeadline) {
+                    if (todo.dateFinished!!.toLocalDate() <= todo.deadlineDate!!.toLocalDate()) {
+                        summaryDb.insert(summary.value!!.mapExcept {
+                            deadlinesMet += 1
+                        })
+                    } else {
+                        summaryDb.insert(summary.value!!.mapExcept {
+                            deadlinesUnmet += 1
+                        })
+                    }
+                }
+            }
+        }
+    }
+
     fun updateDiscarded() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 summaryDb.insert(summary.value!!.mapExcept {
                     todosDiscarded += 1
+                })
+            }
+        }
+    }
+
+    fun updateMostActive(allCategories: List<Category>, catId: Int = -1) {
+        val mostActiveCount = summary.value!!.mostActiveCategoryCount
+        val category = allCategories.find { it.id == catId }
+
+        if (category != null) {
+            if (category.totalFinished > mostActiveCount) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(summary.value!!.apply {
+                            mostActiveCategory = category.name
+                            mostActiveCategoryCount = category.totalFinished
+                        })
+                    }
+                }
+            }
+        } else {
+            findNextMostActive(allCategories)
+        }
+    }
+
+    private fun findNextMostActive(allCategories: List<Category>) {
+        var countFinished = 0
+        var countCreated = 0
+        var category = summary.value!!.mostActiveCategory
+        allCategories.forEach { cat ->
+            if (cat.totalFinished > countFinished) {
+                countFinished = cat.totalFinished
+                countCreated = cat.totalCreated
+                category = cat.name
+            } else if (cat.totalFinished == countFinished) {
+                if (cat.totalCreated >= countCreated) {
+                    countFinished = cat.totalFinished
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                summaryDb.insert(summary.value!!.apply {
+                    mostActiveCategory = category
+                    mostActiveCategoryCount = countFinished
+                })
+            }
+        }
+    }
+
+    fun updateLeastActive(allCategories: List<Category>, catId: Int = -1) {
+        val leastActiveCount = summary.value!!.leastActiveCategoryCount
+        val category = allCategories.find { it.id == catId }
+
+        if (category != null) {
+            if (category.totalFinished < leastActiveCount) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(summary.value!!.apply {
+                            leastActiveCategory = category.name
+                            leastActiveCategoryCount = category.totalFinished
+                        })
+                    }
+                }
+            }
+        } else {
+            findNextLeastActive(allCategories)
+        }
+    }
+
+    private fun findNextLeastActive(allCategories: List<Category>) {
+        var countFinished = 0
+        var countCreated = 0
+        var category = summary.value!!.leastActiveCategory
+        allCategories.forEach { cat ->
+            if (cat.totalFinished < countFinished) {
+                countFinished = cat.totalFinished
+                countCreated = cat.totalCreated
+                category = cat.name
+            } else if (cat.totalFinished == countFinished) {
+                if (cat.totalCreated < countCreated) {
+                    countFinished = cat.totalFinished
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                summaryDb.insert(summary.value!!.apply {
+                    leastActiveCategory = category
+                    leastActiveCategoryCount = countFinished
                 })
             }
         }
@@ -124,12 +183,11 @@ class SummaryViewModel(
 }
 
 class SummaryViewModelFactory(
-    private val summaryDb: SummaryDao,
-    private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    private val summaryDb: SummaryDao
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SummaryViewModel::class.java))
-            return SummaryViewModel(summaryDb, catDb, todoDb) as T
+            return SummaryViewModel(summaryDb) as T
         throw IllegalArgumentException("Unknown view model class")
     }
 

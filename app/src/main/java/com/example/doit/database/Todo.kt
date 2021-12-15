@@ -13,9 +13,6 @@ data class Todo(
     @ColumnInfo(name = "todo_text")
     var todoString: String = "",
 
-    @ColumnInfo(name = "date_set")
-    var dateSet: LocalDateTime = LocalDateTime.now(),
-
     @ColumnInfo(name = "date_todo")
     var dateTodo: LocalDateTime,
 

@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.doit.MainActivity
 import com.example.doit.R
-import com.example.doit.database.CategoryDb
-import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentSummaryBinding
 
@@ -31,12 +29,9 @@ class SummaryFragment : Fragment() {
 
         mainActivity = (requireActivity() as MainActivity)
 
-        val catDb = CategoryDb.getInstance(requireContext()).dao
-        val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
-
         summaryViewModel = ViewModelProvider(
             requireActivity(), SummaryViewModelFactory(
-                getInstance(requireActivity()).summaryDao, catDb, todoDb
+                getInstance(requireActivity()).summaryDao
             )
         )[SummaryViewModel::class.java]
 
@@ -44,7 +39,7 @@ class SummaryFragment : Fragment() {
 
         binding.viewModel = summaryViewModel
 
-        summaryViewModel.readySummary.observe(viewLifecycleOwner) {}
+        summaryViewModel.readySummary.observe(viewLifecycleOwner) { }
 
         return binding.root
     }
