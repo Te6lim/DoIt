@@ -30,6 +30,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
 
+    private lateinit var summaryViewModel: SummaryViewModel
+
     private lateinit var mainActivity: MainActivity
 
     @SuppressLint("NotifyDataSetChanged")
@@ -43,14 +45,20 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
         setHasOptionsMenu(true)
 
-        val todoDatabase = TodoDatabase.getInstance(requireContext())
-        val categoryDatabase = CategoryDb.getInstance(requireContext())
+        val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
+        val catDb = CategoryDb.getInstance(requireContext()).dao
 
         val viewModelFactory =
-            TodoListViewModelFactory(categoryDatabase.dao, todoDatabase.databaseDao)
+            TodoListViewModelFactory(catDb, todoDb)
         todoListViewModel = ViewModelProvider(
             this, viewModelFactory
         )[TodoListViewModel::class.java]
+
+        summaryViewModel = ViewModelProvider(
+            requireActivity(), SummaryViewModelFactory(
+                getInstance(requireActivity()).summaryDao, catDb, todoDb
+            )
+        )[SummaryViewModel::class.java]
 
         binding.lifecycleOwner = this
 
@@ -64,8 +72,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
                     })
-                if (t.isFinished) mainActivity.summaryViewModel.updateFinishedCount(true)
-                else mainActivity.summaryViewModel.updateFinishedCount(false)
+                if (t.isFinished) summaryViewModel.updateFinishedCount(true)
+                else summaryViewModel.updateFinishedCount(false)
             }
 
             var isSelected: Boolean = false
@@ -302,5 +310,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     override fun positiveAction() {
         todoListViewModel.deleteSelected()
         todoListViewModel.interact()
+        summaryViewModel.updateDiscarded()
     }
 }

@@ -97,6 +97,26 @@ class SummaryViewModel(
         }
     }
 
+    fun updateCreatedCount() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                summaryDb.insert(summary.value!!.mapExcept {
+                    todosCreated += 1
+                })
+            }
+        }
+    }
+
+    fun updateDiscarded() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                summaryDb.insert(summary.value!!.mapExcept {
+                    todosDiscarded += 1
+                })
+            }
+        }
+    }
+
     private fun Summary.mapExcept(x: Summary.() -> Unit): Summary {
         this.x()
         return this

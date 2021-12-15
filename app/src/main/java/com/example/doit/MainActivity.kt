@@ -26,10 +26,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
 
     lateinit var mainViewModel: MainViewModel
-        private set
+    private set
 
-    lateinit var summaryViewModel: SummaryViewModel
-        private set
+    private lateinit var summaryViewModel: SummaryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -177,7 +176,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         summaryViewModel.readySummary.observe(this) {
-            val x = 9
+
         }
 
     }

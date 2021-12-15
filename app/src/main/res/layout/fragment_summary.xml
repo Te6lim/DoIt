@@ -40,7 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="1000"
+                    app:count="@{viewModel.readySummary.todosCreated}"
                     app:layout_constraintBaseline_toBaselineOf="@+id/finished_count_text"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="1000" />
@@ -66,8 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:text="700"
-                    app:finishedTodoCount="@{viewModel.readySummary.todosFinished}"
+                    app:count="@{viewModel.readySummary.todosFinished}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="700" />
@@ -161,7 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="80"
+                    app:count="@{viewModel.readySummary.todosDiscarded}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView9"

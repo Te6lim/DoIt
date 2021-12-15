@@ -16,7 +16,10 @@ import com.example.doit.R
 import com.example.doit.database.Category
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
+import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentTodoCreateBinding
+import com.example.doit.summary.SummaryViewModel
+import com.example.doit.summary.SummaryViewModelFactory
 import java.time.LocalTime
 import java.util.*
 
@@ -25,6 +28,8 @@ class CreateTodoFragment : Fragment() {
     private lateinit var binding: FragmentTodoCreateBinding
     private lateinit var viewModel: CreateTodoViewModel
 
+    private lateinit var summaryViewModel: SummaryViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -32,19 +37,25 @@ class CreateTodoFragment : Fragment() {
             inflater, R.layout.fragment_todo_create, container, false
         )
 
-        val categoryDb = CategoryDb.getInstance(requireContext())
-        val todoDb = TodoDatabase.getInstance(requireContext())
+        val catDb = CategoryDb.getInstance(requireContext()).dao
+        val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
 
         binding.lifecycleOwner = this
 
         val viewModelFactory = CreateTodoViewModelFactory(
-            todoDb.databaseDao, categoryDb.dao,
+            todoDb, catDb,
             CreateTodoFragmentArgs.fromBundle(requireArguments()).todoId
         )
 
         viewModel = ViewModelProvider(
             this, viewModelFactory
         )[CreateTodoViewModel::class.java]
+
+        summaryViewModel = ViewModelProvider(
+            requireActivity(), SummaryViewModelFactory(
+                getInstance(requireActivity()).summaryDao, catDb, todoDb
+            )
+        )[SummaryViewModel::class.java]
 
         binding.viewModel = viewModel
 
@@ -73,6 +84,7 @@ class CreateTodoFragment : Fragment() {
                     findNavController().apply {
                         val id = binding.categorySelection.checkedRadioButtonId
                         previousBackStackEntry?.savedStateHandle?.set("KEY", id)
+                        summaryViewModel.updateCreatedCount()
                     }.popBackStack()
                 }
             }

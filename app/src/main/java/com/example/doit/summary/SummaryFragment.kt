@@ -20,6 +20,8 @@ class SummaryFragment : Fragment() {
 
     private lateinit var binding: FragmentSummaryBinding
 
+    private lateinit var summaryViewModel: SummaryViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -29,9 +31,20 @@ class SummaryFragment : Fragment() {
 
         mainActivity = (requireActivity() as MainActivity)
 
+        val catDb = CategoryDb.getInstance(requireContext()).dao
+        val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
+
+        summaryViewModel = ViewModelProvider(
+            requireActivity(), SummaryViewModelFactory(
+                getInstance(requireActivity()).summaryDao, catDb, todoDb
+            )
+        )[SummaryViewModel::class.java]
+
         binding.lifecycleOwner = this
 
-        binding.viewModel = mainActivity.summaryViewModel
+        binding.viewModel = summaryViewModel
+
+        summaryViewModel.readySummary.observe(viewLifecycleOwner) {}
 
         return binding.root
     }
