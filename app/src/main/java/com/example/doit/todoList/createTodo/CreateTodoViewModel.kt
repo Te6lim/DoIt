@@ -13,9 +13,6 @@ class CreateTodoViewModel(
     private val editTodoId: Long
 ) : ViewModel() {
 
-    private val job = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + job)
-
     val categories = catDb.getAll()
 
     private val summary = summaryDb.getSummary()
@@ -50,7 +47,7 @@ class CreateTodoViewModel(
     }
 
     private fun initializeEditTodo() {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 _editTodo.postValue(todoDb.get(editTodoId))
             }
@@ -58,25 +55,27 @@ class CreateTodoViewModel(
     }
 
     fun createTodoInfo() {
-        uiScope.launch {
+        viewModelScope.launch {
             if (editTodo.value != null) {
-                todoDb.update(editTodo.value!!.apply {
-                    todoString = todoModel.description.value!!
-                    catId = category.value!!.id
-                    dateTodo = LocalDateTime.of(
-                        todoModel.dateTodoLive.value!!,
-                        todoModel.timeTodoLive.value!!
-                    )
-                    hasDeadline = todoModel.hasDeadline.value!!
-                    if (hasDeadline) {
-                        deadlineDate =
-                            LocalDateTime.of(
-                                todoModel.deadlineDateLive.value!!.toLocalDate(),
-                                todoModel.deadlineDateLive.value!!.toLocalTime()
-                            )
-                    }
-                })
-                clearTodoInfo()
+                withContext(Dispatchers.IO) {
+                    todoDb.update(editTodo.value!!.apply {
+                        todoString = todoModel.description.value!!
+                        catId = category.value!!.id
+                        dateTodo = LocalDateTime.of(
+                            todoModel.dateTodoLive.value!!,
+                            todoModel.timeTodoLive.value!!
+                        )
+                        hasDeadline = todoModel.hasDeadline.value!!
+                        if (hasDeadline) {
+                            deadlineDate =
+                                LocalDateTime.of(
+                                    todoModel.deadlineDateLive.value!!.toLocalDate(),
+                                    todoModel.deadlineDateLive.value!!.toLocalTime()
+                                )
+                        }
+                    })
+                    clearTodoInfo()
+                }
             } else {
                 val todo = Todo(
                     todoString = todoModel.description.value!!,
@@ -113,15 +112,17 @@ class CreateTodoViewModel(
     }
 
     fun addNewCategory(newCategory: String, default: Boolean = false) {
-        uiScope.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                catDb.insert(Category(name = newCategory, isDefault = default))
+                val new = Category(name = newCategory, isDefault = default)
+                catDb.insert(new)
+                _category.postValue(new)
             }
         }
     }
 
     fun emitCategory(id: Int) {
-        uiScope.launch {
+        viewModelScope.launch {
             _category.value = getCat(id)
         }
     }
@@ -141,7 +142,7 @@ class CreateTodoViewModel(
     }
 
     private fun initializeFields(editTodo: Todo) {
-        uiScope.launch {
+        viewModelScope.launch {
             val todoEdit = editTodo
             with(editTodo) {
                 todoModel.setDescription(todoString)
@@ -191,10 +192,6 @@ class CreateTodoViewModel(
 
             }
         }
-    }
-
-    override fun onCleared() {
-        uiScope.cancel()
     }
 }
 

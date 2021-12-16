@@ -107,8 +107,11 @@ class TodoModel {
 
     private fun dateIsValid(date: LocalDate, referenceDate: LocalDate): Boolean {
         if (date.year < referenceDate.year) return false
-        if (date.monthValue < referenceDate.monthValue) return false
-        if (date.dayOfMonth < referenceDate.dayOfMonth) return false
+        if (date.year == referenceDate.year && date.monthValue < referenceDate.monthValue)
+            return false
+        if (date.year == referenceDate.year && date.monthValue == referenceDate.monthValue &&
+            date.dayOfMonth < referenceDate.dayOfMonth
+        ) return false
         return true
     }
 

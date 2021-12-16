@@ -70,6 +70,7 @@ class CreateTodoFragment : Fragment() {
                         }, 0
                     )
                 }
+                binding.categorySelection.check(category.value?.id ?: categoryId)
             }
 
             todoCreated.observe(viewLifecycleOwner) { isCreated ->
@@ -110,7 +111,6 @@ class CreateTodoFragment : Fragment() {
             category.observe(viewLifecycleOwner) {
                 it?.let {
                     setTitleToDefaultCategoryName(it)
-                    binding.categorySelection.findViewById<RadioButton>(it.id)?.isChecked = true
                 }
             }
 
