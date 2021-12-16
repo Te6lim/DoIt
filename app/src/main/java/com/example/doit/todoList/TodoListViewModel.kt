@@ -132,6 +132,7 @@ class TodoListViewModel(
                 } else updateFinishedCount(false)
 
                 updateMostActive(cat.id)
+                updateLeastActive()
             }
         }
     }
@@ -380,6 +381,29 @@ class TodoListViewModel(
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
                         mostActiveCategory = it.id
+                    })
+                }
+            }
+        }
+    }
+
+    fun updateLeastActive() {
+        var least: Category = categories.value!![0]
+        for (i in 1..categories.value!!.size - 1) {
+            if (categories.value!![i].totalFinished < least.totalFinished)
+                least = categories.value!![i]
+        }
+        viewModelScope.launch {
+            if (least.id != summary.value!!.mostActiveCategory) {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastActiveCategory = least.id
+                    })
+                }
+            } else {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastActiveCategory = -1
                     })
                 }
             }

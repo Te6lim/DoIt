@@ -183,9 +183,7 @@ class CategoriesFragment : Fragment() {
         with(viewModel) {
             readySummary.observe(viewLifecycleOwner) {}
 
-            categoriesTransform.observe(viewLifecycleOwner) {
-                viewModel.updateMostActive()
-            }
+            categoriesTransform.observe(viewLifecycleOwner) {}
 
             todoListTransform.observe(viewLifecycleOwner) {}
 

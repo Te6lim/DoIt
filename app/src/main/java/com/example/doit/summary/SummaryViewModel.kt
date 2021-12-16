@@ -13,7 +13,6 @@ class SummaryViewModel(
     private val catDb: CategoryDao
 ) : ViewModel() {
 
-    val categories = catDb.getAll()
     private val summary = summaryDb.getSummary()
 
     val readySummary = fetchReadySummary()
@@ -21,6 +20,10 @@ class SummaryViewModel(
     private val _mostActive = MutableLiveData<Category>()
     val mostActive: LiveData<Category>
         get() = _mostActive
+
+    private val _leastActive = MutableLiveData<Category>()
+    val leastActive: LiveData<Category>
+        get() = _leastActive
 
 
     private fun fetchReadySummary(): LiveData<Summary> {
@@ -38,6 +41,9 @@ class SummaryViewModel(
                     withContext(Dispatchers.IO) {
                         _mostActive.postValue(
                             catDb.get(it.mostActiveCategory)
+                        )
+                        _leastActive.postValue(
+                            catDb.get(it.leastActiveCategory)
                         )
                     }
                 }

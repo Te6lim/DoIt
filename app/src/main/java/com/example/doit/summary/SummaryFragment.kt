@@ -43,7 +43,6 @@ class SummaryFragment : Fragment() {
 
         with(summaryViewModel) {
             readySummary.observe(viewLifecycleOwner) { }
-            categories.observe(viewLifecycleOwner) { }
         }
 
         return binding.root

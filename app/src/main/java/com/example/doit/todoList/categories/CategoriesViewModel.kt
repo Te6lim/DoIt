@@ -43,6 +43,8 @@ class CategoriesViewModel(
     val categoriesTransform = Transformations.map(categories) { catList ->
         todos.value?.let { todoList ->
             _catListInfo.value = getList(catList, todoList)
+            updateMostActive()
+            updateLeastActive()
         }
     }
 
@@ -120,7 +122,7 @@ class CategoriesViewModel(
         return result
     }
 
-    fun updateMostActive(catId: Int = -1) {
+    private fun updateMostActive(catId: Int = -1) {
         val cat = categories.value!!.find { it.id == catId }
         val former = categories.value!!.find { it.id == summary.value?.mostActiveCategory }
         if (cat != null) {
@@ -149,6 +151,29 @@ class CategoriesViewModel(
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
                         mostActiveCategory = it.id
+                    })
+                }
+            }
+        }
+    }
+
+    private fun updateLeastActive() {
+        var least: Category = categories.value!![0]
+        for (i in 1 until categories.value!!.size) {
+            if (categories.value!![i].totalFinished < least.totalFinished)
+                least = categories.value!![i]
+        }
+        viewModelScope.launch {
+            if (least.id != summary.value!!.mostActiveCategory) {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastActiveCategory = least.id
+                    })
+                }
+            } else {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastActiveCategory = -1
                     })
                 }
             }
