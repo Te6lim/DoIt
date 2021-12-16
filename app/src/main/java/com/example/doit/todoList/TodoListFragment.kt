@@ -111,7 +111,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                     R.id.edit -> {
                         findNavController().navigate(
                             TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                            ).setTodoId(todoListViewModel.editTodo!!.todoId)
+                            ).setEditTodoId(todoListViewModel.editTodo!!.todoId)
+                                .setActiveCategoryId(todoListViewModel.activeCategory.value!!.id)
                         )
                         todoListViewModel.interact()
                         todoListViewModel.isNavigating(true)
@@ -166,11 +167,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         binding.addNew.setOnClickListener {
             findNavController().navigate(
                 TodoListFragmentDirections.actionTodoListFragmentToCreateTodoFragment(
-                ).setDefaultCategoryId(
-                    if (todoListViewModel.activeCategory.value != null)
-                        todoListViewModel.activeCategory.value!!.id
-                    else todoListViewModel.defaultCategory!!.id
-                )
+
+                ).setActiveCategoryId(todoListViewModel.activeCategory.value!!.id)
             )
             todoListViewModel.isNavigating(true)
         }

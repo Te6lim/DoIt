@@ -18,8 +18,6 @@ import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentTodoCreateBinding
-import com.example.doit.summary.SummaryViewModel
-import com.example.doit.summary.SummaryViewModelFactory
 import java.time.LocalTime
 import java.util.*
 
@@ -43,7 +41,7 @@ class CreateTodoFragment : Fragment() {
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb, catDb,
             getInstance(requireContext()).summaryDao,
-            CreateTodoFragmentArgs.fromBundle(requireArguments()).todoId
+            CreateTodoFragmentArgs.fromBundle(requireArguments()).editTodoId
         )
 
         viewModel = ViewModelProvider(
@@ -52,7 +50,7 @@ class CreateTodoFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        val categoryId = CreateTodoFragmentArgs.fromBundle(requireArguments()).defaultCategoryId
+        val categoryId = CreateTodoFragmentArgs.fromBundle(requireArguments()).activeCategoryId
 
         with(viewModel) {
             categories.observe(viewLifecycleOwner) {
