@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.*
 import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
+import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentCategoriesBinding
 import com.example.doit.finishedTodoList.FinishedTodoListFragment
 import com.example.doit.todoList.TodoListFragment
@@ -33,7 +34,9 @@ class CategoriesFragment : Fragment() {
 
         val todoDbDao = TodoDatabase.getInstance(requireContext()).databaseDao
         val categoryDbDao = CategoryDb.getInstance(requireContext()).dao
-        val viewModelFactory = CategoriesViewModelFactory(categoryDbDao, todoDbDao)
+        val viewModelFactory = CategoriesViewModelFactory(
+            categoryDbDao, todoDbDao, getInstance(requireContext()).summaryDao
+        )
 
         val viewModel = ViewModelProvider(
             this, viewModelFactory
@@ -178,13 +181,15 @@ class CategoriesFragment : Fragment() {
         binding.categoriesRecyclerView.adapter = adapter
 
         with(viewModel) {
-            categoriesTransform.observe(viewLifecycleOwner) {}
+            readySummary.observe(viewLifecycleOwner) {}
+
+            categoriesTransform.observe(viewLifecycleOwner) {
+                viewModel.updateMostActive()
+            }
 
             todoListTransform.observe(viewLifecycleOwner) {}
 
-            defaultCategory.observe(viewLifecycleOwner) {
-
-            }
+            defaultCategory.observe(viewLifecycleOwner) {}
 
         }
 

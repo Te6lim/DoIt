@@ -2,16 +2,14 @@ package com.example.doit.todoList
 
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.example.doit.database.Category
-import com.example.doit.database.CategoryDao
-import com.example.doit.database.Todo
-import com.example.doit.database.TodoDbDao
+import com.example.doit.database.*
 import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
 class TodoListViewModel(
-    private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    private val catDb: CategoryDao, private val todoDb: TodoDbDao,
+    private val summaryDb: SummaryDao
 ) : ViewModel() {
 
     companion object {
@@ -20,6 +18,9 @@ class TodoListViewModel(
 
     val categories = catDb.getAll()
     val allTodos = todoDb.getAll()
+    private val summary = summaryDb.getSummary()
+
+    val readySummary = fetchReadySummary()
 
     var defaultCategory: Category? = null
         private set
@@ -43,12 +44,9 @@ class TodoListViewModel(
     val categoriesTransform = Transformations.map(categories) { catList ->
         count = 0
         if (catList.isNullOrEmpty()) {
-            val cat = Category(
-                name = CreateTodoViewModel.DEFAULT_CATEGORY, isDefault = true
-            )
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    catDb.insert(cat)
+                    catDb.insert(Category())
                 }
             }
         }
@@ -122,13 +120,18 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo)
-                catDb.update(
-                    categories.value!!.find { it.id == todo.catId }!!.apply {
-                        if (todo.isFinished) totalFinished += 1
-                        else totalFinished -= 1
-                    }
-                )
                 resetItemsState(todoList.value!!)
+                val cat = categories.value!!.find { it.id == todo.catId }!!.apply {
+                    if (todo.isFinished) totalFinished += 1
+                    else totalFinished -= 1
+                }
+                catDb.update(cat)
+                if (todo.isFinished) {
+                    updateFinishedCount(true)
+                    updateDeadlineStatus(todo)
+                } else updateFinishedCount(false)
+
+                updateMostActive(cat.id)
             }
         }
     }
@@ -288,16 +291,111 @@ class TodoListViewModel(
         }
         _activeCategory.value = nextCategory
     }
+
+    private fun fetchReadySummary(): LiveData<Summary> {
+        val result = MediatorLiveData<Summary>()
+        val action = Observer<Summary?> {
+            if (it == null) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(Summary())
+                    }
+                }
+            } else {
+                result.value = it
+            }
+        }
+        result.addSource(summary, action)
+        return result
+    }
+
+    fun updateFinishedCount(value: Boolean) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (value)
+                    summaryDb.insert(summary.value!!.apply {
+                        todosFinished += 1
+                    })
+                else summaryDb.insert(summary.value!!.apply {
+                    todosFinished -= 1
+                })
+            }
+        }
+    }
+
+    fun updateDeadlineStatus(todo: Todo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (todo.hasDeadline) {
+                    if (todo.dateFinished!!.toLocalDate() <= todo.deadlineDate!!.toLocalDate()) {
+                        summaryDb.insert(summary.value!!.apply {
+                            deadlinesMet += 1
+                        })
+                    } else {
+                        summaryDb.insert(summary.value!!.apply {
+                            deadlinesUnmet += 1
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateDiscarded() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                summaryDb.insert(summary.value!!.apply {
+                    todosDiscarded += 1
+                })
+            }
+        }
+    }
+
+    fun updateMostActive(catId: Int = -1) {
+        val cat = categories.value!!.find { it.id == catId }
+        val former = categories.value!!.find { it.id == summary.value!!.mostActiveCategory }
+        if (cat != null) {
+            if (cat.totalFinished > former?.totalFinished ?: 0) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(summary.value!!.apply {
+                            mostActiveCategory = cat.id
+                        })
+                    }
+                }
+            }
+        } else {
+            findNextMostActive()
+        }
+    }
+
+    private fun findNextMostActive() {
+        var cat: Category? = null
+        categories.value!!.forEach {
+            if (it.totalFinished > cat?.totalFinished ?: 0) cat = it
+        }
+
+        cat?.let {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        mostActiveCategory = it.id
+                    })
+                }
+            }
+        }
+    }
 }
 
 class TodoListViewModelFactory(
     private val categoryDb: CategoryDao,
-    private val database: TodoDbDao
+    private val database: TodoDbDao,
+    private val summaryDb: SummaryDao
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TodoListViewModel::class.java)) {
-            return TodoListViewModel(categoryDb, database) as T
+            return TodoListViewModel(categoryDb, database, summaryDb) as T
         }
         throw IllegalArgumentException("unknown viewModel class")
     }

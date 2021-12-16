@@ -1,10 +1,7 @@
 package com.example.doit.todoList.categories
 
 import androidx.lifecycle.*
-import com.example.doit.database.Category
-import com.example.doit.database.CategoryDao
-import com.example.doit.database.Todo
-import com.example.doit.database.TodoDbDao
+import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,11 +13,15 @@ enum class DialogOptions(val value: String) {
 
 class CategoriesViewModel(
     private val catDb: CategoryDao,
-    private val todoDb: TodoDbDao
+    private val todoDb: TodoDbDao,
+    private val summaryDb: SummaryDao
 ) : ViewModel() {
 
     private val todos = todoDb.getAll()
-    private val categories = catDb.getAll()
+    val categories = catDb.getAll()
+
+    private val summary = summaryDb.getSummary()
+    val readySummary = fetchReadySummary()
 
     val defaultCategory = Transformations.map(categories) { list ->
         list.find { it.isDefault }
@@ -101,6 +102,58 @@ class CategoriesViewModel(
             }
         }
     }
+
+    private fun fetchReadySummary(): LiveData<Summary> {
+        val result = MediatorLiveData<Summary>()
+        val action = Observer<Summary?> {
+            if (it == null) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(Summary())
+                    }
+                }
+            } else {
+                result.value = it
+            }
+        }
+        result.addSource(summary, action)
+        return result
+    }
+
+    fun updateMostActive(catId: Int = -1) {
+        val cat = categories.value!!.find { it.id == catId }
+        val former = categories.value!!.find { it.id == summary.value?.mostActiveCategory }
+        if (cat != null) {
+            if (cat.totalFinished > former?.totalFinished ?: 0) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(summary.value!!.apply {
+                            mostActiveCategory = cat.id
+                        })
+                    }
+                }
+            }
+        } else {
+            findNextMostActive()
+        }
+    }
+
+    private fun findNextMostActive() {
+        var cat: Category? = null
+        categories.value!!.forEach {
+            if (it.totalFinished > cat?.totalFinished ?: 0) cat = it
+        }
+
+        cat?.let {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        mostActiveCategory = it.id
+                    })
+                }
+            }
+        }
+    }
 }
 
 data class CategoryInfo(
@@ -112,13 +165,14 @@ data class CategoryInfo(
 )
 
 class CategoriesViewModelFactory(
-    private val catDb: CategoryDao, private val todoDb: TodoDbDao
+    private val catDb: CategoryDao, private val todoDb: TodoDbDao,
+    private val summaryDb: SummaryDao
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CategoriesViewModel::class.java))
-            return CategoriesViewModel(catDb, todoDb) as T
+            return CategoriesViewModel(catDb, todoDb, summaryDb) as T
 
         throw IllegalArgumentException("Unknown view model class")
     }

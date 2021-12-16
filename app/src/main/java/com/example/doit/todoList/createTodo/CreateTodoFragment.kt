@@ -28,8 +28,6 @@ class CreateTodoFragment : Fragment() {
     private lateinit var binding: FragmentTodoCreateBinding
     private lateinit var viewModel: CreateTodoViewModel
 
-    private lateinit var summaryViewModel: SummaryViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -44,16 +42,13 @@ class CreateTodoFragment : Fragment() {
 
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb, catDb,
+            getInstance(requireContext()).summaryDao,
             CreateTodoFragmentArgs.fromBundle(requireArguments()).todoId
         )
 
         viewModel = ViewModelProvider(
             this, viewModelFactory
         )[CreateTodoViewModel::class.java]
-
-        summaryViewModel = ViewModelProvider(
-            requireActivity(), SummaryViewModelFactory(getInstance(requireActivity()).summaryDao)
-        )[SummaryViewModel::class.java]
 
         binding.viewModel = viewModel
 
@@ -82,7 +77,7 @@ class CreateTodoFragment : Fragment() {
                     findNavController().apply {
                         val id = binding.categorySelection.checkedRadioButtonId
                         previousBackStackEntry?.savedStateHandle?.set("KEY", id)
-                        summaryViewModel.updateCreatedCount()
+                        viewModel.updateCreatedCount()
                     }.popBackStack()
                 }
             }
@@ -120,6 +115,8 @@ class CreateTodoFragment : Fragment() {
             }
 
             editTodo.observe(viewLifecycleOwner) { }
+
+            readySummary.observe(viewLifecycleOwner) { }
         }
 
         binding.categoryEditText.addTextChangedListener {

@@ -1,17 +1,15 @@
 package com.example.doit.finishedTodoList
 
 import androidx.lifecycle.*
-import com.example.doit.database.Category
-import com.example.doit.database.CategoryDao
-import com.example.doit.database.Todo
-import com.example.doit.database.TodoDbDao
+import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 
 class FinishedTodoListViewModel(
-    private val categoryDb: CategoryDao, private val todoDatabase: TodoDbDao
+    private val catDb: CategoryDao, private val todoDatabase: TodoDbDao,
+    private val summaryDb: SummaryDao
 ) : ViewModel() {
 
     private val _defaultCategory = MutableLiveData<Category>()
@@ -19,6 +17,9 @@ class FinishedTodoListViewModel(
         get() = _defaultCategory
 
     private val allTodos = todoDatabase.getAll()
+    private val summary = summaryDb.getSummary()
+
+    val readySummary = fetchReadySummary()
 
 
     init {
@@ -38,7 +39,7 @@ class FinishedTodoListViewModel(
     private fun initializeCategory() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _defaultCategory.postValue(categoryDb.getDefault())
+                _defaultCategory.postValue(catDb.getDefault())
             }
         }
     }
@@ -46,7 +47,7 @@ class FinishedTodoListViewModel(
     fun emitCategory(id: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _defaultCategory.postValue(categoryDb.get(id))
+                _defaultCategory.postValue(catDb.get(id))
             }
         }
     }
@@ -67,12 +68,19 @@ class FinishedTodoListViewModel(
         }
     }
 
-    fun updateTodo(catId: Int, todo: Todo) {
+    fun updateTodo(todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDatabase.update(todo)
-                categoryDb.update(
-                    categoryDb.get(catId)!!.apply {
+            }
+        }
+    }
+
+    fun updateCategoryFinished(todo: Todo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                catDb.update(
+                    catDb.get(todo.catId)!!.apply {
                         if (todo.isFinished) totalFinished += 1
                         else totalFinished -= 1
                     }
@@ -107,17 +115,49 @@ class FinishedTodoListViewModel(
 
         return result
     }
+
+    private fun fetchReadySummary(): LiveData<Summary> {
+        val result = MediatorLiveData<Summary>()
+        val action = Observer<Summary?> {
+            if (it == null) {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(Summary())
+                    }
+                }
+            } else {
+                result.value = it
+            }
+        }
+        result.addSource(summary, action)
+        return result
+    }
+
+    fun updateFinishedCount(value: Boolean) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (value)
+                    summaryDb.insert(summary.value!!.apply {
+                        todosFinished += 1
+                    })
+                else summaryDb.insert(summary.value!!.apply {
+                    todosFinished -= 1
+                })
+            }
+        }
+    }
 }
 
 class FinishedTodoListViewModelFactory(
     private val categoryDb: CategoryDao,
-    private val todoDatabase: TodoDbDao
+    private val todoDatabase: TodoDbDao,
+    private val summaryDb: SummaryDao
 ) :
     ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FinishedTodoListViewModel::class.java)) {
-            return FinishedTodoListViewModel(categoryDb, todoDatabase) as T
+            return FinishedTodoListViewModel(categoryDb, todoDatabase, summaryDb) as T
         }
         throw IllegalArgumentException("unknown view model class")
     }

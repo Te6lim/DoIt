@@ -5,7 +5,6 @@
     tools:context="com.example.doit.summary.SummaryFragment">
 
     <data>
-
         <variable
             name="viewModel"
             type="com.example.doit.summary.SummaryViewModel" />
@@ -188,8 +187,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    app:categoryName="@{viewModel.readySummary.mostActiveCategory}"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView14"
+                    app:categoryName="@{viewModel.mostActive.name}"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/least_active_category_count"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="Work" />
 
@@ -210,13 +209,12 @@
                     tools:text="Most active" />
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/least_active_category_count"
                     style="@style/summaryHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    app:categoryName="@{viewModel.readySummary.leastActiveCategory}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="play" />

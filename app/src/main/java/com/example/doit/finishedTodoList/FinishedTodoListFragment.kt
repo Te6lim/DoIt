@@ -29,8 +29,6 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
     private lateinit var viewModel: FinishedTodoListViewModel
     private var menuItems: Menu? = null
 
-    private lateinit var summaryViewModel: SummaryViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -45,19 +43,11 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         val viewModelFactory = FinishedTodoListViewModelFactory(
             categoryDatabase.dao,
             todoDatabase.databaseDao,
+            getInstance(requireContext()).summaryDao
         )
         viewModel = ViewModelProvider(
             this, viewModelFactory
         )[FinishedTodoListViewModel::class.java]
-
-        val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
-        val catDb = CategoryDb.getInstance(requireContext()).dao
-
-        summaryViewModel = ViewModelProvider(
-            requireActivity(), SummaryViewModelFactory(
-                getInstance(requireActivity()).summaryDao
-            )
-        )[SummaryViewModel::class.java]
 
         binding.lifecycleOwner = this
 
@@ -66,15 +56,15 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
             override fun onCheck(t: Todo, holder: View) {
                 viewModel.updateTodo(
-                    t.catId,
                     t.apply {
                         isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
                     }
                 )
-                if (t.isFinished) summaryViewModel.updateFinishedCount(true)
-                else summaryViewModel.updateFinishedCount(false)
+                viewModel.updateCategoryFinished(t)
+                if (t.isFinished) viewModel.updateFinishedCount(true)
+                else viewModel.updateFinishedCount(false)
             }
 
             override fun selectedView(position: Int, holder: View) {}
@@ -110,6 +100,8 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
                     viewModel.isNavigating(false)
                 }
             }
+
+            readySummary.observe(viewLifecycleOwner) { }
         }
 
         val handle = findNavController().currentBackStackEntry?.savedStateHandle

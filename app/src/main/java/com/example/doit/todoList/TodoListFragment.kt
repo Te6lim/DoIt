@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.doit.*
 import com.example.doit.database.*
 import com.example.doit.databinding.FragmentListTodoBinding
-import com.example.doit.summary.SummaryViewModel
-import com.example.doit.summary.SummaryViewModelFactory
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.DEF_KEY
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.LIST_STATE_KEY
 import java.time.LocalDateTime
@@ -29,8 +27,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
-
-    private lateinit var summaryViewModel: SummaryViewModel
 
     private lateinit var mainActivity: MainActivity
 
@@ -49,14 +45,10 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val catDb = CategoryDb.getInstance(requireContext()).dao
 
         val viewModelFactory =
-            TodoListViewModelFactory(catDb, todoDb)
+            TodoListViewModelFactory(catDb, todoDb, getInstance(requireContext()).summaryDao)
         todoListViewModel = ViewModelProvider(
             this, viewModelFactory
         )[TodoListViewModel::class.java]
-
-        summaryViewModel = ViewModelProvider(
-            requireActivity(), SummaryViewModelFactory(getInstance(requireActivity()).summaryDao)
-        )[SummaryViewModel::class.java]
 
         binding.lifecycleOwner = this
 
@@ -70,13 +62,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
                     })
-                if (t.isFinished) {
-                    summaryViewModel.updateFinishedCount(true)
-                    summaryViewModel.updateDeadlineStatus(t)
-                } else summaryViewModel.updateFinishedCount(false)
-
-                summaryViewModel.updateMostActive(todoListViewModel.categories.value!!, t.catId)
-                summaryViewModel.updateLeastActive(todoListViewModel.categories.value!!, t.catId)
             }
 
             var isSelected: Boolean = false
@@ -247,6 +232,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                     }
                 }
             }
+
+            readySummary.observe(viewLifecycleOwner) { }
         }
 
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
@@ -313,6 +300,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     override fun positiveAction() {
         todoListViewModel.deleteSelected()
         todoListViewModel.interact()
-        summaryViewModel.updateDiscarded()
+        todoListViewModel.updateDiscarded()
     }
 }
