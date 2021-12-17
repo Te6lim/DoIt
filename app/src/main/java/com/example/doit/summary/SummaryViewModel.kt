@@ -17,16 +17,16 @@ class SummaryViewModel(
 
     val readySummary = fetchReadySummary()
 
-    private val _mostActive = MutableLiveData<Category>()
-    val mostActive: LiveData<Category>
+    private val _mostActive = MutableLiveData<Category?>()
+    val mostActive: LiveData<Category?>
         get() = _mostActive
 
-    private val _leastActive = MutableLiveData<Category>()
-    val leastActive: LiveData<Category>
+    private val _leastActive = MutableLiveData<Category?>()
+    val leastActive: LiveData<Category?>
         get() = _leastActive
 
-    private val _mostSuccessFul = MutableLiveData<String>()
-    val mostSuccessful: LiveData<String>
+    private val _mostSuccessFul = MutableLiveData<String?>()
+    val mostSuccessful: LiveData<String?>
         get() = _mostSuccessFul
 
 
@@ -40,7 +40,6 @@ class SummaryViewModel(
                     }
                 }
             } else {
-                result.value = it
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
                         _mostActive.postValue(
@@ -49,10 +48,14 @@ class SummaryViewModel(
                         _leastActive.postValue(
                             catDb.get(it.leastActiveCategory)
                         )
-                        val cat = catDb.get(it.mostSuccessfulCategory)
-                        _mostSuccessFul.postValue(
-                            "${cat?.name}: ${it.mostSuccessfulRatio}%"
-                        )
+                        val category = catDb.get(it.mostSuccessfulCategory)
+                        category?.let { cat ->
+                            _mostSuccessFul.postValue(
+                                "${cat.name}: ${it.mostSuccessfulRatio}%"
+                            )
+                        } ?: _mostSuccessFul.postValue(null)
+
+                        result.postValue(it)
                     }
                 }
             }

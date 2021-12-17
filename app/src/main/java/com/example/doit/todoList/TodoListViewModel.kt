@@ -124,8 +124,10 @@ class TodoListViewModel(
                     if (todo.isFinished) totalFinished += 1
                     else totalFinished -= 1
 
-                    if (todo.isSuccess) totalSuccess += 1
-                    else totalFailure += 1
+                    if (todo.isSuccess)
+                        totalSuccess += 1
+                    else
+                        totalFailure += 1
                 }
                 catDb.update(cat)
 
@@ -152,7 +154,7 @@ class TodoListViewModel(
             }
         } else {
             with(todo) {
-                if (dateFinished!!.toLocalDate() > dateTodo.toLocalDate()) return true
+                if (dateTodo.toLocalDate() <= dateFinished!!.toLocalDate()) return true
                 else return false
             }
         }
@@ -437,8 +439,9 @@ class TodoListViewModel(
         categories.value!!.forEach {
             with(it) {
                 if (totalFinished > 0 && Math.round((totalSuccess / totalFinished) * 100.0) > rate) {
-                    rate = Math.round((totalSuccess / totalFinished) * 100.0)
                     category = it.id
+                    rate = Math.round((totalSuccess / totalFinished) * 100.0)
+
                 }
             }
         }

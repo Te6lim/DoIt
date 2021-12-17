@@ -60,8 +60,6 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
                         else null
                     }, t.isSuccess
                 )
-                if (t.isFinished) viewModel.updateFinishedCount(true)
-                else viewModel.updateFinishedCount(false)
             }
 
             override fun selectedView(position: Int, holder: View) {}
