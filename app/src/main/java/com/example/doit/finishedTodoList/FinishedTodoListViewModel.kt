@@ -68,23 +68,23 @@ class FinishedTodoListViewModel(
         }
     }
 
-    fun updateTodo(todo: Todo) {
+    fun updateTodo(todo: Todo, success: Boolean) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDatabase.update(todo)
-            }
-        }
-    }
 
-    fun updateCategoryFinished(todo: Todo) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                catDb.update(
-                    catDb.get(todo.catId)!!.apply {
-                        if (todo.isFinished) totalFinished += 1
-                        else totalFinished -= 1
-                    }
-                )
+                val cat = catDb.get(todo.catId)!!.apply {
+                    if (todo.isFinished) totalFinished += 1
+                    else totalFinished -= 1
+                    if (success) totalSuccess -= 1
+                    else totalFailure -= 1
+                }
+
+                catDb.update(cat)
+
+                if (todo.isFinished)
+                    updateFinishedCount(true)
+                else updateFinishedCount(false)
             }
         }
     }

@@ -25,6 +25,10 @@ class SummaryViewModel(
     val leastActive: LiveData<Category>
         get() = _leastActive
 
+    private val _mostSuccessFul = MutableLiveData<String>()
+    val mostSuccessful: LiveData<String>
+        get() = _mostSuccessFul
+
 
     private fun fetchReadySummary(): LiveData<Summary> {
         val result = MediatorLiveData<Summary>()
@@ -44,6 +48,10 @@ class SummaryViewModel(
                         )
                         _leastActive.postValue(
                             catDb.get(it.leastActiveCategory)
+                        )
+                        val cat = catDb.get(it.mostSuccessfulCategory)
+                        _mostSuccessFul.postValue(
+                            "${cat?.name}: ${it.mostSuccessfulRatio}%"
                         )
                     }
                 }

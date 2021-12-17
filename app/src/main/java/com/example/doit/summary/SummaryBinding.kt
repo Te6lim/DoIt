@@ -10,8 +10,8 @@ fun TextView.todoCount(count: Int?) {
     }
 }
 
-@BindingAdapter("categoryName")
-fun TextView.mostActive(name: String?) {
+@BindingAdapter("setValue")
+fun TextView.category(name: String?) {
     name?.let {
         text = name
     } ?: run { text = "-" }

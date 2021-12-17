@@ -19,7 +19,13 @@ data class Category(
     var totalCreated: Int = 0,
 
     @ColumnInfo(name = "totalFinished")
-    var totalFinished: Int = 0
+    var totalFinished: Int = 0,
+
+    @ColumnInfo(name = "totalSuccess")
+    var totalSuccess: Int = 0,
+
+    @ColumnInfo(name = "totalFailure")
+    var totalFailure: Int = 0
 )
 
 @Dao

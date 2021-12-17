@@ -187,7 +187,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    app:categoryName="@{viewModel.mostActive.name}"
+                    app:setValue="@{viewModel.mostActive.name}"
                     app:layout_constraintBaseline_toBaselineOf="@+id/least_active_category_count"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="Work" />
@@ -215,7 +215,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    app:categoryName="@{viewModel.leastActive.name}"
+                    app:setValue="@{viewModel.leastActive.name}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="play" />
@@ -251,7 +251,7 @@
                         style="@style/summaryHead"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Career: 90%"
+                        app:setValue="@{viewModel.mostSuccessful}"
                         android:textAlignment="center"
                         tools:text="Career: 90%" />
 

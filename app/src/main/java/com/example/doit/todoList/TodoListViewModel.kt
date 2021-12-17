@@ -3,7 +3,6 @@ package com.example.doit.todoList
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.example.doit.database.*
-import com.example.doit.todoList.createTodo.CreateTodoViewModel
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
@@ -119,20 +118,42 @@ class TodoListViewModel(
     fun updateTodo(todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                todoDb.update(todo)
+                todoDb.update(todo.apply { isSuccess = isSuccess(this) })
                 resetItemsState(todoList.value!!)
-                val cat = categories.value!!.find { it.id == todo.catId }!!.apply {
+                val cat = catDb.get(todo.catId)!!.apply {
                     if (todo.isFinished) totalFinished += 1
                     else totalFinished -= 1
+
+                    if (todo.isSuccess) totalSuccess += 1
+                    else totalFailure += 1
                 }
                 catDb.update(cat)
+
                 if (todo.isFinished) {
                     updateFinishedCount(true)
                     updateDeadlineStatus(todo)
                 } else updateFinishedCount(false)
 
-                updateMostActive(cat.id)
+                updateMostActive(cat)
                 updateLeastActive()
+                updateMostSuccessful()
+            }
+        }
+    }
+
+    private fun isSuccess(todo: Todo): Boolean {
+        if (todo.hasDeadline) {
+            with(todo) {
+                if (
+                    dateFinished!!.toLocalDate() <= deadlineDate!!.toLocalDate()
+                    && dateFinished!!.toLocalTime() <= deadlineDate!!.toLocalTime()
+                ) return true
+                else return false
+            }
+        } else {
+            with(todo) {
+                if (dateFinished!!.toLocalDate() > dateTodo.toLocalDate()) return true
+                else return false
             }
         }
     }
@@ -239,8 +260,8 @@ class TodoListViewModel(
 
         val doOperationIfA = Observer<Category> { category ->
             inputB.value?.let { list ->
-                if (!list.isNullOrEmpty() && listIsReady) {
-                    val newList = filter(list, category).sortedBy { !it.hasDeadline }
+                val newList = filter(list, category).sortedBy { !it.hasDeadline }
+                if (!newList.isNullOrEmpty() && listIsReady) {
                     if (newList.isEmpty() && category != defaultCategory)
                         selectNextCategory()
                     else {
@@ -352,19 +373,19 @@ class TodoListViewModel(
         }
     }
 
-    fun updateMostActive(catId: Int = -1) {
-        val cat = categories.value!!.find { it.id == catId }
-        val former = categories.value!!.find { it.id == summary.value!!.mostActiveCategory }
+    fun updateMostActive(cat: Category? = null) {
         if (cat != null) {
-            if (cat.totalFinished > former?.totalFinished ?: 0) {
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val former = catDb.get(summary.value!!.mostActiveCategory)
+                    if (cat.totalFinished > former?.totalFinished ?: 0) {
                         summaryDb.insert(summary.value!!.apply {
                             mostActiveCategory = cat.id
                         })
                     }
                 }
             }
+
         } else {
             findNextMostActive()
         }
@@ -404,6 +425,30 @@ class TodoListViewModel(
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
                         leastActiveCategory = -1
+                    })
+                }
+            }
+        }
+    }
+
+    fun updateMostSuccessful() {
+        var category = -1
+        var rate = 0L
+        categories.value!!.forEach {
+            with(it) {
+                if (totalFinished > 0 && Math.round((totalSuccess / totalFinished) * 100.0) > rate) {
+                    rate = Math.round((totalSuccess / totalFinished) * 100.0)
+                    category = it.id
+                }
+            }
+        }
+
+        if (category != -1) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        mostSuccessfulCategory = category
+                        mostSuccessfulRatio = rate.toInt()
                     })
                 }
             }

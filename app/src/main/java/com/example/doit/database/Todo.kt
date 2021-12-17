@@ -29,5 +29,8 @@ data class Todo(
     var deadlineDate: LocalDateTime? = null,
 
     @ColumnInfo(name = "categoryId")
-    var catId: Int
+    var catId: Int = -1,
+
+    @ColumnInfo(name = "isSuccess")
+    var isSuccess: Boolean = false
 )

@@ -13,8 +13,6 @@ import com.example.doit.database.Todo
 import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentListTodoFinishedBinding
-import com.example.doit.summary.SummaryViewModel
-import com.example.doit.summary.SummaryViewModelFactory
 import com.example.doit.todoList.TodoListAdapter
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.DEF_KEY
 import java.time.LocalDateTime
@@ -60,9 +58,8 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
                         isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
-                    }
+                    }, t.isSuccess
                 )
-                viewModel.updateCategoryFinished(t)
                 if (t.isFinished) viewModel.updateFinishedCount(true)
                 else viewModel.updateFinishedCount(false)
             }
