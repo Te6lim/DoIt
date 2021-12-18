@@ -139,6 +139,7 @@ class TodoListViewModel(
                 updateMostActive(cat)
                 updateLeastActive()
                 updateMostSuccessful()
+                updateLeastSuccessful()
             }
         }
     }
@@ -434,24 +435,49 @@ class TodoListViewModel(
     }
 
     fun updateMostSuccessful() {
-        var category = -1
+        var categoryId = -1
         var rate = 0L
         categories.value!!.forEach {
             with(it) {
                 if (totalFinished > 0 && Math.round((totalSuccess / totalFinished) * 100.0) > rate) {
-                    category = it.id
+                    categoryId = it.id
                     rate = Math.round((totalSuccess / totalFinished) * 100.0)
 
                 }
             }
         }
 
-        if (category != -1) {
+        if (categoryId != -1) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
-                        mostSuccessfulCategory = category
+                        mostSuccessfulCategory = categoryId
                         mostSuccessfulRatio = rate.toInt()
+                    })
+                }
+            }
+        }
+    }
+
+    fun updateLeastSuccessful() {
+        var categoryId = categories.value!![0].id
+        var rate = 0L
+        categories.value!!.forEach {
+            with(it) {
+                if (totalFinished > 0 && Math.round((totalFailure / totalFinished) * 100.0) > rate) {
+                    categoryId = it.id
+                    rate = Math.round((totalFailure / totalFinished) * 100.0)
+
+                }
+            }
+        }
+
+        if (categoryId != -1 && rate < 50) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastSuccessfulCategory = categoryId
+                        leastSuccessfulRatio = rate.toInt()
                     })
                 }
             }
