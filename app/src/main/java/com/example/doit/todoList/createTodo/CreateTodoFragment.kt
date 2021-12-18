@@ -40,8 +40,9 @@ class CreateTodoFragment : Fragment() {
 
         val viewModelFactory = CreateTodoViewModelFactory(
             todoDb, catDb,
+            CreateTodoFragmentArgs.fromBundle(requireArguments()).editTodoId,
+            CreateTodoFragmentArgs.fromBundle(requireArguments()).activeCategoryId,
             getInstance(requireContext()).summaryDao,
-            CreateTodoFragmentArgs.fromBundle(requireArguments()).editTodoId
         )
 
         viewModel = ViewModelProvider(
@@ -50,25 +51,25 @@ class CreateTodoFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        val categoryId = CreateTodoFragmentArgs.fromBundle(requireArguments()).activeCategoryId
-
         with(viewModel) {
             categories.observe(viewLifecycleOwner) {
                 when (binding.categorySelection.childCount) {
                     0 -> {
-                        addCategoryViews(categories.value!!)
-                        if (categoryId != -1) emitCategory(categoryId)
+                        addCategoryViews(it)
+                        binding.categorySelection.check(activeCategoryId)
                     }
 
-                    else -> binding.categorySelection.addView(
-                        RadioButton(requireContext()).apply {
-                            id = it[it.size - 1].id
-                            text = it[it.size - 1].name
-                            this@CreateTodoFragment.viewModel.emitCategory(id)
-                        }, 0
-                    )
+                    else -> {
+                        binding.categorySelection.addView(
+                            RadioButton(requireContext()).apply {
+                                id = it[it.size - 1].id
+                                text = it[it.size - 1].name
+                            }, 0
+                        )
+                        emitCategory(it[it.size - 1].id)
+                        binding.categorySelection.check(it[it.size - 1].id)
+                    }
                 }
-                binding.categorySelection.check(category.value?.id ?: categoryId)
             }
 
             todoCreated.observe(viewLifecycleOwner) { isCreated ->
@@ -106,7 +107,7 @@ class CreateTodoFragment : Fragment() {
                 }
             }
 
-            category.observe(viewLifecycleOwner) {
+            categoryLive.observe(viewLifecycleOwner) {
                 it?.let {
                     setTitleToDefaultCategoryName(it)
                 }

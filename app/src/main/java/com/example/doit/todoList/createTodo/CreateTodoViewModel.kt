@@ -9,8 +9,9 @@ import java.time.LocalTime
 
 class CreateTodoViewModel(
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
-    private val summaryDb: SummaryDao,
-    private val editTodoId: Long
+    private val editTodoId: Long,
+    catId: Int,
+    private val summaryDb: SummaryDao
 ) : ViewModel() {
 
     val categories = catDb.getAll()
@@ -29,9 +30,12 @@ class CreateTodoViewModel(
     val categoryEditTextIsOpen: LiveData<Boolean>
         get() = _categoryEditTextIsOpen
 
-    private val _category = MutableLiveData<Category>()
-    val category: LiveData<Category>
-        get() = _category
+    var activeCategoryId: Int = catId
+        private set
+
+    private val _categoryLive = MutableLiveData<Category>()
+    val categoryLive: LiveData<Category>
+        get() = _categoryLive
 
     private val _editTodo = MutableLiveData<Todo?>()
     val editTodo = Transformations.map(_editTodo) {
@@ -60,7 +64,7 @@ class CreateTodoViewModel(
                 withContext(Dispatchers.IO) {
                     todoDb.update(editTodo.value!!.apply {
                         todoString = todoModel.description.value!!
-                        catId = category.value!!.id
+                        catId = categoryLive.value!!.id
                         dateTodo = LocalDateTime.of(
                             todoModel.dateTodoLive.value!!,
                             todoModel.timeTodoLive.value!!
@@ -79,7 +83,7 @@ class CreateTodoViewModel(
             } else {
                 val todo = Todo(
                     todoString = todoModel.description.value!!,
-                    catId = category.value!!.id,
+                    catId = categoryLive.value!!.id,
                     dateTodo = LocalDateTime.of(
                         todoModel.dateTodoLive.value ?: LocalDate.now(),
                         todoModel.timeTodoLive.value ?: LocalTime.now()
@@ -116,14 +120,13 @@ class CreateTodoViewModel(
             withContext(Dispatchers.IO) {
                 val new = Category(name = newCategory, isDefault = default)
                 catDb.insert(new)
-                _category.postValue(new)
             }
         }
     }
 
     fun emitCategory(id: Int) {
         viewModelScope.launch {
-            _category.value = getCat(id)
+            _categoryLive.value = getCat(id).apply { activeCategoryId = id }
         }
     }
 
@@ -197,14 +200,15 @@ class CreateTodoViewModel(
 
 class CreateTodoViewModelFactory(
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
+    private val editTodo: Long,
+    private val catId: Int,
     private val summaryDb: SummaryDao,
-    private val editTodo: Long
 ) :
     ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
-            return CreateTodoViewModel(todoDb, catDb, summaryDb, editTodo) as T
+            return CreateTodoViewModel(todoDb, catDb, editTodo, catId, summaryDb) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

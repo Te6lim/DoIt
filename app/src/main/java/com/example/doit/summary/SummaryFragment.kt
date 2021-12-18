@@ -41,13 +41,9 @@ class SummaryFragment : Fragment() {
 
         binding.viewModel = summaryViewModel
 
-        with(summaryViewModel) {
-            readySummary.observe(viewLifecycleOwner) { }
-        }
+        with(summaryViewModel) { readySummary.observe(viewLifecycleOwner) { } }
 
-        binding.resetButton.setOnClickListener {
-            summaryViewModel.resetSummary()
-        }
+        binding.resetButton.setOnClickListener { summaryViewModel.resetSummary() }
 
         return binding.root
     }
