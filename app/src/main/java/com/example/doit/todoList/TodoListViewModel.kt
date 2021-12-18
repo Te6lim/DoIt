@@ -463,8 +463,8 @@ class TodoListViewModel(
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
-                        leastSuccessfulCategory = -1
-                        leastSuccessfulRatio = 0
+                        mostSuccessfulCategory = -1
+                        mostSuccessfulRatio = 0
                     })
                 }
             }

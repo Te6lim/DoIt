@@ -56,4 +56,5 @@
     <string name="remind_me">Remind me: %s</string>
     <string name="today">Today</string>
     <string name="now">Now</string>
+    <string name="reset">Reset</string>
 </resources>

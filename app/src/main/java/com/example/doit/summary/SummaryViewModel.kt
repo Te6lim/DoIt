@@ -48,11 +48,12 @@ class SummaryViewModel(
                     withContext(Dispatchers.IO) {
                         catDb.get(it.mostActiveCategory)?.let { category ->
                             _mostActive.postValue(category)
-                        }
+                        } ?: _mostActive.postValue(null)
 
                         catDb.get(it.leastActiveCategory)?.let { category ->
                             _leastActive.postValue(category)
-                        }
+                        } ?: _leastActive.postValue(null)
+
                         catDb.get(it.mostSuccessfulCategory)?.let { category ->
                             _mostSuccessFul.postValue(
                                 "${category.name}: ${it.mostSuccessfulRatio}%"
@@ -72,6 +73,27 @@ class SummaryViewModel(
         }
         result.addSource(summary, action)
         return result
+    }
+
+    fun resetSummary() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val s = Summary()
+                summaryDb.insert(summary.value!!.apply {
+                    todosCreated = s.todosCreated
+                    todosFinished = s.todosFinished
+                    deadlinesMet = s.deadlinesMet
+                    deadlinesUnmet = s.deadlinesUnmet
+                    todosDiscarded = s.todosDiscarded
+                    mostActiveCategory = s.mostActiveCategory
+                    leastActiveCategory = s.leastActiveCategory
+                    mostSuccessfulCategory = s.mostSuccessfulCategory
+                    mostSuccessfulRatio = s.mostSuccessfulRatio
+                    leastSuccessfulCategory = s.leastSuccessfulCategory
+                    leastSuccessfulRatio = s.leastSuccessfulRatio
+                })
+            }
+        }
     }
 }
 
