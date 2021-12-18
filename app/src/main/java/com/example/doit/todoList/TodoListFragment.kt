@@ -61,7 +61,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                         isFinished = checkBox!!.isChecked
                         dateFinished = if (isFinished) LocalDateTime.now()
                         else null
-                    })
+                    }, todoListViewModel.activeCategory.value!!
+                )
             }
 
             var isSelected: Boolean = false
@@ -298,6 +299,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
     override fun positiveAction() {
         todoListViewModel.deleteSelected()
         todoListViewModel.interact()
-        todoListViewModel.updateDiscarded()
+        todoListViewModel.updateDiscarded(todoListViewModel.activeCategory.value!!)
     }
 }

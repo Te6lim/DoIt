@@ -115,12 +115,12 @@ class TodoListViewModel(
         }
     }
 
-    fun updateTodo(todo: Todo) {
+    fun updateTodo(todo: Todo, cat: Category) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo.apply { isSuccess = isSuccess(this) })
                 resetItemsState(todoList.value!!)
-                val cat = catDb.get(todo.catId)!!.apply {
+                cat.apply {
                     if (todo.isFinished) totalFinished += 1
                     else totalFinished -= 1
 
@@ -366,12 +366,13 @@ class TodoListViewModel(
         }
     }
 
-    fun updateDiscarded() {
+    fun updateDiscarded(category: Category) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 summaryDb.insert(summary.value!!.apply {
                     todosDiscarded += 1
                 })
+                catDb.update(category.apply { totalCreated -= 1 })
             }
         }
     }
@@ -418,7 +419,9 @@ class TodoListViewModel(
                 least = categories.value!![i]
         }
         viewModelScope.launch {
-            if (least.id != summary.value!!.mostActiveCategory) {
+            val mark = with(least) { (totalFinished / totalCreated) * 100L }
+
+            if (least.id != summary.value!!.mostActiveCategory && mark < 50) {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
                         leastActiveCategory = least.id
@@ -456,6 +459,15 @@ class TodoListViewModel(
                     })
                 }
             }
+        } else {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastSuccessfulCategory = -1
+                        leastSuccessfulRatio = 0
+                    })
+                }
+            }
         }
     }
 
@@ -478,6 +490,15 @@ class TodoListViewModel(
                     summaryDb.insert(summary.value!!.apply {
                         leastSuccessfulCategory = categoryId
                         leastSuccessfulRatio = rate.toInt()
+                    })
+                }
+            }
+        } else {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        leastSuccessfulCategory = -1
+                        leastSuccessfulRatio = 0
                     })
                 }
             }
