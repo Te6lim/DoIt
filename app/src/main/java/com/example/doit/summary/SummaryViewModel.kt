@@ -29,6 +29,10 @@ class SummaryViewModel(
     val mostSuccessful: LiveData<String?>
         get() = _mostSuccessFul
 
+    private val _leastSuccessful = MutableLiveData<String?>()
+    val leastSuccessful: LiveData<String?>
+        get() = _leastSuccessful
+
 
     private fun fetchReadySummary(): LiveData<Summary> {
         val result = MediatorLiveData<Summary>()
@@ -42,18 +46,24 @@ class SummaryViewModel(
             } else {
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        _mostActive.postValue(
-                            catDb.get(it.mostActiveCategory)
-                        )
-                        _leastActive.postValue(
-                            catDb.get(it.leastActiveCategory)
-                        )
-                        val category = catDb.get(it.mostSuccessfulCategory)
-                        category?.let { cat ->
+                        catDb.get(it.mostActiveCategory)?.let { category ->
+                            _mostActive.postValue(category)
+                        }
+
+                        catDb.get(it.leastActiveCategory)?.let { category ->
+                            _leastActive.postValue(category)
+                        }
+                        catDb.get(it.mostSuccessfulCategory)?.let { category ->
                             _mostSuccessFul.postValue(
-                                "${cat.name}: ${it.mostSuccessfulRatio}%"
+                                "${category.name}: ${it.mostSuccessfulRatio}%"
                             )
                         } ?: _mostSuccessFul.postValue(null)
+
+                        catDb.get(it.leastSuccessfulCategory)?.let { category ->
+                            _leastSuccessful.postValue(
+                                "${category.name}: ${it.leastSuccessfulRatio}%"
+                            )
+                        } ?: _leastSuccessful.postValue(null)
 
                         result.postValue(it)
                     }
@@ -69,6 +79,8 @@ class SummaryViewModelFactory(
     private val summaryDb: SummaryDao,
     private val catDb: CategoryDao
 ) : ViewModelProvider.Factory {
+
+    @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SummaryViewModel::class.java))
             return SummaryViewModel(summaryDb, catDb) as T

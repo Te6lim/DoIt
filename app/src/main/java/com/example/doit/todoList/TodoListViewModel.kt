@@ -460,7 +460,7 @@ class TodoListViewModel(
     }
 
     fun updateLeastSuccessful() {
-        var categoryId = categories.value!![0].id
+        var categoryId = -1
         var rate = 0L
         categories.value!!.forEach {
             with(it) {
@@ -472,7 +472,7 @@ class TodoListViewModel(
             }
         }
 
-        if (categoryId != -1 && rate < 50) {
+        if (categoryId != -1 && rate > 50) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {

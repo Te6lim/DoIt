@@ -282,8 +282,8 @@
                         style="@style/summaryHead"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Chores: 17%"
                         android:textAlignment="center"
+                        app:setValue="@{viewModel.leastSuccessful}"
                         tools:text="Chores: 17%" />
 
                     <TextView
