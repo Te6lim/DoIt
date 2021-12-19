@@ -31,7 +31,7 @@ class CreateTodoViewModel(
         get() = _categoryEditTextIsOpen
 
     var activeCategoryId: Int = catId
-        private set
+    private set
 
     private val _categoryLive = MutableLiveData<Category>()
     val categoryLive: LiveData<Category>
@@ -100,6 +100,9 @@ class CreateTodoViewModel(
                 }
                 withContext(Dispatchers.IO) {
                     todoDb.insert(todo)
+                    summaryDb.insert(summary.value!!.apply {
+                        todosCreated += 1
+                    })
                     catDb.update(categories.value!!.find { it.id == todo.catId }!!.apply {
                         this.totalCreated += 1
                     })
@@ -186,16 +189,6 @@ class CreateTodoViewModel(
         return result
     }
 
-    fun updateCreatedCount() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                summaryDb.insert(summary.value!!.apply {
-                    todosCreated += 1
-                })
-
-            }
-        }
-    }
 }
 
 class CreateTodoViewModelFactory(
@@ -203,8 +196,7 @@ class CreateTodoViewModelFactory(
     private val editTodo: Long,
     private val catId: Int,
     private val summaryDb: SummaryDao,
-) :
-    ViewModelProvider.Factory {
+) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {

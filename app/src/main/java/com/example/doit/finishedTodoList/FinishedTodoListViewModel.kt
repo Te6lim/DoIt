@@ -133,7 +133,7 @@ class FinishedTodoListViewModel(
         return result
     }
 
-    fun updateFinishedCount(value: Boolean) {
+    private fun updateFinishedCount(value: Boolean) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (value)

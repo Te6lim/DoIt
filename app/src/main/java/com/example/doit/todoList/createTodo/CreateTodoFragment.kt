@@ -77,7 +77,6 @@ class CreateTodoFragment : Fragment() {
                     findNavController().apply {
                         val id = binding.categorySelection.checkedRadioButtonId
                         previousBackStackEntry?.savedStateHandle?.set("KEY", id)
-                        viewModel.updateCreatedCount()
                     }.popBackStack()
                 }
             }
