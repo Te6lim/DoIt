@@ -153,12 +153,7 @@ class TodoListViewModel(
                 ) return true
                 else return false
             }
-        } else {
-            with(todo) {
-                if (dateTodo.toLocalDate() <= dateFinished!!.toLocalDate()) return true
-                else return false
-            }
-        }
+        } else return todo.isFinished
     }
 
     fun delete(id: Long) {
