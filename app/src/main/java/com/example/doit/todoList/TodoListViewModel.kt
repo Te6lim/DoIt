@@ -148,8 +148,8 @@ class TodoListViewModel(
         if (todo.hasDeadline) {
             with(todo) {
                 if (
-                    dateFinished!!.toLocalDate() <= deadlineDate!!.toLocalDate()
-                    && dateFinished!!.toLocalTime() <= deadlineDate!!.toLocalTime()
+                    dateFinished!!.toLocalDate().compareTo(deadlineDate!!.toLocalDate()) <= 0
+                    && dateFinished!!.toLocalTime().compareTo(deadlineDate!!.toLocalTime()) <= 0
                 ) return true
                 else return false
             }
@@ -414,7 +414,7 @@ class TodoListViewModel(
                 least = categories.value!![i]
         }
         viewModelScope.launch {
-            val mark = with(least) { (totalFinished / totalCreated) * 100L }
+            val mark = with(least) { (totalFinished / totalCreated) * 100f }
 
             if (least.id != summary.value!!.mostActiveCategory && mark < 50) {
                 withContext(Dispatchers.IO) {
@@ -422,78 +422,61 @@ class TodoListViewModel(
                         leastActiveCategory = least.id
                     })
                 }
-            } else {
-                withContext(Dispatchers.IO) {
-                    summaryDb.insert(summary.value!!.apply {
-                        leastActiveCategory = -1
-                    })
-                }
             }
         }
     }
 
     fun updateMostSuccessful() {
-        var categoryId = -1
-        var rate = 0L
+        var categoryId = summary.value!!.mostSuccessfulCategory
+        var rate = summary.value!!.mostSuccessfulRatio
         categories.value!!.forEach {
             with(it) {
-                if (totalFinished > 0 && Math.round((totalSuccess / totalFinished) * 100.0) > rate) {
+                if (totalFinished > 0
+                    && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) > rate
+                ) {
                     categoryId = it.id
-                    rate = Math.round((totalSuccess / totalFinished) * 100.0)
+                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
 
+                } else if (it.id == summary.value!!.mostSuccessfulCategory) {
+                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
+                    categoryId = it.id
+                    val x = 0
                 }
             }
         }
 
-        if (categoryId != -1) {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    summaryDb.insert(summary.value!!.apply {
-                        mostSuccessfulCategory = categoryId
-                        mostSuccessfulRatio = rate.toInt()
-                    })
-                }
-            }
-        } else {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    summaryDb.insert(summary.value!!.apply {
-                        mostSuccessfulCategory = -1
-                        mostSuccessfulRatio = 0
-                    })
-                }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                summaryDb.insert(summary.value!!.apply {
+                    mostSuccessfulRatio = rate
+                    mostSuccessfulCategory = categoryId
+                })
             }
         }
     }
 
     fun updateLeastSuccessful() {
-        var categoryId = -1
-        var rate = 0L
+        var categoryId = summary.value!!.leastSuccessfulCategory
+        var rate = summary.value!!.leastSuccessfulRatio
         categories.value!!.forEach {
             with(it) {
-                if (totalFinished > 0 && Math.round((totalFailure / totalFinished) * 100.0) > rate) {
+                if (totalFinished > 0 && Math.round((totalSuccess / totalFinished) * 100.0f) < rate) {
                     categoryId = it.id
-                    rate = Math.round((totalFailure / totalFinished) * 100.0)
+                    rate = Math.round((totalSuccess / totalFinished) * 100.0f)
 
+                } else if (it.id == summary.value!!.leastSuccessfulCategory) {
+                    categoryId = it.id
+                    rate = Math.round((totalSuccess / totalFinished) * 100.0f)
                 }
             }
         }
 
-        if (categoryId != -1 && rate > 50) {
+        if (rate < 50) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
                         leastSuccessfulCategory = categoryId
                         leastSuccessfulRatio = rate.toInt()
-                    })
-                }
-            }
-        } else {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    summaryDb.insert(summary.value!!.apply {
-                        leastSuccessfulCategory = -1
-                        leastSuccessfulRatio = 0
                     })
                 }
             }

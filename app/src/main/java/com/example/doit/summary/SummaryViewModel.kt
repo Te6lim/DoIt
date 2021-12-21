@@ -93,7 +93,7 @@ class SummaryViewModel(
                     leastSuccessfulRatio = s.leastSuccessfulRatio
                 })
             }
-            catDb.getAll().value!!.forEach {
+            catDb.getAll().value?.forEach {
                 it.totalCreated = 0
                 it.totalFinished = 0
                 it.totalSuccess = 0
