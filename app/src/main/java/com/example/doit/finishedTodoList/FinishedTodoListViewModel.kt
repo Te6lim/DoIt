@@ -6,7 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
-import java.time.LocalDateTime
 
 class FinishedTodoListViewModel(
     private val catDb: CategoryDao, private val todoDatabase: TodoDbDao,

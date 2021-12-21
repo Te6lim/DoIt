@@ -55,14 +55,28 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
 
             override fun onCheck(t: Todo, holder: View) {
-                val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
-                todoListViewModel.updateTodo(
-                    t.apply {
-                        isFinished = checkBox!!.isChecked
-                        dateFinished = if (isFinished) LocalDateTime.now()
-                        else null
-                    }, todoListViewModel.activeCategory.value!!
-                )
+
+                ConfirmationDialog(object : ConfirmationCallbacks {
+                    override fun message(): String {
+                        return "Todo cannot be undone!"
+                    }
+
+                    override fun positiveAction() {
+                        val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
+                        todoListViewModel.updateTodo(
+                            t.apply {
+                                isFinished = checkBox!!.isChecked
+                                dateFinished = if (isFinished) LocalDateTime.now()
+                                else null
+                            }, todoListViewModel.activeCategory.value!!
+                        )
+                    }
+
+                    override fun negativeAction() {
+                        val checkBox = holder.findViewById<CheckBox>(R.id.todo_check_box)
+                        checkBox.isChecked = false
+                    }
+                }).show(requireActivity().supportFragmentManager, "TODO_CHECK")
             }
 
             var isSelected: Boolean = false

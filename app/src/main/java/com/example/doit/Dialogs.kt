@@ -1,6 +1,7 @@
 package com.example.doit
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
@@ -20,9 +21,14 @@ class ConfirmationDialog(act: ConfirmationCallbacks) : DialogFragment() {
                     callbacks.positiveAction()
                 }
                 .setNegativeButton("Cancel") { _, _ ->
-
+                    callbacks.negativeAction()
                 }.create()
         } ?: throw IllegalStateException()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        callbacks.negativeAction()
+        dismiss()
     }
 }
 
@@ -31,4 +37,6 @@ interface ConfirmationCallbacks {
     fun message(): String
 
     fun positiveAction()
+
+    fun negativeAction() {}
 }
