@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
+import java.time.LocalDateTime
 
 class FinishedTodoListViewModel(
     private val catDb: CategoryDao, private val todoDatabase: TodoDbDao,
@@ -64,27 +65,6 @@ class FinishedTodoListViewModel(
                         }
                     }
                 }
-            }
-        }
-    }
-
-    fun updateTodo(todo: Todo, success: Boolean) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                todoDatabase.update(todo)
-
-                val cat = catDb.get(todo.catId)!!.apply {
-                    if (todo.isFinished) totalFinished += 1
-                    else totalFinished -= 1
-                    if (success) totalSuccess -= 1
-                    else totalFailure -= 1
-                }
-
-                catDb.update(cat)
-
-                if (todo.isFinished)
-                    updateFinishedCount(true)
-                else updateFinishedCount(false)
             }
         }
     }
@@ -152,8 +132,7 @@ class FinishedTodoListViewModelFactory(
     private val categoryDb: CategoryDao,
     private val todoDatabase: TodoDbDao,
     private val summaryDb: SummaryDao
-) :
-    ViewModelProvider.Factory {
+) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FinishedTodoListViewModel::class.java)) {

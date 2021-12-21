@@ -52,17 +52,10 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         (requireActivity() as MainActivity).supportActionBar?.subtitle = null
 
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
-            override fun onCheck(t: Todo, holder: View) {
-                viewModel.updateTodo(
-                    t.apply {
-                        isFinished = holder.findViewById<CheckBox>(R.id.todo_check_box)!!.isChecked
-                        dateFinished = if (isFinished) LocalDateTime.now()
-                        else null
-                    }, t.isSuccess
-                )
-            }
 
-            override fun selectedView(position: Int, holder: View) {}
+            override fun selectedView(position: Int, holder: View) {
+                holder.findViewById<CheckBox>(R.id.todo_check_box).isEnabled = false
+            }
         })
 
         binding.completedTodoList.adapter = adapter
