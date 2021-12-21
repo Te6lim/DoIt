@@ -151,7 +151,8 @@ class TodoListViewModel(
                     dateFinished!!.toLocalDate().compareTo(deadlineDate!!.toLocalDate()) <= 0
                     && dateFinished!!.toLocalTime().compareTo(deadlineDate!!.toLocalTime()) <= 0
                 ) return true
-                else return false
+                else
+                    return false
             }
         } else return todo.isFinished
     }
@@ -347,7 +348,11 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (todo.hasDeadline) {
-                    if (todo.dateFinished!!.toLocalDate() <= todo.deadlineDate!!.toLocalDate()) {
+                    if (todo.dateFinished!!.toLocalDate()
+                            .compareTo(todo.deadlineDate!!.toLocalDate()) <= 0
+                        && todo.dateFinished!!.toLocalTime()
+                            .compareTo(todo.deadlineDate!!.toLocalTime()) <= 0
+                    ) {
                         summaryDb.insert(summary.value!!.apply {
                             deadlinesMet += 1
                         })
@@ -460,13 +465,15 @@ class TodoListViewModel(
         var rate = summary.value!!.leastSuccessfulRatio
         categories.value!!.forEach {
             with(it) {
-                if (totalFinished > 0 && Math.round((totalSuccess / totalFinished) * 100.0f) < rate) {
+                if (totalFinished > 0
+                    && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) < rate
+                ) {
                     categoryId = it.id
-                    rate = Math.round((totalSuccess / totalFinished) * 100.0f)
+                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f)
 
                 } else if (it.id == summary.value!!.leastSuccessfulCategory) {
                     categoryId = it.id
-                    rate = Math.round((totalSuccess / totalFinished) * 100.0f)
+                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f)
                 }
             }
         }
