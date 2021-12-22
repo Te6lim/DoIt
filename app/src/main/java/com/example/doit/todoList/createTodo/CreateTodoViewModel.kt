@@ -6,11 +6,12 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
 import com.example.doit.broadcasts.AlarmReceiver
 import com.example.doit.database.*
-import com.example.doit.toMilliSeconds
+import com.example.doit.todoList.toMilliSeconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -98,22 +99,8 @@ class CreateTodoViewModel(
                         }
                     })
 
-                    if (editTodo.value!!.hasDeadline) {
-                        val notifyIntent = Intent(
-                            app, AlarmReceiver::class.java
-                        ).apply { putExtra(TODO_STRING, editTodo.value!!.todoString) }
+                    if (editTodo.value!!.hasDeadline) setAlarm(editTodo.value!!)
 
-                        @SuppressLint("UnspecifiedImmutableFlag")
-                        val pendingIntent = PendingIntent.getBroadcast(
-                            app, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-                        )
-                        val duration = editTodo.value!!
-                            .deadlineDate!!.toMilliSeconds() - System.currentTimeMillis()
-                        AlarmManagerCompat.setExactAndAllowWhileIdle(
-                            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            duration, pendingIntent
-                        )
-                    }
                     clearTodoInfo()
                 }
             } ?: run {
@@ -144,26 +131,28 @@ class CreateTodoViewModel(
                     })
                 }
 
-                if (todo.hasDeadline) {
-                    val notifyIntent = Intent(
-                        app, AlarmReceiver::class.java
-                    ).apply { putExtra(TODO_STRING, todo.todoString) }
-
-                    @SuppressLint("UnspecifiedImmutableFlag")
-                    val pendingIntent = PendingIntent.getBroadcast(
-                        app, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                    val duration = todo.deadlineDate!!
-                        .toMilliSeconds() - System.currentTimeMillis()
-                    AlarmManagerCompat.setExactAndAllowWhileIdle(
-                        alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        duration, pendingIntent
-                    )
-                }
+                if (todo.hasDeadline) setAlarm(todo)
             }
         }
 
         _todoCreated.value = true
+    }
+
+    private fun setAlarm(todo: Todo) {
+        val notifyIntent = Intent(
+            app, AlarmReceiver::class.java
+        ).apply { putExtra(TODO_STRING, todo.todoString) }
+
+        @SuppressLint("UnspecifiedImmutableFlag")
+        val pendingIntent = PendingIntent.getBroadcast(
+            app, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val duration = todo.deadlineDate!!
+            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
+        AlarmManagerCompat.setExactAndAllowWhileIdle(
+            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime() + duration, pendingIntent
+        )
     }
 
     private fun clearTodoInfo() {
