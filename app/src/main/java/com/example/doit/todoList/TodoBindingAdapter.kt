@@ -12,29 +12,27 @@ import java.time.format.FormatStyle
 @BindingAdapter("setDate")
 fun TextView.setDate(item: Todo?) {
     item?.let { todo ->
-        if (todo.dateFinished == null) {
-            text = context.getString(
-                R.string.date_time_string,
-                with(todo.dateTodo.toLocalDate()) {
-                    val day = this.dayOfMonth - 1
-                    when {
-                        this == LocalDate.now() -> "Today"
+        text = context.getString(
+            R.string.date_time_string,
+            with(todo.dateTodo.toLocalDate()) {
+                val day = this.dayOfMonth - 1
+                when {
+                    this == LocalDate.now() -> "Today"
 
-                        day in (1..LocalDate.now().month.length(
-                            (this.year % 100 == 0 && this.year % 4 == 0 || this.year % 400 == 0)
-                        )) && LocalDate.now() == LocalDate.of(
-                            this.year, this.monthValue, day
-                        ) -> {
-                            "Tomorrow"
-                        }
-
-                        else -> this.formatToString(
-                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                        )
+                    day in (1..LocalDate.now().month.length(
+                        (this.year % 100 == 0 && this.year % 4 == 0 || this.year % 400 == 0)
+                    )) && LocalDate.now() == LocalDate.of(
+                        this.year, this.monthValue, day
+                    ) -> {
+                        "Tomorrow"
                     }
-                }, todo.dateTodo.toLocalTime().formatToString()
-            )
-        } else visibility = View.GONE
+
+                    else -> this.formatToString(
+                        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                    )
+                }
+            }, todo.dateTodo.toLocalTime().formatToString()
+        )
     }
 }
 
