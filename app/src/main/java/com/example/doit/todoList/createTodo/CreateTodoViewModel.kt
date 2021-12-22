@@ -1,18 +1,38 @@
 package com.example.doit.todoList.createTodo
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.Application
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
+import com.example.doit.broadcasts.AlarmReceiver
 import com.example.doit.database.*
-import kotlinx.coroutines.*
+import com.example.doit.toMilliSeconds
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 class CreateTodoViewModel(
+    private val app: Application,
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
     private val editTodoId: Long,
     catId: Int,
     private val summaryDb: SummaryDao
-) : ViewModel() {
+) : AndroidViewModel(app) {
+
+    companion object {
+        private const val REQUEST_CODE = 0
+        const val DEADLINE_NOTIFICATION = "deadline notification"
+        const val TODO_STRING = "todo string"
+    }
+
+    private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     val categories = catDb.getAll()
 
@@ -60,14 +80,13 @@ class CreateTodoViewModel(
 
     fun createTodoInfo() {
         viewModelScope.launch {
-            if (editTodo.value != null) {
+            editTodo.value?.let {
                 withContext(Dispatchers.IO) {
                     todoDb.update(editTodo.value!!.apply {
                         todoString = todoModel.description.value!!
                         catId = categoryLive.value!!.id
                         dateTodo = LocalDateTime.of(
-                            todoModel.dateTodoLive.value!!,
-                            todoModel.timeTodoLive.value!!
+                            todoModel.dateTodoLive.value!!, todoModel.timeTodoLive.value!!
                         )
                         hasDeadline = todoModel.hasDeadline.value!!
                         if (hasDeadline) {
@@ -78,9 +97,26 @@ class CreateTodoViewModel(
                                 )
                         }
                     })
+
+                    if (editTodo.value!!.hasDeadline) {
+                        val notifyIntent = Intent(
+                            app, AlarmReceiver::class.java
+                        ).apply { putExtra(TODO_STRING, editTodo.value!!.todoString) }
+
+                        @SuppressLint("UnspecifiedImmutableFlag")
+                        val pendingIntent = PendingIntent.getBroadcast(
+                            app, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                        )
+                        val duration = editTodo.value!!
+                            .deadlineDate!!.toMilliSeconds() - System.currentTimeMillis()
+                        AlarmManagerCompat.setExactAndAllowWhileIdle(
+                            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            duration, pendingIntent
+                        )
+                    }
                     clearTodoInfo()
                 }
-            } else {
+            } ?: run {
                 val todo = Todo(
                     todoString = todoModel.description.value!!,
                     catId = categoryLive.value!!.id,
@@ -106,6 +142,23 @@ class CreateTodoViewModel(
                     catDb.update(categories.value!!.find { it.id == todo.catId }!!.apply {
                         this.totalCreated += 1
                     })
+                }
+
+                if (todo.hasDeadline) {
+                    val notifyIntent = Intent(
+                        app, AlarmReceiver::class.java
+                    ).apply { putExtra(TODO_STRING, todo.todoString) }
+
+                    @SuppressLint("UnspecifiedImmutableFlag")
+                    val pendingIntent = PendingIntent.getBroadcast(
+                        app, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                    val duration = todo.deadlineDate!!
+                        .toMilliSeconds() - System.currentTimeMillis()
+                    AlarmManagerCompat.setExactAndAllowWhileIdle(
+                        alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        duration, pendingIntent
+                    )
                 }
             }
         }
@@ -192,6 +245,7 @@ class CreateTodoViewModel(
 }
 
 class CreateTodoViewModelFactory(
+    private val app: Application,
     private val todoDb: TodoDbDao, private val catDb: CategoryDao,
     private val editTodo: Long,
     private val catId: Int,
@@ -200,7 +254,7 @@ class CreateTodoViewModelFactory(
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTodoViewModel::class.java)) {
-            return CreateTodoViewModel(todoDb, catDb, editTodo, catId, summaryDb) as T
+            return CreateTodoViewModel(app, todoDb, catDb, editTodo, catId, summaryDb) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

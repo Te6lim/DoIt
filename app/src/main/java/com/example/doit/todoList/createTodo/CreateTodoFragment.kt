@@ -1,11 +1,17 @@
 package com.example.doit.todoList.createTodo
 
 import android.app.DatePickerDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.TimePickerDialog
+import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -18,6 +24,7 @@ import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentTodoCreateBinding
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.DEADLINE_NOTIFICATION
 import java.time.LocalTime
 import java.util.*
 
@@ -33,12 +40,15 @@ class CreateTodoFragment : Fragment() {
             inflater, R.layout.fragment_todo_create, container, false
         )
 
+        createNotificationChannel(DEADLINE_NOTIFICATION, "deadline notification")
+
         val catDb = CategoryDb.getInstance(requireContext()).dao
         val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
 
         binding.lifecycleOwner = this
 
         val viewModelFactory = CreateTodoViewModelFactory(
+            requireActivity().application,
             todoDb, catDb,
             CreateTodoFragmentArgs.fromBundle(requireArguments()).editTodoId,
             CreateTodoFragmentArgs.fromBundle(requireArguments()).activeCategoryId,
@@ -200,6 +210,16 @@ class CreateTodoFragment : Fragment() {
                     text = cat.name
                 }
             )
+        }
+    }
+
+    private fun createNotificationChannel(id: String, name: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
+            ContextCompat.getSystemService(requireContext(), NotificationManager::class.java)
+                ?.createNotificationChannel(channel)
+        } else {
+            TODO("VERSION.SDK_INT < O")
         }
     }
 }
