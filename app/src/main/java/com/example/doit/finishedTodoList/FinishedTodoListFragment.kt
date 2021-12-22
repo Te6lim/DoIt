@@ -15,7 +15,6 @@ import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentListTodoFinishedBinding
 import com.example.doit.todoList.TodoListAdapter
 import com.example.doit.todoList.categories.CategoriesFragment.Companion.DEF_KEY
-import java.time.LocalDateTime
 
 class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
 

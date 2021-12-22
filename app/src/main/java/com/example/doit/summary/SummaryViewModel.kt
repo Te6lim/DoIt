@@ -1,12 +1,13 @@
 package com.example.doit.summary
 
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
-import com.example.doit.database.*
+import com.example.doit.database.Category
+import com.example.doit.database.CategoryDao
+import com.example.doit.database.Summary
+import com.example.doit.database.SummaryDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalArgumentException
 
 class SummaryViewModel(
     private val summaryDb: SummaryDao,
@@ -14,6 +15,7 @@ class SummaryViewModel(
 ) : ViewModel() {
 
     private val summary = summaryDb.getSummary()
+    val categories = catDb.getAll()
 
     val readySummary = fetchReadySummary()
 
@@ -92,12 +94,15 @@ class SummaryViewModel(
                     leastSuccessfulCategory = s.leastSuccessfulCategory
                     leastSuccessfulRatio = s.leastSuccessfulRatio
                 })
-            }
-            catDb.getAll().value?.forEach {
-                it.totalCreated = 0
-                it.totalFinished = 0
-                it.totalSuccess = 0
-                it.totalFailure = 0
+
+                categories.value!!.forEach {
+                    catDb.update(it.apply {
+                        totalCreated = 0
+                        totalFinished = 0
+                        totalSuccess = 0
+                        totalFailure = 0
+                    })
+                }
             }
         }
     }

@@ -1,10 +1,10 @@
 package com.example.doit.todoList
 
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import com.example.doit.database.*
-import kotlinx.coroutines.*
-import java.lang.IllegalArgumentException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TodoListViewModel(
     private val catDb: CategoryDao, private val todoDb: TodoDbDao,
@@ -419,13 +419,14 @@ class TodoListViewModel(
                 least = categories.value!![i]
         }
         viewModelScope.launch {
-            val mark = with(least) { (totalFinished / totalCreated) * 100f }
-
-            if (least.id != summary.value!!.mostActiveCategory && mark < 50) {
-                withContext(Dispatchers.IO) {
-                    summaryDb.insert(summary.value!!.apply {
-                        leastActiveCategory = least.id
-                    })
+            if (least.totalCreated > 0) {
+                val mark = with(least) { (totalFinished.toFloat() / totalCreated) * 100f }
+                if (least.id != summary.value!!.mostActiveCategory && mark < 50) {
+                    withContext(Dispatchers.IO) {
+                        summaryDb.insert(summary.value!!.apply {
+                            leastActiveCategory = least.id
+                        })
+                    }
                 }
             }
         }
@@ -441,11 +442,6 @@ class TodoListViewModel(
                 ) {
                     categoryId = it.id
                     rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
-
-                } else if (it.id == summary.value!!.mostSuccessfulCategory) {
-                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
-                    categoryId = it.id
-                    val x = 0
                 }
             }
         }
@@ -462,18 +458,15 @@ class TodoListViewModel(
 
     fun updateLeastSuccessful() {
         var categoryId = summary.value!!.leastSuccessfulCategory
-        var rate = summary.value!!.leastSuccessfulRatio
+        var rate = 0
         categories.value!!.forEach {
             with(it) {
                 if (totalFinished > 0
-                    && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) < rate
+                    && Math.round((totalFailure.toFloat() / totalFinished) * 100.0f) > rate
                 ) {
                     categoryId = it.id
-                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f)
+                    rate = Math.round((totalFailure.toFloat() / totalFinished) * 100.0f)
 
-                } else if (it.id == summary.value!!.leastSuccessfulCategory) {
-                    categoryId = it.id
-                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f)
                 }
             }
         }
@@ -483,7 +476,7 @@ class TodoListViewModel(
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
                         leastSuccessfulCategory = categoryId
-                        leastSuccessfulRatio = rate.toInt()
+                        leastSuccessfulRatio = 100 - rate
                     })
                 }
             }

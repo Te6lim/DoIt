@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import java.lang.IllegalStateException
 
 class ConfirmationDialog(act: ConfirmationCallbacks) : DialogFragment() {
 
@@ -28,7 +27,6 @@ class ConfirmationDialog(act: ConfirmationCallbacks) : DialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         callbacks.negativeAction()
-        dismiss()
     }
 }
 

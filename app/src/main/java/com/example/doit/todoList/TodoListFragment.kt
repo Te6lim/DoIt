@@ -55,7 +55,6 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         val adapter = TodoListAdapter(object : ActionCallback<Todo> {
 
             override fun onCheck(t: Todo, holder: View) {
-
                 ConfirmationDialog(object : ConfirmationCallbacks {
                     override fun message(): String {
                         return "Todo cannot be undone!"
