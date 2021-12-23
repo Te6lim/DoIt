@@ -162,6 +162,7 @@ class TodoListViewModel(
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
                 resetItemsState(todoList.value!!)
+                updateDiscarded(activeCategory.value!!)
             }
         }
     }
@@ -223,7 +224,7 @@ class TodoListViewModel(
                 if (v) selectedId.add(todoList.value!![i].todoId)
 
             withContext(Dispatchers.IO) {
-                selectedId.forEach { todoDb.delete(it) }
+                selectedId.forEach { delete(it) }
                 resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }

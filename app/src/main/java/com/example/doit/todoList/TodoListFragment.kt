@@ -309,12 +309,11 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     override fun message(): String {
         return "Delete ${todoListViewModel.selectionCount.value!!} todos " +
-                "from ${todoListViewModel.activeCategory.value!!.name} ?"
+                "from ${todoListViewModel.activeCategory.value!!.name}?"
     }
 
     override fun positiveAction() {
         todoListViewModel.deleteSelected()
         todoListViewModel.interact()
-        todoListViewModel.updateDiscarded(todoListViewModel.activeCategory.value!!)
     }
 }

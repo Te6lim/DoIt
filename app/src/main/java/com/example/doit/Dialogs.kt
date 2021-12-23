@@ -27,6 +27,7 @@ class ConfirmationDialog(act: ConfirmationCallbacks) : DialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         callbacks.negativeAction()
+        dismiss()
     }
 }
 
