@@ -1,17 +1,8 @@
 package com.example.doit.todoList.createTodo
 
-import android.annotation.SuppressLint
-import android.app.AlarmManager
 import android.app.Application
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.SystemClock
-import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
-import com.example.doit.broadcasts.AlarmReceiver
 import com.example.doit.database.*
-import com.example.doit.todoList.toMilliSeconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,14 +17,6 @@ class CreateTodoViewModel(
     catId: Int,
     private val summaryDb: SummaryDao
 ) : AndroidViewModel(app) {
-
-    companion object {
-        private const val REQUEST_CODE = 0
-        const val DEADLINE_NOTIFICATION = "deadline notification"
-        const val TODO_STRING = "todo string"
-    }
-
-    private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     val categories = catDb.getAll()
 
@@ -99,8 +82,6 @@ class CreateTodoViewModel(
                         }
                     })
 
-                    if (editTodo.value!!.hasDeadline) setAlarm(editTodo.value!!)
-
                     clearTodoInfo()
                 }
             } ?: run {
@@ -130,29 +111,10 @@ class CreateTodoViewModel(
                         this.totalCreated += 1
                     })
                 }
-
-                if (todo.hasDeadline) setAlarm(todo)
             }
         }
 
         _todoCreated.value = true
-    }
-
-    private fun setAlarm(todo: Todo) {
-        val notifyIntent = Intent(
-            app, AlarmReceiver::class.java
-        ).apply { putExtra(TODO_STRING, todo.todoString) }
-
-        @SuppressLint("UnspecifiedImmutableFlag")
-        val pendingIntent = PendingIntent.getBroadcast(
-            app, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        val duration = todo.deadlineDate!!
-            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
-        AlarmManagerCompat.setExactAndAllowWhileIdle(
-            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            SystemClock.elapsedRealtime() + duration, pendingIntent
-        )
     }
 
     private fun clearTodoInfo() {

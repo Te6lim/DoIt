@@ -24,7 +24,8 @@ import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentTodoCreateBinding
-import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.DEADLINE_NOTIFICATION
+import com.example.doit.todoList.TodoListViewModel.Companion.DEADLINE_CHANNEL
+import com.example.doit.todoList.TodoListViewModel.Companion.TIME_TODO_CHANNEL
 import java.time.LocalTime
 import java.util.*
 
@@ -39,8 +40,12 @@ class CreateTodoFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_todo_create, container, false
         )
-
-        createNotificationChannel(DEADLINE_NOTIFICATION, "deadline notification")
+        createNotificationChannel(
+            TIME_TODO_CHANNEL, "Time todo channel", "Todo notification"
+        )
+        createNotificationChannel(
+            DEADLINE_CHANNEL, "Deadline channel", "Deadline notification"
+        )
 
         val catDb = CategoryDb.getInstance(requireContext()).dao
         val todoDb = TodoDatabase.getInstance(requireContext()).databaseDao
@@ -213,9 +218,14 @@ class CreateTodoFragment : Fragment() {
         }
     }
 
-    private fun createNotificationChannel(id: String, name: String) {
+    private fun createNotificationChannel(id: String, name: String, description: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
+                .apply {
+                    enableVibration(true)
+                    enableLights(true)
+                    this.description = description
+                }
             ContextCompat.getSystemService(requireContext(), NotificationManager::class.java)
                 ?.createNotificationChannel(channel)
         } else {

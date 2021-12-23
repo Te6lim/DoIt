@@ -6,15 +6,21 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.example.doit.sendNotification
-import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.DEADLINE_NOTIFICATION
-import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TODO_STRING
+import com.example.doit.todoList.TodoListViewModel.Companion.CHANNEL_EXTRA
+import com.example.doit.todoList.TodoListViewModel.Companion.NOTIFICATION_EXTRA
+import com.example.doit.todoList.TodoListViewModel.Companion.TODO_STRING_EXTRA
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        ContextCompat.getSystemService(context, NotificationManager::class.java)
-            ?.sendNotification(
-                context,
-                DEADLINE_NOTIFICATION, intent.getStringExtra(TODO_STRING) ?: "Empty todo"
-            )
+        intent.getStringExtra(CHANNEL_EXTRA)?.let { channel ->
+            ContextCompat.getSystemService(context, NotificationManager::class.java)
+                ?.sendNotification(
+                    context,
+                    intent.getIntExtra(
+                        NOTIFICATION_EXTRA, 0
+                    ), channel,
+                    intent.getStringExtra(TODO_STRING_EXTRA) ?: "Empty todo"
+                )
+        } ?: throw IllegalArgumentException()
     }
 }
