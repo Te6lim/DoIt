@@ -26,4 +26,5 @@
     <color name="deadline_safe_background">#322BA600</color>
     <color name="deadline_close">#CAA600</color>
     <color name="deadline_passed">#EF0000</color>
+    <color name="grey">#949494</color>
 </resources>
