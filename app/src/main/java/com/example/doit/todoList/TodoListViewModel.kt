@@ -1,37 +1,19 @@
 package com.example.doit.todoList
 
-import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.Application
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.SystemClock
-import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
-import com.example.doit.broadcasts.AlarmReceiver
 import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
 
 class TodoListViewModel(
-    private val app: Application,
     private val catDb: CategoryDao, private val todoDb: TodoDbDao,
     private val summaryDb: SummaryDao
-) : AndroidViewModel(app) {
+) : ViewModel() {
 
     companion object {
-        var count = 0
-        const val CHANNEL_EXTRA = "channel key"
-        const val NOTIFICATION_EXTRA = "notification extra key"
-        const val DEADLINE_CHANNEL = "deadline channel"
-        const val TIME_TODO_CHANNEL = "time_ todo_channel"
-        const val TODO_STRING_EXTRA = "todo string"
+        private var count = 0
     }
-
-    private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     val categories = catDb.getAll()
     val allTodos = todoDb.getAll()
@@ -71,7 +53,6 @@ class TodoListViewModel(
     }
 
     val todoList = fetchList(activeCategory, allTodos)
-    private var formerList = listOf<Todo>()
 
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
         list?.let { resetItemsState(it) }
@@ -286,19 +267,10 @@ class TodoListViewModel(
                         _itemCountInCategory.value = category.name to newList.size
                         resetItemsState(newList)
                         result.value = newList
-                        if (formerList.isNotEmpty()) {
-                            if ((newList - formerList).isNotEmpty()) {
-                                val latestItem = (newList - formerList)[0]
-                                setTimeTodoAlarm(latestItem)
-                                if (latestItem.hasDeadline) setDeadlineAlarm(latestItem)
-                            }
-                        }
-                        formerList = newList
                     }
                 } else {
                     _itemCountInCategory.value = category.name to 0
                     result.value = null
-                    //formerList = listOf<Todo>()
                 }
             }
         }
@@ -314,15 +286,6 @@ class TodoListViewModel(
                     _itemCountInCategory.value = category.name to newList.size
                     resetItemsState(newList)
                     result.value = newList
-
-                    if (formerList.isNotEmpty()) {
-                        if ((newList - formerList).isNotEmpty()) {
-                            val latestItem = (newList - formerList)[0]
-                            setTimeTodoAlarm(latestItem)
-                            if (latestItem.hasDeadline) setDeadlineAlarm(latestItem)
-                        }
-                    }
-                    formerList = newList
                 }
             }
         }
@@ -519,53 +482,9 @@ class TodoListViewModel(
             }
         }
     }
-
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setTimeTodoAlarm(todo: Todo) {
-        if (todo.dateTodo > LocalDateTime.now()) {
-            val notifyIntent = Intent(
-                app, AlarmReceiver::class.java
-            ).apply {
-                putExtra(TODO_STRING_EXTRA, todo.todoString)
-                putExtra(CHANNEL_EXTRA, TIME_TODO_CHANNEL)
-                putExtra(NOTIFICATION_EXTRA, todo.todoId.toInt())
-            }
-            val duration = todo.dateTodo.toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
-            val pendingIntent = PendingIntent.getBroadcast(
-                app, todo.todoId.toInt(), notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            AlarmManagerCompat.setExactAndAllowWhileIdle(
-                alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + duration, pendingIntent
-            )
-        }
-    }
-
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setDeadlineAlarm(todo: Todo) {
-        val notifyIntent = Intent(
-            app, AlarmReceiver::class.java
-        ).apply {
-            putExtra(TODO_STRING_EXTRA, todo.todoString)
-            putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
-            putExtra(NOTIFICATION_EXTRA, Integer.MAX_VALUE - todo.todoId.toInt())
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            app, Integer.MAX_VALUE - todo.todoId.toInt(),
-            notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        val duration = todo.deadlineDate!!
-            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
-        AlarmManagerCompat.setExactAndAllowWhileIdle(
-            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            SystemClock.elapsedRealtime() + duration, pendingIntent
-        )
-    }
 }
 
 class TodoListViewModelFactory(
-    private val app: Application,
     private val categoryDb: CategoryDao,
     private val database: TodoDbDao,
     private val summaryDb: SummaryDao
@@ -573,7 +492,7 @@ class TodoListViewModelFactory(
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TodoListViewModel::class.java)) {
-            return TodoListViewModel(app, categoryDb, database, summaryDb) as T
+            return TodoListViewModel(categoryDb, database, summaryDb) as T
         }
         throw IllegalArgumentException("unknown viewModel class")
     }

@@ -1,8 +1,17 @@
 package com.example.doit.todoList.createTodo
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.Application
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.SystemClock
+import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
+import com.example.doit.broadcasts.AlarmReceiver
 import com.example.doit.database.*
+import com.example.doit.todoList.toMilliSeconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,6 +26,16 @@ class CreateTodoViewModel(
     catId: Int,
     private val summaryDb: SummaryDao
 ) : AndroidViewModel(app) {
+
+    companion object {
+        const val CHANNEL_EXTRA = "channel key"
+        const val NOTIFICATION_EXTRA = "notification extra key"
+        const val DEADLINE_CHANNEL = "deadline channel"
+        const val TIME_TODO_CHANNEL = "time_ todo_channel"
+        const val TODO_STRING_EXTRA = "todo string"
+    }
+
+    private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     val categories = catDb.getAll()
 
@@ -82,6 +101,13 @@ class CreateTodoViewModel(
                         }
                     })
 
+                    setTimeTodoAlarm(editTodo.value!!, editTodo.value!!.todoId.toInt())
+                    if (editTodo.value!!.hasDeadline)
+                        setDeadlineAlarm(
+                            editTodo.value!!,
+                            Integer.MAX_VALUE - editTodo.value!!.todoId.toInt()
+                        )
+
                     clearTodoInfo()
                 }
             } ?: run {
@@ -103,18 +129,64 @@ class CreateTodoViewModel(
                     }
                 }
                 withContext(Dispatchers.IO) {
-                    todoDb.insert(todo)
+                    val id = todoDb.insert(todo)
                     summaryDb.insert(summary.value!!.apply {
                         todosCreated += 1
                     })
                     catDb.update(categories.value!!.find { it.id == todo.catId }!!.apply {
                         this.totalCreated += 1
                     })
+
+                    setTimeTodoAlarm(todo, id.toInt())
+                    if (todo.hasDeadline) setDeadlineAlarm(todo, Integer.MAX_VALUE - id.toInt())
                 }
             }
         }
 
         _todoCreated.value = true
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun setTimeTodoAlarm(todo: Todo, id: Int) {
+        if (todo.dateTodo > LocalDateTime.now()) {
+            val notifyIntent = Intent(
+                app, AlarmReceiver::class.java
+            ).apply {
+                putExtra(TODO_STRING_EXTRA, todo.todoString)
+                putExtra(CHANNEL_EXTRA, TIME_TODO_CHANNEL)
+                putExtra(NOTIFICATION_EXTRA, id)
+            }
+            val duration = todo.dateTodo.toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
+            val pendingIntent = PendingIntent.getBroadcast(
+                app, id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            AlarmManagerCompat.setExactAndAllowWhileIdle(
+                alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + duration, pendingIntent
+            )
+        }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun setDeadlineAlarm(todo: Todo, id: Int) {
+        val notifyIntent = Intent(
+            app, AlarmReceiver::class.java
+        ).apply {
+            putExtra(TODO_STRING_EXTRA, todo.todoString)
+            putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
+            putExtra(NOTIFICATION_EXTRA, id)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            app, id,
+            notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val duration = todo.deadlineDate!!
+            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
+        AlarmManagerCompat.setExactAndAllowWhileIdle(
+            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime() + duration, pendingIntent
+        )
     }
 
     private fun clearTodoInfo() {

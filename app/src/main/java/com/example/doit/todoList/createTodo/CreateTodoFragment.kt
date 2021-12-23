@@ -24,8 +24,8 @@ import com.example.doit.database.CategoryDb
 import com.example.doit.database.TodoDatabase
 import com.example.doit.database.getInstance
 import com.example.doit.databinding.FragmentTodoCreateBinding
-import com.example.doit.todoList.TodoListViewModel.Companion.DEADLINE_CHANNEL
-import com.example.doit.todoList.TodoListViewModel.Companion.TIME_TODO_CHANNEL
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.DEADLINE_CHANNEL
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TIME_TODO_CHANNEL
 import java.time.LocalTime
 import java.util.*
 
