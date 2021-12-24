@@ -35,6 +35,8 @@ class CreateTodoViewModel(
         const val TODO_STRING_EXTRA = "todo string"
         const val TODO_ID_EXTRA = "todo id extra"
         const val CAT_ID_EXTRA = "cat id extra"
+        const val CAT_IDS = "cat ids"
+        const val SUMMARY_ID = "summary id"
     }
 
     private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -105,7 +107,7 @@ class CreateTodoViewModel(
 
                     setTimeTodoAlarm(
                         editTodo.value!!,
-                        Integer.MAX_VALUE - editTodo.value!!.todoId.toInt()
+                        Integer.MAX_VALUE - editTodo.value!!.todoId
                     )
                     if (editTodo.value!!.hasDeadline)
                         setDeadlineAlarm(
@@ -141,7 +143,7 @@ class CreateTodoViewModel(
                         this.totalCreated += 1
                     })
 
-                    setTimeTodoAlarm(todo, Integer.MAX_VALUE - id.toInt())
+                    setTimeTodoAlarm(todo, Integer.MAX_VALUE - id)
                     if (todo.hasDeadline)
                         setDeadlineAlarm(todo, id)
                 }
@@ -152,7 +154,7 @@ class CreateTodoViewModel(
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setTimeTodoAlarm(todo: Todo, id: Int) {
+    private fun setTimeTodoAlarm(todo: Todo, id: Long) {
         if (todo.dateTodo > LocalDateTime.now()) {
             val notifyIntent = Intent(
                 app, AlarmReceiver::class.java
@@ -163,7 +165,7 @@ class CreateTodoViewModel(
             }
             val duration = todo.dateTodo.toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
             val pendingIntent = PendingIntent.getBroadcast(
-                app, id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                app, id.toInt(), notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
             AlarmManagerCompat.setExactAndAllowWhileIdle(
                 alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -174,6 +176,10 @@ class CreateTodoViewModel(
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun setDeadlineAlarm(todo: Todo, id: Long) {
+        val categoryIdList = arrayListOf<Int>()
+        categories.value!!.forEach {
+            categoryIdList.add(it.id)
+        }
         val notifyIntent = Intent(
             app, AlarmReceiver::class.java
         ).apply {
@@ -182,6 +188,8 @@ class CreateTodoViewModel(
             putExtra(NOTIFICATION_EXTRA, id)
             putExtra(TODO_ID_EXTRA, id)
             putExtra(CAT_ID_EXTRA, todo.catId)
+            putExtra(SUMMARY_ID, summary.value!!.id)
+            putIntegerArrayListExtra(CAT_IDS, categoryIdList)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(

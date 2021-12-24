@@ -8,8 +8,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import com.example.doit.broadcasts.CheckTodoReceiver
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_IDS
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_ID_EXTRA
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.DEADLINE_CHANNEL
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.NOTIFICATION_EXTRA
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.SUMMARY_ID
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TIME_TODO_CHANNEL
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TODO_ID_EXTRA
 
@@ -30,13 +33,19 @@ fun NotificationManager.sendNotification(
     val intent = Intent(context, CheckTodoReceiver::class.java)
     val todoId = bundle.getLong(TODO_ID_EXTRA)
     val catId = bundle.getInt(CAT_ID_EXTRA)
+    val summaryId = bundle.getLong(SUMMARY_ID)
+    val catIdList = bundle.getIntegerArrayList(CAT_IDS)
 
     if (todoId != -1L && catId != -1) {
         intent.apply {
             putExtra(TODO_ID_EXTRA, todoId)
             putExtra(CAT_ID_EXTRA, catId)
+            putExtra(SUMMARY_ID, summaryId)
+            putIntegerArrayListExtra(CAT_IDS, catIdList)
         }
     }
+
+    intent.putExtra(NOTIFICATION_EXTRA, notificationId)
 
     val donePendingIntent = PendingIntent.getBroadcast(
         context, requestCode, intent,

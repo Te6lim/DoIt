@@ -1,10 +1,13 @@
 package com.example.doit.database
 
 import android.content.Context
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.android.parcel.Parcelize
 
 @Entity(tableName = "summary_table")
+@Parcelize
 data class Summary(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(name = "todosCreated") var todosCreated: Int = 0,
@@ -18,7 +21,7 @@ data class Summary(
     @ColumnInfo(name = "mostSuccessfulRatio") var mostSuccessfulRatio: Int = 0,
     @ColumnInfo(name = "leastSuccessfulCategory") var leastSuccessfulCategory: Int = -1,
     @ColumnInfo(name = "leastSuccessfulRatio") var leastSuccessfulRatio: Int = 0
-)
+) : Parcelable
 
 @Dao
 interface SummaryDao {
@@ -28,6 +31,9 @@ interface SummaryDao {
 
     @Query("Select * from summary_table limit 1")
     fun getSummary(): LiveData<Summary>
+
+    @Query("Select * from summary_table where :key = id")
+    fun getSummary(key: Long): Summary
 }
 
 @Database(entities = [Summary::class], version = 1, exportSchema = false)

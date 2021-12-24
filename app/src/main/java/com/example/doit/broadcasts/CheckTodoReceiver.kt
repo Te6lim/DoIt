@@ -1,10 +1,15 @@
 package com.example.doit.broadcasts
 
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.example.doit.database.*
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_IDS
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_ID_EXTRA
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.NOTIFICATION_EXTRA
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.SUMMARY_ID
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TODO_ID_EXTRA
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,15 +24,26 @@ class CheckTodoReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val todoId = intent.getLongExtra(TODO_ID_EXTRA, -1L)
         val catId = intent.getIntExtra(CAT_ID_EXTRA, -1)
-        updateTodo(context, todoId, catId)
+        val summaryId = intent.getLongExtra(SUMMARY_ID, -1L)
+        val catIdList = intent.getIntegerArrayListExtra(CAT_IDS)
+        val notificationId = intent.getIntExtra(NOTIFICATION_EXTRA, 0)
+        updateTodo(context, todoId, catId, catIdList!!, summaryId, notificationId)
     }
 
-    private fun updateTodo(context: Context, todoId: Long, catId: Int) {
+    private fun updateTodo(
+        context: Context, todoId: Long,
+        catId: Int, categoryIds: ArrayList<Int>, summaryId: Long, notificationId: Int
+    ) {
         val todoDb = TodoDatabase.getInstance(context).databaseDao
         val catDb = CategoryDb.getInstance(context).dao
         val summaryDb = getInstance(context).summaryDao
         scope.launch {
             withContext(Dispatchers.IO) {
+                val summary = summaryDb.getSummary(summaryId)
+                val categories = mutableListOf<Category>()
+                categoryIds.forEach {
+                    categories.add(catDb.get(it)!!)
+                }
                 val todo = todoDb.get(todoId)!!.apply {
                     isFinished = true
                     dateFinished = LocalDateTime.now()
@@ -47,14 +63,20 @@ class CheckTodoReceiver : BroadcastReceiver() {
                 catDb.update(cat)
 
                 if (todo.isFinished) {
-                    updateFinishedCount(summaryDb, true)
-                    updateDeadlineStatus(summaryDb, todo)
-                } else updateFinishedCount(summaryDb, false)
+                    updateFinishedCount(summary, true)
+                    updateDeadlineStatus(summary, todo)
+                } else updateFinishedCount(summary, false)
 
-                updateMostActive(catDb, summaryDb, cat)
-                updateLeastActive(catDb, summaryDb)
-                updateMostSuccessful(catDb, summaryDb)
-                updateLeastSuccessful(catDb, summaryDb)
+                updateMostActive(categories, summary, cat)
+                updateLeastActive(categories, summary)
+                updateMostSuccessful(categories, summary)
+                updateLeastSuccessful(categories, summary)
+                summaryDb.insert(summary)
+                categories.forEach {
+                    catDb.update(it)
+                }
+                ContextCompat.getSystemService(context, NotificationManager::class.java)
+                    ?.cancel(notificationId)
             }
         }
     }
@@ -69,161 +91,106 @@ class CheckTodoReceiver : BroadcastReceiver() {
         } else return todo.isFinished
     }
 
-    private fun updateFinishedCount(summaryDb: SummaryDao, value: Boolean) {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val summary = summaryDb.getSummary()
-                if (value)
-                    summaryDb.insert(summary.value!!.apply {
-                        todosFinished += 1
-                    })
-                else summaryDb.insert(summary.value!!.apply {
-                    todosFinished -= 1
-                })
+    private fun updateFinishedCount(summary: Summary, value: Boolean) {
+        if (value) summary.todosFinished += 1
+        else summary.todosFinished -= 1
+    }
+
+    private fun updateDeadlineStatus(summary: Summary, todo: Todo) {
+        if (todo.hasDeadline) {
+            if (todo.dateFinished!!.toLocalDate()
+                    .compareTo(todo.deadlineDate!!.toLocalDate()) <= 0
+                && todo.dateFinished!!.toLocalTime()
+                    .compareTo(todo.deadlineDate!!.toLocalTime()) <= 0
+            ) {
+                summary.deadlinesMet += 1
+            } else {
+                summary.deadlinesUnmet += 1
             }
         }
     }
 
-    private fun updateDeadlineStatus(summaryDb: SummaryDao, todo: Todo) {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val summary = summaryDb.getSummary()
-                if (todo.hasDeadline) {
-                    if (todo.dateFinished!!.toLocalDate()
-                            .compareTo(todo.deadlineDate!!.toLocalDate()) <= 0
-                        && todo.dateFinished!!.toLocalTime()
-                            .compareTo(todo.deadlineDate!!.toLocalTime()) <= 0
-                    ) {
-                        summaryDb.insert(summary.value!!.apply {
-                            deadlinesMet += 1
-                        })
-                    } else {
-                        summaryDb.insert(summary.value!!.apply {
-                            deadlinesUnmet += 1
-                        })
-                    }
-                }
-            }
-        }
-    }
-
-    private fun updateMostActive(catDb: CategoryDao, summaryDb: SummaryDao, cat: Category? = null) {
+    private fun updateMostActive(
+        categories: List<Category>,
+        summary: Summary,
+        cat: Category? = null
+    ) {
         if (cat != null) {
-            scope.launch {
-                withContext(Dispatchers.IO) {
-                    val summary = summaryDb.getSummary()
-                    val former = catDb.get(summary.value!!.mostActiveCategory)
-                    if (cat.totalFinished > former?.totalFinished ?: 0) {
-                        summaryDb.insert(summary.value!!.apply {
-                            mostActiveCategory = cat.id
-                        })
-                    }
-                }
+            val former = categories.find { it.id == summary.mostActiveCategory }
+            if (cat.totalFinished > former?.totalFinished ?: 0) {
+                summary.mostActiveCategory = cat.id
             }
 
         } else {
-            findNextMostActive(catDb, summaryDb)
+            findNextMostActive(categories, summary)
         }
     }
 
-    private fun findNextMostActive(categoryDb: CategoryDao, summaryDb: SummaryDao) {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val categories = categoryDb.getAll()
-                var cat: Category? = null
-                categories.value!!.forEach {
-                    if (it.totalFinished > cat?.totalFinished ?: 0) cat = it
-                }
+    private fun findNextMostActive(categories: List<Category>, summary: Summary) {
+        var cat: Category? = null
+        categories.forEach {
+            if (it.totalFinished > cat?.totalFinished ?: 0) cat = it
+        }
 
-                cat?.let {
-                    withContext(Dispatchers.IO) {
-                        val summary = summaryDb.getSummary()
-                        summaryDb.insert(summary.value!!.apply {
-                            mostActiveCategory = it.id
-                        })
-                    }
-                }
+        cat?.let {
+            summary.mostActiveCategory = it.id
+        }
+    }
+
+    private fun updateLeastActive(categories: List<Category>, summary: Summary) {
+        var least: Category = categories[0]
+        for (i in 1..categories.size - 1) {
+            if (categories[i].totalFinished < least.totalFinished)
+                least = categories[i]
+        }
+        if (least.totalCreated > 0) {
+            val mark = with(least) { (totalFinished.toFloat() / totalCreated) * 100f }
+            if (least.id != summary.mostActiveCategory && mark < 50) {
+                summary.leastActiveCategory = least.id
             }
         }
     }
 
-    private fun updateLeastActive(catDb: CategoryDao, summaryDb: SummaryDao) {
-
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val summary = summaryDb.getSummary()
-                val categories = catDb.getAll()
-                var least: Category = categories.value!![0]
-                for (i in 1..categories.value!!.size - 1) {
-                    if (categories.value!![i].totalFinished < least.totalFinished)
-                        least = categories.value!![i]
-                }
-                if (least.totalCreated > 0) {
-                    val mark = with(least) { (totalFinished.toFloat() / totalCreated) * 100f }
-                    if (least.id != summary.value!!.mostActiveCategory && mark < 50) {
-                        withContext(Dispatchers.IO) {
-                            summaryDb.insert(summary.value!!.apply {
-                                leastActiveCategory = least.id
-                            })
-                        }
-                    }
+    private fun updateMostSuccessful(categories: List<Category>, summary: Summary) {
+        var categoryId = summary.mostSuccessfulCategory
+        var rate = summary.mostSuccessfulRatio
+        categories.forEach {
+            with(it) {
+                if (totalFinished > 0
+                    && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) > rate
+                ) {
+                    categoryId = it.id
+                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
                 }
             }
         }
-    }
 
-    private fun updateMostSuccessful(catDb: CategoryDao, summaryDb: SummaryDao) {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val summary = summaryDb.getSummary()
-                val categories = catDb.getAll()
-                var categoryId = summary.value!!.mostSuccessfulCategory
-                var rate = summary.value!!.mostSuccessfulRatio
-                categories.value!!.forEach {
-                    with(it) {
-                        if (totalFinished > 0
-                            && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) > rate
-                        ) {
-                            categoryId = it.id
-                            rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
-                        }
-                    }
-                }
-
-                summaryDb.insert(summary.value!!.apply {
-                    mostSuccessfulRatio = rate
-                    mostSuccessfulCategory = categoryId
-                })
-            }
+        summary.apply {
+            mostSuccessfulRatio = rate
+            mostSuccessfulCategory = categoryId
         }
     }
 
-    private fun updateLeastSuccessful(catDb: CategoryDao, summaryDb: SummaryDao) {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val summary = summaryDb.getSummary()
-                val categories = catDb.getAll()
-                var categoryId = summary.value!!.leastSuccessfulCategory
-                var rate = 0
-                categories.value!!.forEach {
-                    with(it) {
-                        if (totalFinished > 0
-                            && java.lang.Math.round((totalFailure.toFloat() / totalFinished) * 100.0f) > rate
-                        ) {
-                            categoryId = it.id
-                            rate =
-                                java.lang.Math.round((totalFailure.toFloat() / totalFinished) * 100.0f)
+    private fun updateLeastSuccessful(categories: List<Category>, summary: Summary) {
+        var categoryId = summary.leastSuccessfulCategory
+        var rate = 0
+        categories.forEach {
+            with(it) {
+                if (totalFinished > 0
+                    && Math.round((totalFailure.toFloat() / totalFinished) * 100.0f) > rate
+                ) {
+                    categoryId = it.id
+                    rate =
+                        Math.round((totalFailure.toFloat() / totalFinished) * 100.0f)
 
-                        }
-                    }
                 }
+            }
+        }
 
-                if (rate < 50) {
-                    summaryDb.insert(summary.value!!.apply {
-                        leastSuccessfulCategory = categoryId
-                        leastSuccessfulRatio = 100 - rate
-                    })
-                }
+        if (rate < 50) {
+            summary.apply {
+                leastSuccessfulCategory = categoryId
+                leastSuccessfulRatio = 100 - rate
             }
         }
     }
