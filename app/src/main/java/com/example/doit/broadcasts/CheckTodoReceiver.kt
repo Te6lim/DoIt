@@ -16,7 +16,6 @@ class CheckTodoReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
-
     override fun onReceive(context: Context, intent: Intent) {
         val todoId = intent.getLongExtra(TODO_ID_EXTRA, -1L)
         val catId = intent.getIntExtra(CAT_ID_EXTRA, -1)

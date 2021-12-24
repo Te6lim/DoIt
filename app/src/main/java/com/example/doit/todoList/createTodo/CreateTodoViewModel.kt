@@ -103,11 +103,13 @@ class CreateTodoViewModel(
                         }
                     })
 
-                    setTimeTodoAlarm(editTodo.value!!, editTodo.value!!.todoId.toInt())
+                    setTimeTodoAlarm(
+                        editTodo.value!!,
+                        Integer.MAX_VALUE - editTodo.value!!.todoId.toInt()
+                    )
                     if (editTodo.value!!.hasDeadline)
                         setDeadlineAlarm(
-                            editTodo.value!!,
-                            Integer.MAX_VALUE - editTodo.value!!.todoId.toInt()
+                            editTodo.value!!, editTodo.value!!.todoId
                         )
 
                     clearTodoInfo()
@@ -139,8 +141,9 @@ class CreateTodoViewModel(
                         this.totalCreated += 1
                     })
 
-                    setTimeTodoAlarm(todo, id.toInt())
-                    if (todo.hasDeadline) setDeadlineAlarm(todo, Integer.MAX_VALUE - id.toInt())
+                    setTimeTodoAlarm(todo, Integer.MAX_VALUE - id.toInt())
+                    if (todo.hasDeadline)
+                        setDeadlineAlarm(todo, id)
                 }
             }
         }
@@ -170,19 +173,19 @@ class CreateTodoViewModel(
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setDeadlineAlarm(todo: Todo, id: Int) {
+    private fun setDeadlineAlarm(todo: Todo, id: Long) {
         val notifyIntent = Intent(
             app, AlarmReceiver::class.java
         ).apply {
             putExtra(TODO_STRING_EXTRA, todo.todoString)
             putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
             putExtra(NOTIFICATION_EXTRA, id)
-            putExtra(TODO_ID_EXTRA, todo.todoId)
+            putExtra(TODO_ID_EXTRA, id)
             putExtra(CAT_ID_EXTRA, todo.catId)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
-            app, id,
+            app, id.toInt(),
             notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
         val duration = todo.deadlineDate!!

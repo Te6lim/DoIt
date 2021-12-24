@@ -39,7 +39,7 @@ fun NotificationManager.sendNotification(
     }
 
     val donePendingIntent = PendingIntent.getBroadcast(
-        context, requestCode, Intent(context, CheckTodoReceiver::class.java),
+        context, requestCode, intent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
     val notification = NotificationCompat.Builder(context, channel)
