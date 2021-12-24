@@ -24,6 +24,10 @@
         <receiver
             android:name=".broadcasts.AlarmReceiver"
             android:exported="true" />
+
+        <receiver
+            android:name=".broadcasts.CheckTodoReceiver"
+            android:exported="true" />
     </application>
 
 </manifest>

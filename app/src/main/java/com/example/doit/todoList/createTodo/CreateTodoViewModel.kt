@@ -33,6 +33,8 @@ class CreateTodoViewModel(
         const val DEADLINE_CHANNEL = "deadline channel"
         const val TIME_TODO_CHANNEL = "time_ todo_channel"
         const val TODO_STRING_EXTRA = "todo string"
+        const val TODO_ID_EXTRA = "todo id extra"
+        const val CAT_ID_EXTRA = "cat id extra"
     }
 
     private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -175,6 +177,8 @@ class CreateTodoViewModel(
             putExtra(TODO_STRING_EXTRA, todo.todoString)
             putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
             putExtra(NOTIFICATION_EXTRA, id)
+            putExtra(TODO_ID_EXTRA, todo.todoId)
+            putExtra(CAT_ID_EXTRA, todo.catId)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(

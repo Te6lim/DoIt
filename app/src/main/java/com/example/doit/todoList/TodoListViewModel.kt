@@ -331,7 +331,7 @@ class TodoListViewModel(
         return result
     }
 
-    fun updateFinishedCount(value: Boolean) {
+    private fun updateFinishedCount(value: Boolean) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (value)
@@ -345,7 +345,7 @@ class TodoListViewModel(
         }
     }
 
-    fun updateDeadlineStatus(todo: Todo) {
+    private fun updateDeadlineStatus(todo: Todo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (todo.hasDeadline) {
@@ -367,7 +367,7 @@ class TodoListViewModel(
         }
     }
 
-    fun updateDiscarded(category: Category) {
+    private fun updateDiscarded(category: Category) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 summaryDb.insert(summary.value!!.apply {
@@ -378,7 +378,7 @@ class TodoListViewModel(
         }
     }
 
-    fun updateMostActive(cat: Category? = null) {
+    private fun updateMostActive(cat: Category? = null) {
         if (cat != null) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
@@ -413,7 +413,7 @@ class TodoListViewModel(
         }
     }
 
-    fun updateLeastActive() {
+    private fun updateLeastActive() {
         var least: Category = categories.value!![0]
         for (i in 1..categories.value!!.size - 1) {
             if (categories.value!![i].totalFinished < least.totalFinished)
@@ -433,7 +433,7 @@ class TodoListViewModel(
         }
     }
 
-    fun updateMostSuccessful() {
+    private fun updateMostSuccessful() {
         var categoryId = summary.value!!.mostSuccessfulCategory
         var rate = summary.value!!.mostSuccessfulRatio
         categories.value!!.forEach {
@@ -457,7 +457,7 @@ class TodoListViewModel(
         }
     }
 
-    fun updateLeastSuccessful() {
+    private fun updateLeastSuccessful() {
         var categoryId = summary.value!!.leastSuccessfulCategory
         var rate = 0
         categories.value!!.forEach {
