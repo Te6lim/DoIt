@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import com.example.doit.sendNotification
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_IDS
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_ID_EXTRA
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_STRING_EXTRA
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CHANNEL_EXTRA
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.NOTIFICATION_EXTRA
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.SUMMARY_ID
@@ -18,6 +19,8 @@ import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TODO_S
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val notificationId = intent.getIntExtra(NOTIFICATION_EXTRA, 0)
+        val categoryName = intent.getStringExtra(CAT_STRING_EXTRA)!!
+
         val bundle = Bundle().apply {
             putLong(TODO_ID_EXTRA, intent.getLongExtra(TODO_ID_EXTRA, -1L))
             putInt(CAT_ID_EXTRA, intent.getIntExtra(CAT_ID_EXTRA, -1))
@@ -29,9 +32,8 @@ class AlarmReceiver : BroadcastReceiver() {
             ContextCompat.getSystemService(context, NotificationManager::class.java)
                 ?.sendNotification(
                     context,
-                    notificationId, channel,
-                    intent.getStringExtra(TODO_STRING_EXTRA) ?: "Empty todo",
-                    notificationId, bundle
+                    notificationId, categoryName, channel,
+                    intent.getStringExtra(TODO_STRING_EXTRA) ?: "Empty todo", notificationId, bundle
                 )
         } ?: throw IllegalArgumentException()
     }

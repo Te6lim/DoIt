@@ -36,6 +36,7 @@ class CreateTodoViewModel(
         const val TODO_ID_EXTRA = "todo id extra"
         const val CAT_ID_EXTRA = "cat id extra"
         const val CAT_IDS = "cat ids"
+        const val CAT_STRING_EXTRA = "cat string extra"
         const val SUMMARY_ID = "summary id"
 
         const val minute = 60_000
@@ -163,6 +164,7 @@ class CreateTodoViewModel(
             ).apply {
                 putExtra(TODO_STRING_EXTRA, todo.todoString)
                 putExtra(CHANNEL_EXTRA, TIME_TODO_CHANNEL)
+                putExtra(CAT_STRING_EXTRA, categoryLive.value!!.name)
                 putExtra(NOTIFICATION_EXTRA, id)
             }
             val duration = todo.dateTodo.toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
@@ -192,6 +194,7 @@ class CreateTodoViewModel(
                 putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
                 putExtra(NOTIFICATION_EXTRA, id)
                 putExtra(TODO_ID_EXTRA, id)
+                putExtra(CAT_STRING_EXTRA, categoryLive.value!!.name)
                 putExtra(CAT_ID_EXTRA, todo.catId)
                 putExtra(SUMMARY_ID, summary.value!!.id)
                 putIntegerArrayListExtra(CAT_IDS, categoryIdList)

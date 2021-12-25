@@ -20,6 +20,7 @@ import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TODO_I
 fun NotificationManager.sendNotification(
     context: Context,
     notificationId: Int,
+    categoryName: String,
     channel: String,
     message: String,
     requestCode: Int,
@@ -61,8 +62,10 @@ fun NotificationManager.sendNotification(
         .setContentIntent(pendingIntent)
         .setContentTitle(
             when (channel) {
-                DEADLINE_CHANNEL -> "Deadline"
-                TIME_TODO_CHANNEL -> "Todo"
+                DEADLINE_CHANNEL ->
+                    context.getString(R.string.notification_deadline_title, categoryName)
+                TIME_TODO_CHANNEL ->
+                    context.getString(R.string.notification_todo_title, categoryName)
                 else -> ""
             }
         )

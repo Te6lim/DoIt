@@ -57,4 +57,6 @@
     <string name="today">Today</string>
     <string name="now">Now</string>
     <string name="reset">Reset</string>
+    <string name="notification_deadline_title">Deadline (%s)</string>
+    <string name="notification_todo_title">Todo (%s)</string>
 </resources>
