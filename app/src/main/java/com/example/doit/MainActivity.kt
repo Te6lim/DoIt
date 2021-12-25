@@ -1,9 +1,11 @@
 package com.example.doit
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.NotificationManager
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
@@ -11,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.doit.databinding.ActivityMainBinding
+import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.NOTIFICATION_EXTRA
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -166,9 +169,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
+    override fun onStart() {
+        super.onStart()
+        val notificationId = intent.getIntExtra(NOTIFICATION_EXTRA, -1)
+        if (notificationId != -1) {
+            ContextCompat.getSystemService(this, NotificationManager::class.java)
+                ?.cancel(notificationId)
+            intent.removeExtra(NOTIFICATION_EXTRA)
+        }
+
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(findNavController(R.id.myNavHost), drawer)

@@ -37,6 +37,8 @@ class CreateTodoViewModel(
         const val CAT_ID_EXTRA = "cat id extra"
         const val CAT_IDS = "cat ids"
         const val SUMMARY_ID = "summary id"
+
+        const val minute = 60_000
     }
 
     private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -176,32 +178,34 @@ class CreateTodoViewModel(
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun setDeadlineAlarm(todo: Todo, id: Long) {
-        val categoryIdList = arrayListOf<Int>()
-        categories.value!!.forEach {
-            categoryIdList.add(it.id)
-        }
-        val notifyIntent = Intent(
-            app, AlarmReceiver::class.java
-        ).apply {
-            putExtra(TODO_STRING_EXTRA, todo.todoString)
-            putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
-            putExtra(NOTIFICATION_EXTRA, id)
-            putExtra(TODO_ID_EXTRA, id)
-            putExtra(CAT_ID_EXTRA, todo.catId)
-            putExtra(SUMMARY_ID, summary.value!!.id)
-            putIntegerArrayListExtra(CAT_IDS, categoryIdList)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            app, id.toInt(),
-            notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
         val duration = todo.deadlineDate!!
-            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
-        AlarmManagerCompat.setExactAndAllowWhileIdle(
-            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            SystemClock.elapsedRealtime() + duration, pendingIntent
-        )
+            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds() - minute
+        if (duration > 0) {
+            val categoryIdList = arrayListOf<Int>()
+            categories.value!!.forEach {
+                categoryIdList.add(it.id)
+            }
+            val notifyIntent = Intent(
+                app, AlarmReceiver::class.java
+            ).apply {
+                putExtra(TODO_STRING_EXTRA, todo.todoString)
+                putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
+                putExtra(NOTIFICATION_EXTRA, id)
+                putExtra(TODO_ID_EXTRA, id)
+                putExtra(CAT_ID_EXTRA, todo.catId)
+                putExtra(SUMMARY_ID, summary.value!!.id)
+                putIntegerArrayListExtra(CAT_IDS, categoryIdList)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                app, id.toInt(),
+                notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            AlarmManagerCompat.setExactAndAllowWhileIdle(
+                alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + duration, pendingIntent
+            )
+        }
     }
 
     private fun clearTodoInfo() {
@@ -284,7 +288,8 @@ class CreateTodoViewModel(
 
 class CreateTodoViewModelFactory(
     private val app: Application,
-    private val todoDb: TodoDbDao, private val catDb: CategoryDao,
+    private val todoDb: TodoDbDao,
+    private val catDb: CategoryDao,
     private val editTodo: Long,
     private val catId: Int,
     private val summaryDb: SummaryDao,

@@ -25,19 +25,24 @@ fun NotificationManager.sendNotification(
     requestCode: Int,
     bundle: Bundle
 ) {
+
+    val startActivityIntent = Intent(context, MainActivity::class.java).apply {
+        putExtra(NOTIFICATION_EXTRA, notificationId)
+    }
+
     val pendingIntent = PendingIntent.getActivity(
-        context, notificationId, Intent(context, MainActivity::class.java),
+        context, notificationId, startActivityIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
 
-    val intent = Intent(context, CheckTodoReceiver::class.java)
+    val notificationActionIntent = Intent(context, CheckTodoReceiver::class.java)
     val todoId = bundle.getLong(TODO_ID_EXTRA)
     val catId = bundle.getInt(CAT_ID_EXTRA)
     val summaryId = bundle.getLong(SUMMARY_ID)
     val catIdList = bundle.getIntegerArrayList(CAT_IDS)
 
     if (todoId != -1L && catId != -1) {
-        intent.apply {
+        notificationActionIntent.apply {
             putExtra(TODO_ID_EXTRA, todoId)
             putExtra(CAT_ID_EXTRA, catId)
             putExtra(SUMMARY_ID, summaryId)
@@ -45,10 +50,10 @@ fun NotificationManager.sendNotification(
         }
     }
 
-    intent.putExtra(NOTIFICATION_EXTRA, notificationId)
+    notificationActionIntent.putExtra(NOTIFICATION_EXTRA, notificationId)
 
     val donePendingIntent = PendingIntent.getBroadcast(
-        context, requestCode, intent,
+        context, requestCode, notificationActionIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
     val notification = NotificationCompat.Builder(context, channel)
@@ -68,7 +73,6 @@ fun NotificationManager.sendNotification(
             R.drawable.ic_todo, "Done", donePendingIntent
         )
     }
-
 
     notify(notificationId, notification.build())
 }
