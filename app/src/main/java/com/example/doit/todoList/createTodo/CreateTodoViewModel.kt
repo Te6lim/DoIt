@@ -44,7 +44,7 @@ class CreateTodoViewModel(
 
     private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    val categories = catDb.getAll()
+    val categories = catDb.getAllLive()
 
     private val summary = summaryDb.getSummary()
     val readySummary = fetchReadySummary()

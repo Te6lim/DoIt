@@ -17,8 +17,8 @@ class CategoriesViewModel(
     private val summaryDb: SummaryDao
 ) : ViewModel() {
 
-    private val todos = todoDb.getAll()
-    val categories = catDb.getAll()
+    private val todos = todoDb.getAllLive()
+    val categories = catDb.getAllLive()
 
     private val summary = summaryDb.getSummary()
     val readySummary = fetchReadySummary()

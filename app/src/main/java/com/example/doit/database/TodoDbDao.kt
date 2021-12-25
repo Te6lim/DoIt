@@ -19,7 +19,10 @@ interface TodoDbDao {
     fun get(key: Long): Todo?
 
     @Query("SELECT * FROM todo_table ORDER BY deadline_date ASC")
-    fun getAll(): LiveData<List<Todo>?>
+    fun getAllLive(): LiveData<List<Todo>?>
+
+    @Query("SELECT * FROM todo_table ORDER BY deadline_date ASC")
+    fun getAll(): List<Todo>?
 
     @Query("DELETE FROM todo_table WHERE :key = todoId")
     fun delete(key: Long)

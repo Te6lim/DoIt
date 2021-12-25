@@ -15,7 +15,7 @@ class SummaryViewModel(
 ) : ViewModel() {
 
     private val summary = summaryDb.getSummary()
-    val categories = catDb.getAll()
+    val categories = catDb.getAllLive()
 
     val readySummary = fetchReadySummary()
 

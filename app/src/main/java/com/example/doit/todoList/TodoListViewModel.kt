@@ -15,8 +15,8 @@ class TodoListViewModel(
         private var count = 0
     }
 
-    val categories = catDb.getAll()
-    val allTodos = todoDb.getAll()
+    val categories = catDb.getAllLive()
+    val allTodos = todoDb.getAllLive()
     private val summary = summaryDb.getSummary()
 
     val readySummary = fetchReadySummary()
@@ -55,7 +55,7 @@ class TodoListViewModel(
     val todoList = fetchList(activeCategory, allTodos)
 
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
-        list?.let { resetItemsState(it) }
+        list?.let { /*resetItemsState(it)*/ }
         list?.none { !it.isFinished } ?: true
     }
 
@@ -119,7 +119,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo.apply { isSuccess = isSuccess(this) })
-                resetItemsState(todoList.value!!)
+//                resetItemsState(todoList.value!!)
                 cat.apply {
                     if (todo.isFinished) totalFinished += 1
                     else totalFinished -= 1
@@ -161,7 +161,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
-                resetItemsState(todoList.value!!)
+                //resetItemsState(todoList.value!!)
                 updateDiscarded(activeCategory.value!!)
             }
         }
@@ -225,7 +225,7 @@ class TodoListViewModel(
 
             withContext(Dispatchers.IO) {
                 selectedId.forEach { delete(it) }
-                resetItemsState(todoList.value!!)
+                //resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }
         }
@@ -247,7 +247,7 @@ class TodoListViewModel(
                 for ((i, v) in itemsState.withIndex()) {
                     if (v) todoDb.update(todoList.value!![i].apply { isFinished = v })
                 }
-                resetItemsState(todoList.value!!)
+                //resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }
         }

@@ -5,7 +5,6 @@ import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalArgumentException
 
 class FinishedTodoListViewModel(
     private val catDb: CategoryDao, private val todoDatabase: TodoDbDao,
@@ -16,7 +15,7 @@ class FinishedTodoListViewModel(
     private val defaultCategory: LiveData<Category>
         get() = _defaultCategory
 
-    private val allTodos = todoDatabase.getAll()
+    private val allTodos = todoDatabase.getAllLive()
     private val summary = summaryDb.getSummary()
 
     val readySummary = fetchReadySummary()

@@ -31,7 +31,10 @@ data class Category(
 @Dao
 interface CategoryDao {
     @Query("SELECT * FROM category_table ORDER BY is_default DESC")
-    fun getAll(): LiveData<List<Category>>
+    fun getAllLive(): LiveData<List<Category>>
+
+    @Query("SELECT * FROM category_table ORDER BY is_default DESC")
+    fun getAll(): List<Category>
 
     @Insert
     fun insert(category: Category)

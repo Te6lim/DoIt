@@ -33,7 +33,8 @@ class AlarmReceiver : BroadcastReceiver() {
                 ?.sendNotification(
                     context,
                     notificationId, categoryName, channel,
-                    intent.getStringExtra(TODO_STRING_EXTRA) ?: "Empty todo", notificationId, bundle
+                    intent.getStringExtra(TODO_STRING_EXTRA) ?: "Empty todo",
+                    notificationId, bundle
                 )
         } ?: throw IllegalArgumentException()
     }

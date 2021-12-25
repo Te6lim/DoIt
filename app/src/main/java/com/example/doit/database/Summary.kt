@@ -34,6 +34,9 @@ interface SummaryDao {
 
     @Query("Select * from summary_table where :key = id")
     fun getSummary(key: Long): Summary
+
+    @Query("Select * from summary_table limit 1")
+    fun get(): Summary
 }
 
 @Database(entities = [Summary::class], version = 1, exportSchema = false)
