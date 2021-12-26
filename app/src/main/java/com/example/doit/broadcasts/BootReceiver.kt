@@ -19,12 +19,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
-class BootReceiver : BroadcastReceiver() {
+open class BootReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    override fun onReceive(context: Context, intent: Intent) {
-        Toast.makeText(context, "Boot complete", Toast.LENGTH_SHORT).show()
+    override fun onReceive(context: Context?, intent: Intent?) {
+        Toast.makeText(context!!, "Boot complete", Toast.LENGTH_SHORT).show()
         Log.d("XYZ", "device boot completed")
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val todoDb = TodoDatabase.getInstance(context).databaseDao
@@ -34,7 +34,7 @@ class BootReceiver : BroadcastReceiver() {
             withContext(Dispatchers.IO) {
                 val todoList = todoDb.getAll()
                 val catList = catDb.getAll()
-                val summary = summaryDb.get()
+                val summary = summaryDb.getSummary()
                 todoList!!.forEach { todo ->
                     setTimeTodoAlarm(
                         context, alarmManager, todo,
@@ -96,9 +96,6 @@ class BootReceiver : BroadcastReceiver() {
                 putExtra(CreateTodoViewModel.NOTIFICATION_EXTRA, id)
                 putExtra(CreateTodoViewModel.TODO_ID_EXTRA, id)
                 putExtra(CreateTodoViewModel.CAT_STRING_EXTRA, categoryName)
-                putExtra(CreateTodoViewModel.CAT_ID_EXTRA, todo.catId)
-                putExtra(CreateTodoViewModel.SUMMARY_ID, summary.id)
-                putIntegerArrayListExtra(CreateTodoViewModel.CAT_IDS, categoryIdList)
             }
 
             val pendingIntent = PendingIntent.getBroadcast(

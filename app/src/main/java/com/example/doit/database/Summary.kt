@@ -30,13 +30,10 @@ interface SummaryDao {
     fun insert(summary: Summary)
 
     @Query("Select * from summary_table limit 1")
-    fun getSummary(): LiveData<Summary>
-
-    @Query("Select * from summary_table where :key = id")
-    fun getSummary(key: Long): Summary
+    fun getSummaryLive(): LiveData<Summary>
 
     @Query("Select * from summary_table limit 1")
-    fun get(): Summary
+    fun getSummary(): Summary
 }
 
 @Database(entities = [Summary::class], version = 1, exportSchema = false)

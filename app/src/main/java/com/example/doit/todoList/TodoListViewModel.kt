@@ -17,7 +17,7 @@ class TodoListViewModel(
 
     val categories = catDb.getAllLive()
     val allTodos = todoDb.getAllLive()
-    private val summary = summaryDb.getSummary()
+    private val summary = summaryDb.getSummaryLive()
 
     val readySummary = fetchReadySummary()
 

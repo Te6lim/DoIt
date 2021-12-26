@@ -34,10 +34,7 @@ class CreateTodoViewModel(
         const val TIME_TODO_CHANNEL = "time_ todo_channel"
         const val TODO_STRING_EXTRA = "todo string"
         const val TODO_ID_EXTRA = "todo id extra"
-        const val CAT_ID_EXTRA = "cat id extra"
-        const val CAT_IDS = "cat ids"
         const val CAT_STRING_EXTRA = "cat string extra"
-        const val SUMMARY_ID = "summary id"
 
         const val minute = 60_000
     }
@@ -46,7 +43,7 @@ class CreateTodoViewModel(
 
     val categories = catDb.getAllLive()
 
-    private val summary = summaryDb.getSummary()
+    private val summary = summaryDb.getSummaryLive()
     val readySummary = fetchReadySummary()
 
     private val _todoCreated = MutableLiveData<Boolean>()
@@ -195,9 +192,6 @@ class CreateTodoViewModel(
                 putExtra(NOTIFICATION_EXTRA, id)
                 putExtra(TODO_ID_EXTRA, id)
                 putExtra(CAT_STRING_EXTRA, categoryLive.value!!.name)
-                putExtra(CAT_ID_EXTRA, todo.catId)
-                putExtra(SUMMARY_ID, summary.value!!.id)
-                putIntegerArrayListExtra(CAT_IDS, categoryIdList)
             }
 
             val pendingIntent = PendingIntent.getBroadcast(

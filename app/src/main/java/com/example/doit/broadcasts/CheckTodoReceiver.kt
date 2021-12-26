@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.example.doit.database.*
-import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_IDS
-import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_ID_EXTRA
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.NOTIFICATION_EXTRA
-import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.SUMMARY_ID
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.TODO_ID_EXTRA
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,32 +20,23 @@ class CheckTodoReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val todoId = intent.getLongExtra(TODO_ID_EXTRA, -1L)
-        val catId = intent.getIntExtra(CAT_ID_EXTRA, -1)
-        val summaryId = intent.getLongExtra(SUMMARY_ID, -1L)
-        val catIdList = intent.getIntegerArrayListExtra(CAT_IDS)
         val notificationId = intent.getIntExtra(NOTIFICATION_EXTRA, 0)
-        updateTodo(context, todoId, catId, catIdList!!, summaryId, notificationId)
+        updateTodo(context, todoId, notificationId)
     }
 
-    private fun updateTodo(
-        context: Context, todoId: Long,
-        catId: Int, categoryIds: ArrayList<Int>, summaryId: Long, notificationId: Int
-    ) {
+    private fun updateTodo(context: Context, todoId: Long, notificationId: Int) {
         val todoDb = TodoDatabase.getInstance(context).databaseDao
         val catDb = CategoryDb.getInstance(context).dao
         val summaryDb = getInstance(context).summaryDao
         scope.launch {
             withContext(Dispatchers.IO) {
-                val summary = summaryDb.getSummary(summaryId)
-                val categories = mutableListOf<Category>()
-                categoryIds.forEach {
-                    categories.add(catDb.get(it)!!)
-                }
+                val summary = summaryDb.getSummary()
+                val categories = catDb.getAll()
                 val todo = todoDb.get(todoId)!!.apply {
                     isFinished = true
                     dateFinished = LocalDateTime.now()
                 }
-                val cat = catDb.get(catId)!!
+                val cat = catDb.get(todo.catId)!!
                 todoDb.update(todo.apply { isSuccess = isSuccess(this) })
                 //resetItemsState(todoList.value!!)
                 cat.apply {

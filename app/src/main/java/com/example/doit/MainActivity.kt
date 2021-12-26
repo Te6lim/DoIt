@@ -12,6 +12,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.example.doit.broadcasts.BootReceiver
 import com.example.doit.databinding.ActivityMainBinding
 import com.example.doit.todoList.createTodo.CreateTodoViewModel.Companion.NOTIFICATION_EXTRA
 import com.google.android.material.navigation.NavigationView
@@ -23,7 +24,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
 
     lateinit var mainViewModel: MainViewModel
-    private set
+        private set
+
+    private object Receiver : BootReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -16,7 +16,7 @@ class FinishedTodoListViewModel(
         get() = _defaultCategory
 
     private val allTodos = todoDatabase.getAllLive()
-    private val summary = summaryDb.getSummary()
+    private val summary = summaryDb.getSummaryLive()
 
     val readySummary = fetchReadySummary()
 

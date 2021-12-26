@@ -20,7 +20,7 @@ class CategoriesViewModel(
     private val todos = todoDb.getAllLive()
     val categories = catDb.getAllLive()
 
-    private val summary = summaryDb.getSummary()
+    private val summary = summaryDb.getSummaryLive()
     val readySummary = fetchReadySummary()
 
     val defaultCategory = Transformations.map(categories) { list ->
