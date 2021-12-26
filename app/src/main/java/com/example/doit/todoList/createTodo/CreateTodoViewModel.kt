@@ -107,11 +107,11 @@ class CreateTodoViewModel(
 
                     setTimeTodoAlarm(
                         editTodo.value!!,
-                        Integer.MAX_VALUE - editTodo.value!!.todoId
+                        Integer.MAX_VALUE - editTodo.value!!.todoId.toInt()
                     )
                     if (editTodo.value!!.hasDeadline)
                         setDeadlineAlarm(
-                            editTodo.value!!, editTodo.value!!.todoId
+                            editTodo.value!!, editTodo.value!!.todoId.toInt()
                         )
 
                     clearTodoInfo()
@@ -143,9 +143,9 @@ class CreateTodoViewModel(
                         this.totalCreated += 1
                     })
 
-                    setTimeTodoAlarm(todo, Integer.MAX_VALUE - id)
+                    setTimeTodoAlarm(todo, Integer.MAX_VALUE - id.toInt())
                     if (todo.hasDeadline)
-                        setDeadlineAlarm(todo, id)
+                        setDeadlineAlarm(todo, id.toInt())
                 }
             }
         }
@@ -154,7 +154,7 @@ class CreateTodoViewModel(
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setTimeTodoAlarm(todo: Todo, id: Long) {
+    private fun setTimeTodoAlarm(todo: Todo, id: Int) {
         if (todo.dateTodo > LocalDateTime.now()) {
             val notifyIntent = Intent(
                 app, AlarmReceiver::class.java
@@ -166,7 +166,7 @@ class CreateTodoViewModel(
             }
             val duration = todo.dateTodo.toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
             val pendingIntent = PendingIntent.getBroadcast(
-                app, id.toInt(), notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                app, id, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
             AlarmManagerCompat.setExactAndAllowWhileIdle(
                 alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -176,7 +176,7 @@ class CreateTodoViewModel(
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setDeadlineAlarm(todo: Todo, id: Long) {
+    private fun setDeadlineAlarm(todo: Todo, id: Int) {
         val duration = todo.deadlineDate!!
             .toMilliSeconds() - LocalDateTime.now().toMilliSeconds() - minute
         if (duration > 0) {
@@ -195,7 +195,7 @@ class CreateTodoViewModel(
             }
 
             val pendingIntent = PendingIntent.getBroadcast(
-                app, id.toInt(),
+                app, id,
                 notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
             AlarmManagerCompat.setExactAndAllowWhileIdle(

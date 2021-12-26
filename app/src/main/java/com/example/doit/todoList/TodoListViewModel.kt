@@ -1,5 +1,8 @@
 package com.example.doit.todoList
 
+import android.app.Application
+import android.app.NotificationManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
@@ -7,9 +10,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class TodoListViewModel(
+    private val app: Application,
     private val catDb: CategoryDao, private val todoDb: TodoDbDao,
     private val summaryDb: SummaryDao
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     companion object {
         private var count = 0
@@ -161,6 +165,10 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
+                ContextCompat.getSystemService(app, NotificationManager::class.java)?.apply {
+                    cancel(id.toInt())
+                    cancel(Integer.MAX_VALUE - id.toInt())
+                }
                 //resetItemsState(todoList.value!!)
                 updateDiscarded(activeCategory.value!!)
             }
@@ -486,6 +494,7 @@ class TodoListViewModel(
 }
 
 class TodoListViewModelFactory(
+    private val app: Application,
     private val categoryDb: CategoryDao,
     private val database: TodoDbDao,
     private val summaryDb: SummaryDao
@@ -493,7 +502,7 @@ class TodoListViewModelFactory(
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TodoListViewModel::class.java)) {
-            return TodoListViewModel(categoryDb, database, summaryDb) as T
+            return TodoListViewModel(app, categoryDb, database, summaryDb) as T
         }
         throw IllegalArgumentException("unknown viewModel class")
     }
