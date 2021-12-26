@@ -47,6 +47,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
         val viewModelFactory =
             TodoListViewModelFactory(
+                requireActivity().application,
                 catDb, todoDb,
                 getInstance(requireContext()).summaryDao
             )
