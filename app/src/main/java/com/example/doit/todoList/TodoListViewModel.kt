@@ -1,9 +1,13 @@
 package com.example.doit.todoList
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.Application
-import android.app.NotificationManager
-import androidx.core.content.ContextCompat
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.*
+import com.example.doit.broadcasts.AlarmReceiver
 import com.example.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,14 +23,15 @@ class TodoListViewModel(
         private var count = 0
     }
 
+    private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
     val categories = catDb.getAllLive()
-    val allTodos = todoDb.getAllLive()
+    private val allTodos = todoDb.getAllLive()
     private val summary = summaryDb.getSummaryLive()
 
     val readySummary = fetchReadySummary()
 
-    var defaultCategory: Category? = null
-        private set
+    private var defaultCategory: Category? = null
 
     private val _activeCategory = MutableLiveData<Category>()
     val activeCategory: LiveData<Category>
@@ -95,7 +100,7 @@ class TodoListViewModel(
     private fun emitDefault() {
         val newDefault = categories.value!!.find { it.isDefault }
         if (newDefault != defaultCategory) {
-            _activeCategory.value = newDefault
+            _activeCategory.value = newDefault!!
             defaultCategory = _activeCategory.value
         }
     }
@@ -110,12 +115,6 @@ class TodoListViewModel(
     private suspend fun getCategoryById(id: Int): Category? {
         return withContext(Dispatchers.IO) {
             catDb.get(id)
-        }
-    }
-
-    private suspend fun getDefault(): Category {
-        return withContext(Dispatchers.IO) {
-            catDb.getDefault()
         }
     }
 
@@ -151,24 +150,33 @@ class TodoListViewModel(
     private fun isSuccess(todo: Todo): Boolean {
         if (todo.hasDeadline) {
             with(todo) {
-                if (
-                    dateFinished!!.toLocalDate().compareTo(deadlineDate!!.toLocalDate()) <= 0
-                    && dateFinished!!.toLocalTime().compareTo(deadlineDate!!.toLocalTime()) <= 0
-                ) return true
-                else
-                    return false
+                return (dateFinished!!.toLocalDate() <= deadlineDate!!.toLocalDate()
+                        && dateFinished!!.toLocalTime() <= deadlineDate!!.toLocalTime())
             }
         } else return todo.isFinished
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     fun delete(id: Long) {
+        with(alarmManager) {
+            cancel(
+                PendingIntent.getBroadcast(
+                    app, id.toInt(),
+                    Intent(app, AlarmReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+            cancel(
+                PendingIntent.getBroadcast(
+                    app, Integer.MAX_VALUE - id.toInt(),
+                    Intent(app, AlarmReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+        }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.delete(id)
-                ContextCompat.getSystemService(app, NotificationManager::class.java)?.apply {
-                    cancel(id.toInt())
-                    cancel(Integer.MAX_VALUE - id.toInt())
-                }
                 //resetItemsState(todoList.value!!)
                 updateDiscarded(activeCategory.value!!)
             }
@@ -263,8 +271,8 @@ class TodoListViewModel(
 
     private fun fetchList(
         inputA: LiveData<Category>, inputB: LiveData<List<Todo>?>
-    ): LiveData<List<Todo>> {
-        val result = MediatorLiveData<List<Todo>>()
+    ): LiveData<List<Todo>?> {
+        val result = MediatorLiveData<List<Todo>?>()
 
         val doOperationIfA = Observer<Category> { category ->
             inputB.value?.let { list ->

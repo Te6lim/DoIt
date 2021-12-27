@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
-open class BootReceiver : BroadcastReceiver() {
+class BootReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
