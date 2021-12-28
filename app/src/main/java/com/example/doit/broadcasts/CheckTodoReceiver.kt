@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
+import kotlin.math.roundToInt
 
 class CheckTodoReceiver : BroadcastReceiver() {
 
@@ -38,7 +39,6 @@ class CheckTodoReceiver : BroadcastReceiver() {
                 }
                 val cat = catDb.get(todo.catId)!!
                 todoDb.update(todo.apply { isSuccess = isSuccess(this) })
-                //resetItemsState(todoList.value!!)
                 cat.apply {
                     if (todo.isFinished) totalFinished += 1
                     else totalFinished -= 1
@@ -72,9 +72,8 @@ class CheckTodoReceiver : BroadcastReceiver() {
     private fun isSuccess(todo: Todo): Boolean {
         if (todo.hasDeadline) {
             with(todo) {
-                return (dateFinished!!.toLocalDate().compareTo(deadlineDate!!.toLocalDate()) <= 0
-                        && dateFinished!!.toLocalTime()
-                    .compareTo(deadlineDate!!.toLocalTime()) <= 0)
+                return (dateFinished!!.toLocalDate() <= deadlineDate!!.toLocalDate()
+                        && dateFinished!!.toLocalTime() <= deadlineDate!!.toLocalTime())
             }
         } else return todo.isFinished
     }
@@ -86,10 +85,8 @@ class CheckTodoReceiver : BroadcastReceiver() {
 
     private fun updateDeadlineStatus(summary: Summary, todo: Todo) {
         if (todo.hasDeadline) {
-            if (todo.dateFinished!!.toLocalDate()
-                    .compareTo(todo.deadlineDate!!.toLocalDate()) <= 0
-                && todo.dateFinished!!.toLocalTime()
-                    .compareTo(todo.deadlineDate!!.toLocalTime()) <= 0
+            if (todo.dateFinished!!.toLocalDate() <= todo.deadlineDate!!.toLocalDate()
+                && todo.dateFinished!!.toLocalTime() <= todo.deadlineDate!!.toLocalTime()
             ) {
                 summary.deadlinesMet += 1
             } else {
@@ -127,7 +124,7 @@ class CheckTodoReceiver : BroadcastReceiver() {
 
     private fun updateLeastActive(categories: List<Category>, summary: Summary) {
         var least: Category = categories[0]
-        for (i in 1..categories.size - 1) {
+        for (i in 1 until categories.size) {
             if (categories[i].totalFinished < least.totalFinished)
                 least = categories[i]
         }
@@ -145,10 +142,10 @@ class CheckTodoReceiver : BroadcastReceiver() {
         categories.forEach {
             with(it) {
                 if (totalFinished > 0
-                    && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) > rate
+                    && ((totalSuccess.toFloat() / totalFinished) * 100.0f).roundToInt() > rate
                 ) {
                     categoryId = it.id
-                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
+                    rate = ((totalSuccess.toFloat() / totalFinished) * 100).roundToInt()
                 }
             }
         }
@@ -165,11 +162,11 @@ class CheckTodoReceiver : BroadcastReceiver() {
         categories.forEach {
             with(it) {
                 if (totalFinished > 0
-                    && Math.round((totalFailure.toFloat() / totalFinished) * 100.0f) > rate
+                    && ((totalFailure.toFloat() / totalFinished) * 100.0f).roundToInt() > rate
                 ) {
                     categoryId = it.id
                     rate =
-                        Math.round((totalFailure.toFloat() / totalFinished) * 100.0f)
+                        ((totalFailure.toFloat() / totalFinished) * 100.0f).roundToInt()
 
                 }
             }

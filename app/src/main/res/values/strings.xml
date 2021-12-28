@@ -59,4 +59,7 @@
     <string name="reset">Reset</string>
     <string name="notification_deadline_title">Deadline (%s)</string>
     <string name="notification_todo_title">Todo (%s)</string>
+    <string name="version_code">Version 1.0</string>
+    <string name="copyright_text">Copyright &#169; Te6lim 2021. All rights reserved</string>
+    <string name="private_policy_text">Private Policy</string>
 </resources>
