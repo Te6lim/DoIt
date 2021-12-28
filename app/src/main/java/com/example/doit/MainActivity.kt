@@ -162,6 +162,12 @@ class MainActivity : AppCompatActivity() {
                         drawer.closeDrawer(GravityCompat.START)
                         true
                     }
+
+                    R.id.aboutFragment -> {
+                        supportActionBar?.subtitle = null
+                        NavigationUI.onNavDestinationSelected(menuItem, navController)
+                        true
+                    }
                     else -> {
                         drawer.closeDrawer(GravityCompat.START)
                         false
