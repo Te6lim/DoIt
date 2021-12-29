@@ -7,15 +7,15 @@
 
         <variable
             name="todoItem"
-            type="com.example.doit.database.Todo" />
+            type="com.te6lim.doit.database.Todo" />
 
         <variable
             name="todoListViewModel"
-            type="com.example.doit.todoList.TodoListViewModel" />
+            type="com.te6lim.doit.todoList.TodoListViewModel" />
 
         <variable
             name="itemListener"
-            type="com.example.doit.ActionCallback" />
+            type="com.te6lim.doit.ActionCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

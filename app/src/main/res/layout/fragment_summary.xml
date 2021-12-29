@@ -2,12 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.doit.summary.SummaryFragment">
+    tools:context="com.te6lim.doit.summary.SummaryFragment">
 
     <data>
+
         <variable
             name="viewModel"
-            type="com.example.doit.summary.SummaryViewModel" />
+            type="com.te6lim.doit.summary.SummaryViewModel" />
     </data>
 
     <ScrollView

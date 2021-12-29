@@ -7,7 +7,7 @@
 
         <variable
             name="headerItem"
-            type="com.example.doit.todoList.categories.DataItem.Header" />
+            type="com.te6lim.doit.todoList.categories.DataItem.Header" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

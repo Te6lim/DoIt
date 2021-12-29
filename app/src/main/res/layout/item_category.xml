@@ -7,11 +7,11 @@
 
         <variable
             name="categoryInfo"
-            type="com.example.doit.todoList.categories.CategoryInfo" />
+            type="com.te6lim.doit.todoList.categories.CategoryInfo" />
 
         <variable
             name="listener"
-            type="com.example.doit.ActionCallback" />
+            type="com.te6lim.doit.ActionCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

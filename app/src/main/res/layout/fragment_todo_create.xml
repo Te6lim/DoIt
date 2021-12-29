@@ -2,12 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.doit.todoList.createTodo.CreateTodoFragment">
+    tools:context="com.te6lim.doit.todoList.createTodo.CreateTodoFragment">
 
     <data>
+
         <variable
-            name = "viewModel"
-            type="com.example.doit.todoList.createTodo.CreateTodoViewModel"/>
+            name="viewModel"
+            type="com.te6lim.doit.todoList.createTodo.CreateTodoViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.doit.todoList.TodoListFragment">
+    tools:context="com.te6lim.doit.todoList.TodoListFragment">
 
     <data>
 

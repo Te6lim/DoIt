@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.doit">
+    package="com.te6lim.doit">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DoIt">
         <activity
-            android:name=".MainActivity"
+            android:name="com.te6lim.doit.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.DoIt.NoActionBar"
             android:windowSoftInputMode="adjustPan">
@@ -24,7 +24,7 @@
         </activity>
 
         <receiver
-            android:name=".broadcasts.BootReceiver"
+            android:name="com.te6lim.doit.broadcasts.BootReceiver"
             android:exported="true"
             android:enabled="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
@@ -38,11 +38,11 @@
         </receiver>
 
         <receiver
-            android:name=".broadcasts.AlarmReceiver"
+            android:name="com.te6lim.doit.broadcasts.AlarmReceiver"
             android:exported="true" />
 
         <receiver
-            android:name=".broadcasts.CheckTodoReceiver"
+            android:name="com.te6lim.doit.broadcasts.CheckTodoReceiver"
             android:exported="true" />
     </application>
 

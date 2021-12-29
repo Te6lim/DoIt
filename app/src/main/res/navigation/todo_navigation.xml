@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/todoListFragment"
-        android:name="com.example.doit.todoList.TodoListFragment"
+        android:name="com.te6lim.doit.todoList.TodoListFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_list_todo">
         <action
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/createTodoFragment"
-        android:name="com.example.doit.todoList.createTodo.CreateTodoFragment"
+        android:name="com.te6lim.doit.todoList.createTodo.CreateTodoFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_todo_create">
         <argument
@@ -41,7 +41,7 @@
     </fragment>
     <fragment
         android:id="@+id/finishedTodoListFragment"
-        android:name="com.example.doit.finishedTodoList.FinishedTodoListFragment"
+        android:name="com.te6lim.doit.finishedTodoList.FinishedTodoListFragment"
         android:label="@string/finished"
         tools:layout="@layout/fragment_list_todo_finished">
         <action
@@ -54,7 +54,7 @@
     </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
-        android:name="com.example.doit.todoList.categories.CategoriesFragment"
+        android:name="com.te6lim.doit.todoList.categories.CategoriesFragment"
         android:label="@string/categories"
         tools:layout="@layout/fragment_categories">
         <argument
@@ -63,12 +63,12 @@
     </fragment>
     <fragment
         android:id="@+id/summaryFragment"
-        android:name="com.example.doit.summary.SummaryFragment"
+        android:name="com.te6lim.doit.summary.SummaryFragment"
         android:label="@string/summary"
         tools:layout="@layout/fragment_summary" />
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.example.doit.about.AboutFragment"
+        android:name="com.te6lim.doit.about.AboutFragment"
         android:label="@string/about"
         tools:layout="@layout/fragment_about" />
 </navigation>
