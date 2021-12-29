@@ -28,7 +28,7 @@ fun NotificationManager.sendNotification(
     }
 
     val pendingIntent = PendingIntent.getActivity(
-        context, notificationId, startActivityIntent,
+        context, requestCode, startActivityIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
 
