@@ -26,7 +26,7 @@ class AboutFragment : Fragment() {
             isClickable = true
             movementMethod = LinkMovementMethod.getInstance()
             text = HtmlCompat.fromHtml(
-                "<a href=''>Private Policy</a>", FROM_HTML_MODE_LEGACY
+                "<a href=''>Privacy Policy</a>", FROM_HTML_MODE_LEGACY
             )
         }
 
