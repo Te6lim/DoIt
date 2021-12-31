@@ -10,28 +10,24 @@ import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.AlarmManagerCompat
-import com.te6lim.doit.MainActivity
-import com.te6lim.doit.database.Category
-import com.te6lim.doit.database.Summary
-import com.te6lim.doit.database.Todo
+import com.te6lim.doit.database.*
 import com.te6lim.doit.todoList.createTodo.CreateTodoViewModel
 import com.te6lim.doit.todoList.toMilliSeconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class BootReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        Toast.makeText(context!!, "Boot complete", Toast.LENGTH_SHORT).show()
+    override fun onReceive(context: Context, intent: Intent) {
+        Toast.makeText(context, "Boot complete", Toast.LENGTH_SHORT).show()
         Log.d("XYZ", "device boot completed")
-        val intent = Intent(context, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
-        /*val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val todoDb = TodoDatabase.getInstance(context).databaseDao
         val catDb = CategoryDb.getInstance(context).dao
         val summaryDb = getInstance(context).summaryDao
@@ -54,7 +50,7 @@ class BootReceiver : BroadcastReceiver() {
                         )
                 }
             }
-        }*/
+        }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
