@@ -38,6 +38,7 @@ class FinishedTodoListFragment : Fragment(), ConfirmationCallbacks {
         val todoDatabase = TodoDatabase.getInstance(requireContext())
         val categoryDatabase = CategoryDb.getInstance(requireContext())
         val viewModelFactory = FinishedTodoListViewModelFactory(
+            requireActivity().application,
             categoryDatabase.dao,
             todoDatabase.databaseDao,
             getInstance(requireContext()).summaryDao

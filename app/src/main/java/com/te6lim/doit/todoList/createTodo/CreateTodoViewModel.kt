@@ -162,7 +162,7 @@ class CreateTodoViewModel(
                 putExtra(TODO_STRING_EXTRA, todo.todoString)
                 putExtra(CHANNEL_EXTRA, TIME_TODO_CHANNEL)
                 putExtra(CAT_STRING_EXTRA, categoryLive.value!!.name)
-                putExtra(NOTIFICATION_EXTRA, id)
+                putExtra(NOTIFICATION_EXTRA, id.toInt())
             }
             val duration = todo.dateTodo.toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
             val pendingIntent = PendingIntent.getBroadcast(
@@ -180,16 +180,12 @@ class CreateTodoViewModel(
         val duration = todo.deadlineDate!!
             .toMilliSeconds() - LocalDateTime.now().toMilliSeconds() - minute
         if (duration > 0) {
-            val categoryIdList = arrayListOf<Int>()
-            categories.value!!.forEach {
-                categoryIdList.add(it.id)
-            }
             val notifyIntent = Intent(
                 app, AlarmReceiver::class.java
             ).apply {
                 putExtra(TODO_STRING_EXTRA, todo.todoString)
                 putExtra(CHANNEL_EXTRA, DEADLINE_CHANNEL)
-                putExtra(NOTIFICATION_EXTRA, id)
+                putExtra(NOTIFICATION_EXTRA, id.toInt())
                 putExtra(TODO_ID_EXTRA, id)
                 putExtra(CAT_STRING_EXTRA, categoryLive.value!!.name)
             }
