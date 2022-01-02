@@ -2,6 +2,7 @@ package com.te6lim.doit.todoList
 
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.te6lim.doit.R
 import com.te6lim.doit.database.Todo
@@ -39,7 +40,7 @@ fun TextView.setDate(item: Todo?) {
 @BindingAdapter("setDeadline")
 fun TextView.setDeadlineDateString(item: Todo?) {
     item?.let { todo ->
-        //setTextColor(ContextCompat.getColor(context, R.color.deadline_safe))
+
         if (todo.dateFinished != null) {
             visibility = View.VISIBLE
             text =
@@ -90,5 +91,9 @@ fun TextView.setDeadlineDateString(item: Todo?) {
                 )
             } else visibility = View.GONE
         }
+
+        if (item.isLate)
+            setTextColor(ContextCompat.getColor(context, R.color.deadline_passed))
+        else setTextColor(ContextCompat.getColor(context, R.color.secondaryColor))
     }
 }

@@ -32,5 +32,8 @@ data class Todo(
     var catId: Int = -1,
 
     @ColumnInfo(name = "isSuccess")
-    var isSuccess: Boolean = false
+    var isSuccess: Boolean = false,
+
+    @ColumnInfo(name = "isLate")
+    var isLate: Boolean = false
 )

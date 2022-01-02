@@ -29,7 +29,6 @@ class FinishedTodoListViewModel(
 
     val readySummary = fetchReadySummary()
 
-
     init {
         initializeCategory()
     }
@@ -72,7 +71,7 @@ class FinishedTodoListViewModel(
             )
             cancel(
                 android.app.PendingIntent.getBroadcast(
-                    app, java.lang.Integer.MAX_VALUE - id.toInt(),
+                    app, Integer.MAX_VALUE - id.toInt(),
                     Intent(app, AlarmReceiver::class.java),
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT
                 )
@@ -143,20 +142,6 @@ class FinishedTodoListViewModel(
         }
         result.addSource(summary, action)
         return result
-    }
-
-    private fun updateFinishedCount(value: Boolean) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (value)
-                    summaryDb.insert(summary.value!!.apply {
-                        todosFinished += 1
-                    })
-                else summaryDb.insert(summary.value!!.apply {
-                    todosFinished -= 1
-                })
-            }
-        }
     }
 }
 

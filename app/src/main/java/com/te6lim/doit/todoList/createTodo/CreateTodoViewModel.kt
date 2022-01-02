@@ -109,10 +109,12 @@ class CreateTodoViewModel(
                         editTodo.value!!,
                         Integer.MAX_VALUE - editTodo.value!!.todoId
                     )
-                    if (editTodo.value!!.hasDeadline)
+                    if (editTodo.value!!.hasDeadline) {
                         setDeadlineAlarm(
                             editTodo.value!!, editTodo.value!!.todoId
                         )
+                        updateLateTodo(editTodo.value!!, editTodo.value!!.todoId)
+                    }
 
                     clearTodoInfo()
                 }
@@ -144,8 +146,10 @@ class CreateTodoViewModel(
                     })
 
                     setTimeTodoAlarm(todo, Integer.MAX_VALUE - id)
-                    if (todo.hasDeadline)
+                    if (todo.hasDeadline) {
                         setDeadlineAlarm(todo, id)
+                        updateLateTodo(todo, id)
+                    }
                 }
             }
         }
@@ -199,6 +203,22 @@ class CreateTodoViewModel(
                 SystemClock.elapsedRealtime() + duration, pendingIntent
             )
         }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun updateLateTodo(todo: Todo, id: Long) {
+        val duration = todo.deadlineDate!!
+            .toMilliSeconds() - LocalDateTime.now().toMilliSeconds()
+        val intent = Intent(app, AlarmReceiver::class.java).apply {
+            putExtra(TODO_ID_EXTRA, id)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            app, -id.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        AlarmManagerCompat.setExactAndAllowWhileIdle(
+            alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime() + duration, pendingIntent
+        )
     }
 
     private fun clearTodoInfo() {
