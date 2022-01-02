@@ -118,7 +118,31 @@ class TodoListViewModel(
         }
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     fun updateTodo(todo: Todo, cat: Category) {
+        with(alarmManager) {
+            cancel(
+                PendingIntent.getBroadcast(
+                    app, todo.todoId.toInt(),
+                    Intent(app, AlarmReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+            cancel(
+                PendingIntent.getBroadcast(
+                    app, Integer.MAX_VALUE - todo.todoId.toInt(),
+                    Intent(app, AlarmReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+            cancel(
+                PendingIntent.getBroadcast(
+                    app, -todo.todoId.toInt(),
+                    Intent(app, AlarmReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+        }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo.apply { isSuccess = isSuccess(this) })
@@ -169,6 +193,13 @@ class TodoListViewModel(
             cancel(
                 PendingIntent.getBroadcast(
                     app, Integer.MAX_VALUE - id.toInt(),
+                    Intent(app, AlarmReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+            cancel(
+                PendingIntent.getBroadcast(
+                    app, -id.toInt(),
                     Intent(app, AlarmReceiver::class.java),
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )

@@ -42,7 +42,6 @@ class AlarmReceiver : BroadcastReceiver() {
                     todoDb.update(todoDb.get(todoId)!!.apply { isLate = true })
                 }
             }
-
         }
     }
 }
