@@ -64,7 +64,6 @@ class TodoListViewModel(
     val todoList = fetchList(activeCategory, allTodos)
 
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
-        list?.let { /*resetItemsState(it)*/ }
         list?.none { !it.isFinished } ?: true
     }
 

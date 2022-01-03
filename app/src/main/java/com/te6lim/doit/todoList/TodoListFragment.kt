@@ -283,6 +283,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
         }
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         return inflater.inflate(R.menu.todo_list_menu, menu)
@@ -299,6 +300,12 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu.findItem(R.id.categoriesFragment)
+        val rootView = item.actionView
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

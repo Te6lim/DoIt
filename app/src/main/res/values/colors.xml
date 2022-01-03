@@ -27,4 +27,5 @@
     <color name="deadline_close">#CAA600</color>
     <color name="deadline_passed">#EF0000</color>
     <color name="grey">#949494</color>
+    <color name="white">#FFFFFF</color>
 </resources>

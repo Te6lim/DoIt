@@ -6,6 +6,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/category_backgorund.xml" value="0.23055555555555557" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/category_background.xml" value="0.22777777777777777" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/completed_todo_background.xml" value="0.22777777777777777" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/deadline_indicator.xml" value="0.1685185185185185" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/dialog_background.xml" value="0.875" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_add.xml" value="0.22777777777777777" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/drawable/ic_create.xml" value="0.23055555555555557" />
@@ -20,6 +21,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/activity_categories.xml" value="0.15806159420289856" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/activity_main.xml" value="0.1743659420289855" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/alternate_actionbar.xml" value="0.25" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/categories_icon.xml" value="0.67" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/category_item.xml" value="0.18070652173913043" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/category_selection.xml" value="0.1852355072463768" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/layout/contextual_actionbar.xml" value="0.18070652173913043" />
@@ -49,6 +51,7 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/menu/finished_todo_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/menu/nav_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/menu/todo_action_mode_menu.xml" value="0.25" />
+        <entry key="..\:/Users/ADMIN/AndroidStudioProjects/DoIt/app/src/main/res/menu/todo_list_menu.xml" value="0.5" />
       </map>
     </option>
   </component>
