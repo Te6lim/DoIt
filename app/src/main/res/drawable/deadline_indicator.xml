@@ -2,7 +2,12 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <solid android:color="@color/deadline_passed" />
-    <corners android:radius="8dp" />
+    <solid android:color="@color/colorRed" />
+
+    <corners android:radius="20dp" />
+
+    <size
+        android:width="20dp"
+        android:height="20dp" />
 
 </shape>

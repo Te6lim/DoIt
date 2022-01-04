@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.CheckBox
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +29,8 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     private lateinit var binding: FragmentListTodoBinding
     private lateinit var todoListViewModel: TodoListViewModel
+
+    private lateinit var menuIcon: View
 
     private lateinit var mainActivity: MainActivity
 
@@ -250,6 +254,15 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                 }
             }
 
+            lateDeadlineCount.observe(viewLifecycleOwner) {
+                if (this@TodoListFragment::menuIcon.isInitialized) {
+                    menuIcon.findViewById<ConstraintLayout>(R.id.indicator)
+                        .visibility = if (it > 0) View.VISIBLE else View.GONE
+                    menuIcon.findViewById<TextView>(R.id.deadlineCount_text)
+                        .text = it.toString()
+                }
+            }
+
             readySummary.observe(viewLifecycleOwner) { }
         }
 
@@ -304,7 +317,16 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         val item = menu.findItem(R.id.categoriesFragment)
-        val rootView = item.actionView
+        menuIcon = item.actionView
+        menuIcon.setOnClickListener {
+            onOptionsItemSelected(item)
+        }
+
+        menuIcon.findViewById<ConstraintLayout>(R.id.indicator)
+            .visibility = if (todoListViewModel.lateDeadlineCount.value ?: 0 > 0) View.VISIBLE
+        else View.GONE
+        menuIcon.findViewById<TextView>(R.id.deadlineCount_text)
+            .text = todoListViewModel.lateDeadlineCount.value?.toString()
         super.onPrepareOptionsMenu(menu)
     }
 

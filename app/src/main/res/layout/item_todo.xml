@@ -4,18 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="todoItem"
             type="com.te6lim.doit.database.Todo" />
-
-        <variable
-            name="todoListViewModel"
-            type="com.te6lim.doit.todoList.TodoListViewModel" />
-
-        <variable
-            name="itemListener"
-            type="com.te6lim.doit.ActionCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

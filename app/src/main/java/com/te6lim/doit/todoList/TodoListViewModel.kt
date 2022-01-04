@@ -63,13 +63,19 @@ class TodoListViewModel(
 
     val todoList = fetchList(activeCategory, allTodos)
 
+    val lateDeadlineCount = Transformations.map(todoList) {
+        it?.filter { todo ->
+            !todo.isFinished && todo.isLate
+        }?.size ?: 0
+    }
+
     val isTodoListEmpty = Transformations.map(allTodos) { list ->
         list?.none { !it.isFinished } ?: true
     }
 
     private val _itemCountInCategory = MutableLiveData<Pair<String, Int>>()
     val itemCountInCategory: LiveData<Pair<String, Int>>
-    get() = _itemCountInCategory
+        get() = _itemCountInCategory
 
     fun itemsState() = itemsState.toList()
 
