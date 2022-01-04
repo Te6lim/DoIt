@@ -76,7 +76,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                                 isFinished = checkBox!!.isChecked
                                 dateFinished = if (isFinished) LocalDateTime.now()
                                 else null
-                            }, todoListViewModel.activeCategory.value!!
+                            }
                         )
                     }
 

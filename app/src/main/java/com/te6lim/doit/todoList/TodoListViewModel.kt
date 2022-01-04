@@ -124,7 +124,7 @@ class TodoListViewModel(
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    fun updateTodo(todo: Todo, cat: Category) {
+    fun updateTodo(todo: Todo) {
         with(alarmManager) {
             cancel(
                 PendingIntent.getBroadcast(
@@ -151,7 +151,7 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 todoDb.update(todo.apply { isSuccess = isSuccess(this) })
-//                resetItemsState(todoList.value!!)
+                val cat = catDb.get(todo.catId)!!
                 cat.apply {
                     if (todo.isFinished) totalFinished += 1
                     else totalFinished -= 1
@@ -160,6 +160,8 @@ class TodoListViewModel(
                         totalSuccess += 1
                     else
                         totalFailure += 1
+
+                    lateTodos -= 1
                 }
                 catDb.update(cat)
 
