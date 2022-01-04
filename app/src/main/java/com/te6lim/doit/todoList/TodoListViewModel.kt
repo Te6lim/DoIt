@@ -63,7 +63,7 @@ class TodoListViewModel(
 
     val todoList = fetchList(activeCategory, allTodos)
 
-    val lateDeadlineCount = Transformations.map(todoList) {
+    val lateDeadlineCount = Transformations.map(allTodos) {
         it?.filter { todo ->
             !todo.isFinished && todo.isLate
         }?.size ?: 0
@@ -533,6 +533,14 @@ class TodoListViewModel(
                     })
                 }
             }
+        }
+    }
+
+    fun getLateDeadlineCountString(): String {
+        return when {
+            lateDeadlineCount.value ?: 0 in 1..9 -> lateDeadlineCount.value?.toString() ?: "0"
+            lateDeadlineCount.value ?: 0 > 9 -> "9+"
+            else -> "${lateDeadlineCount.value ?: 0}"
         }
     }
 }

@@ -259,7 +259,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
                     menuIcon.findViewById<ConstraintLayout>(R.id.indicator)
                         .visibility = if (it > 0) View.VISIBLE else View.GONE
                     menuIcon.findViewById<TextView>(R.id.deadlineCount_text)
-                        .text = it.toString()
+                        .text = getLateDeadlineCountString()
                 }
             }
 
@@ -326,7 +326,7 @@ class TodoListFragment : Fragment(), ConfirmationCallbacks {
             .visibility = if (todoListViewModel.lateDeadlineCount.value ?: 0 > 0) View.VISIBLE
         else View.GONE
         menuIcon.findViewById<TextView>(R.id.deadlineCount_text)
-            .text = todoListViewModel.lateDeadlineCount.value?.toString()
+            .text = todoListViewModel.getLateDeadlineCountString()
         super.onPrepareOptionsMenu(menu)
     }
 

@@ -25,7 +25,10 @@ data class Category(
     var totalSuccess: Int = 0,
 
     @ColumnInfo(name = "totalFailure")
-    var totalFailure: Int = 0
+    var totalFailure: Int = 0,
+
+    @ColumnInfo(name = "lateTodos")
+    var lateTodos: Int = 0
 )
 
 @Dao

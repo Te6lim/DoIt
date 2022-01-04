@@ -39,6 +39,40 @@
             app:setCatName="@{categoryInfo}"
             tools:text="WORK" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/deadline_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/deadline_indicator"
+            android:elevation="2dp"
+            android:minWidth="18dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:setBadgeVisibility="@{categoryInfo}">
+
+            <TextView
+                android:id="@+id/indicator_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/category_todo_count_header"
             style="@style/category_text_style"
@@ -54,13 +88,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/primaryColor"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@+id/category_finished_count"
             app:layout_constraintStart_toEndOf="@+id/category_todo_count_header"
-            app:layout_constraintTop_toBottomOf="@+id/category_title_text"
             app:setCatTodoCount="@{categoryInfo}"
             tools:text="12" />
 

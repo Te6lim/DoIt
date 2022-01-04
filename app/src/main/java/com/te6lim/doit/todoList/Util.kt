@@ -23,7 +23,12 @@ fun CategoryInfo.toCategory(): Category {
     return Category(
         id = this.id,
         name = this.name,
-        isDefault = this.isDefault
+        isDefault = this.isDefault,
+        totalCreated = this.totalCreated,
+        totalFinished = this.totalFinished,
+        totalSuccess = this.totalSuccess,
+        totalFailure = this.totalFailure,
+        lateTodos = this.lateTodos
     )
 }
 

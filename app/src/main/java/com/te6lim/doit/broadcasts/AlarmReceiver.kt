@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.te6lim.doit.database.CategoryDb
 import com.te6lim.doit.database.TodoDatabase
 import com.te6lim.doit.sendNotification
 import com.te6lim.doit.todoList.createTodo.CreateTodoViewModel.Companion.CAT_STRING_EXTRA
@@ -36,10 +37,13 @@ class AlarmReceiver : BroadcastReceiver() {
             val todoId = intent.getLongExtra(TODO_ID_EXTRA, -1L)
 
             val todoDb = TodoDatabase.getInstance(context).databaseDao
+            val catDb = CategoryDb.getInstance(context).dao
 
             scope.launch {
                 withContext(Dispatchers.IO) {
-                    todoDb.update(todoDb.get(todoId)!!.apply { isLate = true })
+                    val todo = todoDb.get(todoId)
+                    todoDb.update(todo!!.apply { isLate = true })
+                    catDb.update(catDb.get(todo.catId)!!.apply { lateTodos += 1 })
                 }
             }
         }

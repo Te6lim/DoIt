@@ -58,7 +58,12 @@ class CategoriesViewModel(
                     cat.name,
                     listFilter.filter { !it.isFinished }.size,
                     listFilter.filter { it.isFinished }.size,
-                    cat.isDefault
+                    cat.isDefault,
+                    cat.totalCreated,
+                    cat.totalFinished,
+                    cat.totalSuccess,
+                    cat.totalFailure,
+                    cat.lateTodos
                 )
             )
         }
@@ -184,9 +189,14 @@ class CategoriesViewModel(
 data class CategoryInfo(
     val id: Int,
     var name: String,
-    val todoCount: Int,
-    val todoCompletedCount: Int,
-    val isDefault: Boolean
+    var todoCount: Int,
+    var todoCompletedCount: Int,
+    var isDefault: Boolean,
+    var totalCreated: Int,
+    var totalFinished: Int,
+    var totalSuccess: Int,
+    var totalFailure: Int,
+    var lateTodos: Int
 )
 
 class CategoriesViewModelFactory(

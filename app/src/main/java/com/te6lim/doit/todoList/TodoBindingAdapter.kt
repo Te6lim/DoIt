@@ -97,10 +97,3 @@ fun TextView.setDeadlineDateString(item: Todo?) {
         else setTextColor(ContextCompat.getColor(context, R.color.secondaryColor))
     }
 }
-
-@BindingAdapter("setBadgeVisibility")
-fun View.setVisibility(count: Int?) {
-    count?.let { c ->
-        visibility = if (c > 0) View.VISIBLE else View.GONE
-    } ?: View.GONE
-}
