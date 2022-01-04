@@ -63,15 +63,13 @@ class TodoListViewModel(
 
     val todoList = fetchList(activeCategory, allTodos)
 
-    val lateDeadlineCount = Transformations.map(allTodos) {
-        it?.filter { todo ->
-            !todo.isFinished && todo.isLate
-        }?.size ?: 0
-    }
+    private val _lateDeadlineCount = MutableLiveData<Int>()
+    val lateDeadlineCount: LiveData<Int>
+        get() = _lateDeadlineCount
 
-    val isTodoListEmpty = Transformations.map(allTodos) { list ->
-        list?.none { !it.isFinished } ?: true
-    }
+    private val _isTodoListEmpty = MutableLiveData<Boolean>()
+    val isTodoListEmpty: LiveData<Boolean>
+        get() = _isTodoListEmpty
 
     private val _itemCountInCategory = MutableLiveData<Pair<String, Int>>()
     val itemCountInCategory: LiveData<Pair<String, Int>>
@@ -161,7 +159,7 @@ class TodoListViewModel(
                     else
                         totalFailure += 1
 
-                    lateTodos -= 1
+                    if (todo.isLate) lateTodos -= 1
                 }
                 catDb.update(cat)
 
@@ -307,6 +305,16 @@ class TodoListViewModel(
         }
     }
 
+    private fun setIsTodoEmpty(list: List<Todo>?) {
+        _isTodoListEmpty.value = list?.none { !it.isFinished } ?: true
+    }
+
+    private fun setDeadlineCount(list: List<Todo>?) {
+        _lateDeadlineCount.value = list?.filter { todo ->
+            !todo.isFinished && todo.isLate
+        }?.size ?: 0
+    }
+
     private fun fetchList(
         inputA: LiveData<Category>, inputB: LiveData<List<Todo>?>
     ): LiveData<List<Todo>?> {
@@ -325,12 +333,20 @@ class TodoListViewModel(
                     }
                 } else {
                     _itemCountInCategory.value = category.name to 0
-                    result.value = null
+                    resetItemsState(newList)
+                    if (newList.isNullOrEmpty() && count < categories.value!!.size)
+                        selectNextCategory()
+                    else
+                        result.value = null
                 }
             }
         }
 
         val doOperationIfB = Observer<List<Todo>?> { list ->
+
+            setIsTodoEmpty(list)
+            setDeadlineCount(list)
+
             listIsReady = true
             inputA.value?.let { category ->
                 count = 0
@@ -352,14 +368,16 @@ class TodoListViewModel(
     }
 
     private fun selectNextCategory() {
-        var c: Int
-        if (count == 0 && activeCategory.value!! == defaultCategory)
+        var c = 0
+        /*if (count == 0 && activeCategory.value!! == defaultCategory)
             c = ++count % categories.value!!.size
-        else c = count++ % categories.value!!.size
+        else c = count++ % categories.value!!.size*/
         var nextCategory = categories.value!![c]
         var i = 0
         while (
-            i < categories.value!!.size - 1 && allTodos.value!!.none { it.catId == nextCategory.id }
+            i < categories.value!!.size && allTodos.value!!.none {
+                !it.isFinished && it.catId == nextCategory.id
+            }
         ) {
             c = ++count % categories.value!!.size
             nextCategory = categories.value!![c]
