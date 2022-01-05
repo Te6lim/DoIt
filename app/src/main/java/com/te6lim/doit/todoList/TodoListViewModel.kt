@@ -334,10 +334,10 @@ class TodoListViewModel(
                 } else {
                     _itemCountInCategory.value = category.name to 0
                     resetItemsState(newList)
-                    if (newList.isNullOrEmpty() && count < categories.value!!.size)
+                    if (newList.isNullOrEmpty() && count < categories.value!!.size && category.totalCreated == 0)
                         selectNextCategory()
                     else
-                        result.value = null
+                        if (category.totalCreated <= 0) result.value = null
                 }
             }
         }
@@ -369,9 +369,6 @@ class TodoListViewModel(
 
     private fun selectNextCategory() {
         var c = 0
-        /*if (count == 0 && activeCategory.value!! == defaultCategory)
-            c = ++count % categories.value!!.size
-        else c = count++ % categories.value!!.size*/
         var nextCategory = categories.value!![c]
         var i = 0
         while (
