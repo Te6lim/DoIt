@@ -106,19 +106,19 @@ class TodoModel {
     }
 
     private fun dateIsValid(date: LocalDate, referenceDate: LocalDate): Boolean {
-        /*if (date.year < referenceDate.year) return false
+        if (date.year < referenceDate.year) return false
         if (date.year == referenceDate.year && date.monthValue < referenceDate.monthValue)
             return false
         if (date.year == referenceDate.year && date.monthValue == referenceDate.monthValue &&
             date.dayOfMonth < referenceDate.dayOfMonth
-        ) return false*/
+        ) return false
         return true
     }
 
     private fun timeIsValid(time: LocalTime, date: LocalDate): Boolean {
-        /*if (date != LocalDate.now()) return true
+        if (date != LocalDate.now()) return true
         if (time.hour < LocalTime.now().hour) return false
-        if (time.hour == LocalTime.now().hour && time.minute < LocalTime.now().minute) return false*/
+        if (time.hour == LocalTime.now().hour && time.minute < LocalTime.now().minute) return false
         return true
     }
 
