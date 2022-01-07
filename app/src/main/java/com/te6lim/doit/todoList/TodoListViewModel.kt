@@ -12,6 +12,7 @@ import com.te6lim.doit.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 class TodoListViewModel(
     private val app: Application,
@@ -483,19 +484,23 @@ class TodoListViewModel(
     }
 
     private fun updateLeastActive() {
-        var least: Category = categories.value!![0]
-        for (i in 1..categories.value!!.size - 1) {
-            if (categories.value!![i].totalFinished < least.totalFinished)
+        var least: Category? = null
+        for (i in 1 until categories.value!!.size) {
+            if (least != null && categories.value!![i].totalFinished < least.totalFinished)
                 least = categories.value!![i]
         }
         viewModelScope.launch {
-            if (least.totalCreated > 0) {
-                val mark = with(least) { (totalFinished.toFloat() / totalCreated) * 100f }
-                if (least.id != summary.value!!.mostActiveCategory && mark < 50) {
-                    withContext(Dispatchers.IO) {
-                        summaryDb.insert(summary.value!!.apply {
-                            leastActiveCategory = least.id
-                        })
+            least?.let {
+                if (it.totalCreated > 0) {
+                    val mark = with(it) {
+                        (totalFinished.toFloat() / totalCreated) * 100f
+                    }
+                    if (it.id != summary.value!!.mostActiveCategory && mark < 50) {
+                        withContext(Dispatchers.IO) {
+                            summaryDb.insert(summary.value!!.apply {
+                                leastActiveCategory = it.id
+                            })
+                        }
                     }
                 }
             }
@@ -508,20 +513,22 @@ class TodoListViewModel(
         categories.value!!.forEach {
             with(it) {
                 if (totalFinished > 0
-                    && Math.round((totalSuccess.toFloat() / totalFinished) * 100.0f) > rate
+                    && ((totalSuccess.toFloat() / totalFinished) * 100.0f).roundToInt() > rate
                 ) {
                     categoryId = it.id
-                    rate = Math.round((totalSuccess.toFloat() / totalFinished) * 100)
+                    rate = ((totalSuccess.toFloat() / totalFinished) * 100).roundToInt()
                 }
             }
         }
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                summaryDb.insert(summary.value!!.apply {
-                    mostSuccessfulRatio = rate
-                    mostSuccessfulCategory = categoryId
-                })
+        if (categoryId != summary.value!!.leastActiveCategory) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    summaryDb.insert(summary.value!!.apply {
+                        mostSuccessfulRatio = rate
+                        mostSuccessfulCategory = categoryId
+                    })
+                }
             }
         }
     }
@@ -541,7 +548,7 @@ class TodoListViewModel(
             }
         }
 
-        if (rate < 50) {
+        if (categoryId != summary.value!!.mostActiveCategory && rate < 50) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {

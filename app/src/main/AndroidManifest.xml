@@ -36,6 +36,7 @@
 
         <receiver
             android:name="com.te6lim.doit.broadcasts.AlarmReceiver"
+            android:process=":remote"
             android:exported="true" />
 
         <receiver
