@@ -16,10 +16,10 @@ data class Summary(
     @ColumnInfo(name = "deadlinesUnmet") var deadlinesUnmet: Int = 0,
     @ColumnInfo(name = "todosDiscarded") var todosDiscarded: Int = 0,
     @ColumnInfo(name = "mostActiveCategory") var mostActiveCategory: Int = -1,
-    @ColumnInfo(name = "leastActiveCategory") var leastActiveCategory: Int = -1,
+    @ColumnInfo(name = "leastActiveCategory") var leastActiveCategory: Int = -2,
     @ColumnInfo(name = "mostSuccessfulCategory") var mostSuccessfulCategory: Int = -1,
     @ColumnInfo(name = "mostSuccessfulRatio") var mostSuccessfulRatio: Int = 0,
-    @ColumnInfo(name = "leastSuccessfulCategory") var leastSuccessfulCategory: Int = -1,
+    @ColumnInfo(name = "leastSuccessfulCategory") var leastSuccessfulCategory: Int = -2,
     @ColumnInfo(name = "leastSuccessfulRatio") var leastSuccessfulRatio: Int = 0
 ) : Parcelable
 

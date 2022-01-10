@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         drawer.addDrawerListener(toggle)
 
         drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
+
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
 
             }
