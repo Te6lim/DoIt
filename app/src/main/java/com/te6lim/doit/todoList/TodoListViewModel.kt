@@ -335,7 +335,10 @@ class TodoListViewModel(
                 } else {
                     _itemCountInCategory.value = category.name to 0
                     resetItemsState(newList)
-                    if (newList.isNullOrEmpty() && count < categories.value!!.size && category.totalCreated == 0)
+                    if (
+                        newList.isNullOrEmpty() && count < categories.value!!.size
+                        && category.totalCreated == 0
+                    )
                         selectNextCategory()
                     else
                         if (category.totalCreated <= 0) result.value = null
