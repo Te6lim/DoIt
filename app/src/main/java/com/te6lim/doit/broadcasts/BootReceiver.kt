@@ -7,10 +7,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.AlarmManagerCompat
-import com.te6lim.doit.database.*
+import com.te6lim.doit.database.Category
+import com.te6lim.doit.database.CategoryDb
+import com.te6lim.doit.database.Todo
+import com.te6lim.doit.database.TodoDatabase
 import com.te6lim.doit.todoList.createTodo.CreateTodoViewModel
 import com.te6lim.doit.todoList.toMilliSeconds
 import kotlinx.coroutines.CoroutineScope
@@ -23,19 +25,17 @@ class BootReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
         Toast.makeText(context, "Boot complete", Toast.LENGTH_SHORT).show()
-        Log.d("XYZ", "device boot completed")
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val todoDb = TodoDatabase.getInstance(context).databaseDao
         val catDb = CategoryDb.getInstance(context).dao
-        val summaryDb = getInstance(context).summaryDao
         scope.launch {
             withContext(Dispatchers.IO) {
                 val todoList = todoDb.getAll()
                 val catList = catDb.getAll()
-                val summary = summaryDb.getSummary()
                 todoList!!.forEach { todo ->
                     setTimeTodoAlarm(
                         context, alarmManager, todo,
@@ -45,7 +45,7 @@ class BootReceiver : BroadcastReceiver() {
                     if (todo.hasDeadline)
                         setDeadlineAlarm(
                             context, alarmManager, todo,
-                            catList.find { it.id == todo.catId }!!.name, catList, summary,
+                            catList.find { it.id == todo.catId }!!.name, catList,
                             todo.todoId
                         )
                 }
@@ -80,7 +80,7 @@ class BootReceiver : BroadcastReceiver() {
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun setDeadlineAlarm(
         context: Context, alarmManager: AlarmManager, todo: Todo,
-        categoryName: String, categories: List<Category>, summary: Summary, id: Long
+        categoryName: String, categories: List<Category>, id: Long
     ) {
         val duration = todo.deadlineDate!!
             .toMilliSeconds() - LocalDateTime.now().toMilliSeconds() - CreateTodoViewModel.minute

@@ -278,7 +278,6 @@ class TodoListViewModel(
 
             withContext(Dispatchers.IO) {
                 selectedId.forEach { delete(it) }
-                //resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }
         }
@@ -300,7 +299,6 @@ class TodoListViewModel(
                 for ((i, v) in itemsState.withIndex()) {
                     if (v) todoDb.update(todoList.value!![i].apply { isFinished = v })
                 }
-                //resetItemsState(todoList.value!!)
                 _selectionCount.postValue(0)
             }
         }
@@ -422,10 +420,8 @@ class TodoListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (todo.hasDeadline) {
-                    if (todo.dateFinished!!.toLocalDate()
-                            .compareTo(todo.deadlineDate!!.toLocalDate()) <= 0
-                        && todo.dateFinished!!.toLocalTime()
-                            .compareTo(todo.deadlineDate!!.toLocalTime()) <= 0
+                    if (todo.dateFinished!!.toLocalDate() <= todo.deadlineDate!!.toLocalDate()
+                        && todo.dateFinished!!.toLocalTime() <= todo.deadlineDate!!.toLocalTime()
                     ) {
                         summaryDb.insert(summary.value!!.apply {
                             deadlinesMet += 1
@@ -542,16 +538,16 @@ class TodoListViewModel(
         categories.value!!.forEach {
             with(it) {
                 if (totalFinished > 0
-                    && Math.round((totalFailure.toFloat() / totalFinished) * 100.0f) > rate
+                    && ((totalFailure.toFloat() / totalFinished) * 100.0f).roundToInt() > rate
                 ) {
                     categoryId = it.id
-                    rate = Math.round((totalFailure.toFloat() / totalFinished) * 100.0f)
+                    rate = ((totalFailure.toFloat() / totalFinished) * 100.0f).roundToInt()
 
                 }
             }
         }
 
-        if (categoryId != summary.value!!.mostActiveCategory && rate < 50) {
+        if (categoryId != summary.value!!.mostSuccessfulCategory && rate < 50) {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     summaryDb.insert(summary.value!!.apply {
